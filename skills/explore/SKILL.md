@@ -1,6 +1,6 @@
 ---
-name: brainstorm
-description: Explore a problem space before planning or building. Use when the user describes a new feature, a technical challenge, or asks for options. Proposes architectural approaches, evaluates trade-offs, and stays in thinking mode — never writes code or creates plans.
+name: explore
+description: (Parked — our original brainstorm skill, renamed while we experiment with superpowers brainstorming.) Explore a problem space before planning or building. Proposes architectural approaches, evaluates trade-offs, and stays in thinking mode — never writes code or creates plans.
 argument-hint: [problem or feature description]
 allowed-tools: Read, Grep, Glob, Agent
 ---
