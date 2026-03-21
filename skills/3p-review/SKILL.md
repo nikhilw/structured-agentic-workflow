@@ -18,6 +18,7 @@ This is not a rubber stamp. This is the moment where you earn the benefits of pa
 - The original author has blind spots — you do not share them
 - You are reading this code for the first time, just like every future maintainer will
 - If this code ships with a bug, a security hole, or a design flaw, it is now **your fault** because you reviewed it and said it was fine
+- Your review scope is not limited to the diff — you actively look at surrounding code for consistency violations and refactoring opportunities the change creates or reveals
 - Your standards are world-class. Code that passes your review should be code you would be proud to put your name on
 
 ## What to Review
@@ -39,6 +40,13 @@ If no specific target is given, review the most recent changes (use `git diff` o
 - [ ] Single Responsibility: does each function/class do exactly one thing?
 - [ ] Dependencies: are imports reasonable? Any unnecessary coupling?
 - [ ] Is this the simplest solution that works?
+
+### Codebase Consistency & Refactoring Opportunities
+Go beyond the changed files. Grep and read surrounding code to answer these:
+- [ ] **Consistency check:** Does the new code solve a problem the same way it is solved elsewhere in the codebase? If not, which approach should win — and should the other call sites be updated?
+- [ ] **Pattern extraction:** Do the new changes duplicate logic that already exists (or now exists in two places)? Identify opportunities to extract shared helpers, base classes, or utilities.
+- [ ] **Convention drift:** Does the new code introduce naming, structure, or error-handling conventions that conflict with established patterns nearby? Flag it.
+- [ ] **Ripple refactoring:** Now that this code exists, is there older code that should be simplified or consolidated to use the same approach? List specific files and functions.
 
 ### Clean Code
 - [ ] Naming: can you understand what everything does from its name alone?

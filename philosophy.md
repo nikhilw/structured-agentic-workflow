@@ -87,4 +87,4 @@ The trade-off is worth it. The time you save in debugging and rework dwarfs the 
 
 ---
 
-*This workflow was born from building [DragonEye](https://github.com/nicholasgasior/dragon-eye), an investigative intelligence tool, entirely with AI-assisted development. Every principle here was learned the hard way — by watching what happens when you skip it.*
+*Every principle here was learned the hard way — by watching what happens when you skip it.*

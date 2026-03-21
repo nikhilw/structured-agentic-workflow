@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Temp
+superpowers-temp/
+
+# Superpowers-sourced skills (generated from vendor/ at install time)
+skills/brainstorming/
+skills/test-driven-development/
+skills/debug/
+skills/verify/

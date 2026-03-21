@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow
-description: The Structured Agentic Development Workflow — orchestrates brainstorming, write-plan, build-phase, 3p-review, triage, test-driven-development, systematic-debugging, and verification-before-completion skills. Use when starting new work, switching between development phases, or when the user asks about the workflow.
+description: The Structured Agentic Development Workflow — orchestrates brainstorming, write-plan, build-phase, 3p-review, triage, test-driven-development, debug, and verify skills. Use when starting new work, switching between development phases, or when the user asks about the workflow.
 user-invocable: false
 ---
 
@@ -24,8 +24,8 @@ You SHOULD proactively suggest phase transitions when the conversation naturally
 | Implementing code | About to write production code | → `/test-driven-development` (write test first) |
 | Phase complete | Tests pass, review clear | → next `/build-phase` or "all phases complete" |
 | Code written (any context) | User wants quality assurance | → `/3p-review` |
-| Bug, test failure, unexpected behavior | Something is broken | → `/systematic-debugging` (investigate before fixing) |
-| About to claim work is done | Ready to commit, PR, or move on | → `/verification-before-completion` (evidence before claims) |
+| Bug, test failure, unexpected behavior | Something is broken | → `/debug` (investigate before fixing) |
+| About to claim work is done | Ready to commit, PR, or move on | → `/verify` (evidence before claims) |
 | Context loaded with project files | User asks "what should I work on?" | → `/triage` |
 | Low context / fresh conversation | Bugs exist in backlog | → `/triage` (will recommend bugs) |
 
@@ -37,8 +37,8 @@ You SHOULD proactively suggest phase transitions when the conversation naturally
 4. **Execute one phase at a time.** Each phase goes through Implement → Test → 3rd-Person Review before proceeding.
 5. **Test first, always.** Use `/test-driven-development` — no production code without a failing test first.
 6. **3rd-person review is a mindset, not a checkbox.** The reviewer owns the code now — it must meet world-class standards.
-7. **Debug systematically, not randomly.** Use `/systematic-debugging` — investigate root cause before proposing fixes.
-8. **Evidence before claims.** Use `/verification-before-completion` — never claim work is done without running verification commands and confirming output.
+7. **Debug systematically, not randomly.** Use `/debug` — investigate root cause before proposing fixes.
+8. **Evidence before claims.** Use `/verify` — never claim work is done without running verification commands and confirming output.
 9. **Triage minimizes context thrash.** When recommending work, factor in what is already loaded in the current conversation context — don't suggest work that requires loading entirely different modules.
 
 ## Plan Directory Lifecycle
@@ -69,7 +69,7 @@ For best results, list the workflow skills in your project's `CLAUDE.md` so they
 - `/build-phase` — execute one plan phase with test + review
 - `/test-driven-development` — RED-GREEN-REFACTOR, test first always (from superpowers)
 - `/3p-review` — independent third-person code review; reviewer owns the code
-- `/systematic-debugging` — 4-phase root cause investigation (from superpowers)
-- `/verification-before-completion` — evidence before claims (from superpowers)
+- `/debug` — 4-phase root cause investigation (from superpowers)
+- `/verify` — evidence before claims (from superpowers)
 - `/triage` — recommend next task minimizing context thrash
 ```

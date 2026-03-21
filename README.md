@@ -24,6 +24,153 @@ The **Structured Agentic Development Workflow** treats the AI not as a magical j
 
 ---
 
+## Installation
+
+### Quick Start
+
+```bash
+# Clone the repo
+git clone https://github.com/nikhilw/structured-agentic-workflow.git
+cd structured-agentic-workflow
+
+# Install for all supported agents
+./install.sh
+
+# Or on Windows (PowerShell — requires Developer Mode or admin)
+.\install.ps1
+```
+
+### What the Installer Does
+
+1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers) (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/` with appropriate renaming.
+2. **Symlinks all skills** into the global skills directory for each supported agent:
+
+| Agent | Skills Directory |
+|-------|-----------------|
+| Claude Code | `~/.claude/skills/` |
+| Cursor | `~/.cursor/skills/` |
+| Gemini CLI | `~/.gemini/skills/` |
+| GitHub Copilot | `~/.config/github-copilot/skills/` |
+
+> **Note:** Cursor also reads `~/.claude/skills/` natively, so installing for Claude Code alone is sufficient if you use both.
+
+All skills use the standard `SKILL.md` format supported by all four agents.
+
+### Targeting a Specific Agent
+
+```bash
+./install.sh --target claude        # Claude Code only
+./install.sh --target gemini        # Gemini CLI only
+./install.sh --target cursor        # Cursor only
+./install.sh --target copilot       # GitHub Copilot only
+```
+
+### Other Options
+
+```bash
+./install.sh --local                # Skip superpowers pull (use existing vendor/)
+./install.sh --remove               # Remove all symlinks
+./install.sh --remove --target claude  # Remove for a specific agent
+./install.sh --list                 # Show agents and install status
+```
+
+### Installed Skills
+
+The installer symlinks these skills from the `skills/` directory:
+
+| Skill | Source | Description |
+|-------|--------|-------------|
+| `agentic-workflow` | This project | Orchestrates the full development lifecycle |
+| `brainstorming` | [superpowers](https://github.com/obra/superpowers) | Explore problem space, create design docs |
+| `write-plan` | This project | Write phased implementation plans |
+| `build-phase` | This project | Execute one plan phase with test + review loop |
+| `3p-review` | This project | Independent third-person code review |
+| `triage` | This project | Recommend next task, minimize context thrash |
+| `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
+| `debug` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
+| `verify` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
+| `explore` | This project | (Parked) Original brainstorm skill |
+
+### Manual Installation
+
+If the install script doesn't work on your system, you can do it by hand. There are two steps: pulling the superpowers skills, and symlinking everything into your agent's skills directory.
+
+#### Step 1: Pull Superpowers Skills
+
+Clone the superpowers repo and copy the skills you need into `skills/`:
+
+```bash
+# Clone superpowers into a temp directory
+git clone --depth 1 https://github.com/obra/superpowers.git /tmp/superpowers
+
+# Copy the four adopted skills into vendor/ (for reference)
+mkdir -p vendor/superpowers
+cp -r /tmp/superpowers/skills/brainstorming vendor/superpowers/
+cp -r /tmp/superpowers/skills/test-driven-development vendor/superpowers/
+cp -r /tmp/superpowers/skills/systematic-debugging vendor/superpowers/
+cp -r /tmp/superpowers/skills/verification-before-completion vendor/superpowers/
+cp /tmp/superpowers/LICENSE vendor/superpowers/
+
+# Copy into skills/ with our naming
+cp -r /tmp/superpowers/skills/brainstorming skills/brainstorming
+cp -r /tmp/superpowers/skills/test-driven-development skills/test-driven-development
+cp -r /tmp/superpowers/skills/systematic-debugging skills/debug
+cp -r /tmp/superpowers/skills/verification-before-completion skills/verify
+
+# Patch the skill name in renamed skills so /debug and /verify work
+sed -i 's/^name: systematic-debugging$/name: debug/' skills/debug/SKILL.md
+sed -i 's/^name: verification-before-completion$/name: verify/' skills/verify/SKILL.md
+
+# Clean up
+rm -rf /tmp/superpowers
+```
+
+#### Step 2: Symlink Skills
+
+Create symlinks from the `skills/` directory to your agent's global skills directory. Replace `~/.claude/skills` with the appropriate path for your agent (see the table above).
+
+**macOS / Linux:**
+
+```bash
+mkdir -p ~/.claude/skills
+
+# Symlink each skill
+ln -sf "$(pwd)/skills/agentic-workflow" ~/.claude/skills/agentic-workflow
+ln -sf "$(pwd)/skills/brainstorming" ~/.claude/skills/brainstorming
+ln -sf "$(pwd)/skills/write-plan" ~/.claude/skills/write-plan
+ln -sf "$(pwd)/skills/build-phase" ~/.claude/skills/build-phase
+ln -sf "$(pwd)/skills/3p-review" ~/.claude/skills/3p-review
+ln -sf "$(pwd)/skills/triage" ~/.claude/skills/triage
+ln -sf "$(pwd)/skills/test-driven-development" ~/.claude/skills/test-driven-development
+ln -sf "$(pwd)/skills/debug" ~/.claude/skills/debug
+ln -sf "$(pwd)/skills/verify" ~/.claude/skills/verify
+ln -sf "$(pwd)/skills/explore" ~/.claude/skills/explore
+```
+
+**Windows (PowerShell — requires Developer Mode or admin):**
+
+```powershell
+New-Item -ItemType Directory -Path "$env:USERPROFILE\.claude\skills" -Force
+
+# Symlink each skill (run from the repo root)
+$skills = Get-ChildItem -Path ".\skills" -Directory
+foreach ($skill in $skills) {
+    New-Item -ItemType SymbolicLink `
+        -Path "$env:USERPROFILE\.claude\skills\$($skill.Name)" `
+        -Target $skill.FullName -Force
+}
+```
+
+#### Step 3: Verify
+
+```bash
+ls -la ~/.claude/skills/
+```
+
+Each entry should be a symlink pointing back to the `skills/` directory in this repo.
+
+---
+
 ## 1. Project Initialization & Context Scaffolding
 
 Before you prompt the AI to write a feature, you must establish its world. Let's imagine a hypothetical project: **SyncScribe**, a real-time collaborative Markdown editor. 
@@ -55,11 +202,14 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      ```markdown
      ## Workflow Skills
      - `agentic-workflow` — orchestrates the structured development lifecycle
-     - `/brainstorm` — explore problem space before planning
+     - `/brainstorming` — explore problem space before planning
      - `/write-plan` — write phased plans to docs/plans/new/
      - `/build-phase` — execute one plan phase with test + review
      - `/3p-review` — independent third-person code review
      - `/triage` — recommend next task minimizing context thrash
+     - `/test-driven-development` — RED-GREEN-REFACTOR discipline
+     - `/debug` — systematic root cause investigation
+     - `/verify` — evidence before completion claims
      ```
 
 ---
@@ -122,9 +272,9 @@ The Build Phase naturally lends itself to a test-first discipline. When plan pha
 
 This BDD/TDD loop nests inside the existing phase loop: for each phase, you write tests first, implement to green, refactor, then proceed to the Third-Person Review. The combination of test-first discipline and independent review produces code with both high correctness and high quality.
 
-*A dedicated BDD/TDD skill will be integrated into the build phase to enforce this discipline more rigorously.*
+The `test-driven-development` skill enforces this discipline. Invoke it with `/test-driven-development` during any build phase.
 
-*Final Validation:** At the end of the complete build (all phases), ALL project tests must pass. No feature is "done" until the suite is green.
+**Final Validation:** At the end of the complete build (all phases), ALL project tests must pass. No feature is "done" until the suite is green.
 
 ---
 

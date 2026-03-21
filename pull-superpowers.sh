@@ -23,6 +23,13 @@ SKILLS=(
     verification-before-completion
 )
 
+# Map superpowers names to our skill names (when different)
+# format: "superpowers-name:our-name"
+SKILL_RENAMES=(
+    "systematic-debugging:debug"
+    "verification-before-completion:verify"
+)
+
 clean() {
     echo "Removing vendored superpowers skills..."
     rm -rf "$VENDOR_DIR"
@@ -62,8 +69,52 @@ fetch() {
     done
 
     cd "$SCRIPT_DIR"
+
+    # Copy vendored skills into skills/ (applying renames)
+    echo ""
+    echo "Installing superpowers into skills/..."
+    local skills_dir="${SCRIPT_DIR}/skills"
+    for skill in "${SKILLS[@]}"; do
+        local vendor_src="${VENDOR_DIR}/${skill}"
+        [ -d "$vendor_src" ] || continue
+
+        # Check if this skill has a rename mapping
+        local target_name="$skill"
+        for mapping in "${SKILL_RENAMES[@]}"; do
+            local from="${mapping%%:*}"
+            local to="${mapping##*:}"
+            if [ "$skill" = "$from" ]; then
+                target_name="$to"
+                break
+            fi
+        done
+
+        local dst="${skills_dir}/${target_name}"
+        rm -rf "$dst"
+        cp -r "$vendor_src" "$dst"
+
+        # Patch the name: field in SKILL.md to match our directory name
+        if [ "$target_name" != "$skill" ]; then
+            local skill_md="${dst}/SKILL.md"
+            if [ -f "$skill_md" ]; then
+                sed -i "s/^name: ${skill}$/name: ${target_name}/" "$skill_md"
+            fi
+            echo "  copied   ${skill}/ -> skills/${target_name}/ (name patched)"
+        else
+            echo "  copied   ${skill}/ -> skills/${skill}/"
+        fi
+    done
+
+    # Patch cross-references to use our skill names
+    local debug_skill="${skills_dir}/debug/SKILL.md"
+    if [ -f "$debug_skill" ]; then
+        sed -i 's|superpowers:test-driven-development|/test-driven-development|g' "$debug_skill"
+        sed -i 's|superpowers:verification-before-completion|/verify|g' "$debug_skill"
+    fi
+
     echo ""
     echo "Done. Vendored skills are in vendor/superpowers/"
+    echo "Superpowers skills installed into skills/"
     echo "License: MIT (Jesse Vincent, 2025)"
     echo "Source:  https://github.com/obra/superpowers"
 }
