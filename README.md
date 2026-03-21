@@ -89,7 +89,7 @@ The installer symlinks these skills from the `skills/` directory:
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
 | `debug` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
 | `verify` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
-| `explore` | This project | (Parked) Original brainstorm skill |
+| `brainstorm-simple` | This project | Lightweight brainstorming — simpler/faster alternative to `/brainstorming` |
 
 ### Manual Installation
 
@@ -144,7 +144,7 @@ ln -sf "$(pwd)/skills/triage" ~/.claude/skills/triage
 ln -sf "$(pwd)/skills/test-driven-development" ~/.claude/skills/test-driven-development
 ln -sf "$(pwd)/skills/debug" ~/.claude/skills/debug
 ln -sf "$(pwd)/skills/verify" ~/.claude/skills/verify
-ln -sf "$(pwd)/skills/explore" ~/.claude/skills/explore
+ln -sf "$(pwd)/skills/brainstorm-simple" ~/.claude/skills/brainstorm-simple
 ```
 
 **Windows (PowerShell — requires Developer Mode or admin):**

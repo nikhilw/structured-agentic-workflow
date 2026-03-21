@@ -1,6 +1,6 @@
 ---
-name: explore
-description: (Parked — our original brainstorm skill, renamed while we experiment with superpowers brainstorming.) Explore a problem space before planning or building. Proposes architectural approaches, evaluates trade-offs, and stays in thinking mode — never writes code or creates plans.
+name: brainstorm-simple
+description: Lightweight brainstorming — explore a problem space before planning. Proposes 2-4 architectural approaches with trade-offs, stays in thinking mode, never writes code or plans. Simpler and faster than /brainstorming (superpowers).
 argument-hint: [problem or feature description]
 allowed-tools: Read, Grep, Glob, Agent
 ---
