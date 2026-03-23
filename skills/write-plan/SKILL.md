@@ -55,13 +55,22 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 - [What this plan explicitly does NOT cover]
 ```
 
-## Agent Decoupling
+## Agent Decoupling — Zero Ambiguity for External Models
 
-This plan is designed as a **contract between agents**. The agent that writes this plan does not have to be the agent that executes it. This means:
+This plan is designed as a **contract between agents**. The agent that writes this plan does not have to be the agent that executes it — it may be a smaller model (Gemini Flash, GPT-4o-mini), a different tool (Cursor Composer, Copilot), or a local model with no conversation history.
+
+**This means the plan must eliminate ALL decision uncertainty:**
 
 - Be explicit about file paths, function signatures, and expected behavior
 - Do not rely on "context from earlier in the conversation"
 - Include enough detail that the plan is self-contained
+- **Never write "choose an appropriate X" or "decide whether to Y"** — make the decision in the plan. The executing agent should not have to make architectural choices.
+- **Never write "consider using X or Y"** — pick one and specify it. If the choice depends on something, investigate it now and decide.
+- **Specify exact function signatures, class names, and return types** — not just descriptions of what they should do.
+- **Specify exact test assertions** — not just "write tests for this". Name the test functions, the inputs, and the expected outputs.
+- **If a step requires installing a package, name it** with the exact install command.
+
+**Self-test:** Before saving the plan, re-read each phase and ask: "Could a junior developer with access to the codebase but zero context about our conversation execute this phase without asking a single clarifying question?" If no, add more detail.
 
 ## What Happens Next
 

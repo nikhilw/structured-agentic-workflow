@@ -14,7 +14,7 @@ Every significant change follows this cycle: **Brainstorm → Plan → Build →
 
 ### Phase Transitions
 
-You SHOULD proactively suggest phase transitions when the conversation naturally reaches one. Use this guide:
+You MUST drive phase transitions forward automatically. Within the build loop (implement → test → review → next phase), do not wait for the user to tell you to proceed — own the process. For cross-phase transitions (e.g., brainstorm → plan), suggest and confirm. Use this guide:
 
 | Current State | Signal to Transition | Suggest |
 |---------------|---------------------|---------|
@@ -40,6 +40,8 @@ You SHOULD proactively suggest phase transitions when the conversation naturally
 7. **Debug systematically, not randomly.** Use `/debug` — investigate root cause before proposing fixes.
 8. **Evidence before claims.** Use `/verify` — never claim work is done without running verification commands and confirming output.
 9. **Triage minimizes context thrash.** When recommending work, factor in what is already loaded in the current conversation context — don't suggest work that requires loading entirely different modules.
+10. **Resume automatically after external execution.** When the user returns after handing a phase to an external model, immediately pick up the workflow: test the work, review it, fix issues, and advance to the next phase. Do not wait to be told.
+11. **The review loop is a loop.** After `/3p-review` finds issues and they are fixed, re-review from scratch. Repeat until clean. Do not stop after one round.
 
 ## Plan Directory Lifecycle
 

@@ -37,24 +37,36 @@ Invoke `/3p-review` on the changes you just made. This is not optional.
 
 The review follows the full 3p-review protocol: switch personas to an independent Senior Architect who did NOT write this code, who now owns it, and who holds it to world-class standards.
 
-If the review surfaces CRITICAL or MAJOR issues, fix them, re-run tests, and re-review.
+**This is a loop:** if the review surfaces CRITICAL or MAJOR issues → fix → re-test → re-review from scratch. Repeat until clean. Do not wait for the user to tell you to re-review.
 
 ### Step 4: Proceed
 
 Report:
 - What was implemented
 - Test results (pass/fail count)
-- Review findings and fixes applied
+- Review findings, rounds, and fixes applied
 - Whether you recommend proceeding to the next phase
 
-## BDD/TDD Integration (Evolving)
+**Then auto-advance:** if the phase is clean and more phases remain, immediately suggest and begin the next phase. Do not wait for the user to say "proceed" unless the plan requires a human decision gate.
 
-When the plan includes behavioral specifications or acceptance criteria, prefer this order:
+## Resuming After External Model Execution
+
+If the user tells you that code was written by another agent (Cursor, Copilot, a local model, etc.) or simply says "it's done" / "I've implemented Phase N" / pastes a diff:
+
+1. **Do NOT re-implement.** The code is already written.
+2. **Immediately run Step 2 (Test)** — verify the external model's work passes tests.
+3. **Then run Step 3 (3p-review)** — review the external model's code with full rigor. External models are more likely to have drifted from project conventions.
+4. **Continue the loop** as normal — fix issues, re-test, re-review until clean.
+5. **Then auto-advance** to the next phase.
+
+The user should not have to tell you to continue the workflow. You own the process from the moment they hand you back control.
+
+## BDD/TDD Integration
+
+When the plan includes behavioral specifications or acceptance criteria, use `/test-driven-development` and follow this order:
 1. Write the failing test first (red)
 2. Implement the minimum code to pass (green)
 3. Refactor while keeping tests green (refactor)
-
-This discipline will be further enforced via a dedicated BDD/TDD skill in the future.
 
 ## Phase Completion
 

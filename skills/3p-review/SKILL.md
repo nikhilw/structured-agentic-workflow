@@ -80,8 +80,18 @@ Severities:
 - **MINOR** — Nice to fix. Style issues, minor simplifications.
 - **GOOD** — Call out things done well. Reinforce good patterns.
 
-## After the Review
+## After the Review — The Fix-and-Re-Review Loop
 
-- If you found CRITICAL or MAJOR issues: fix them, re-run tests, and note what you changed.
-- If all clear: state that the code passes review and is ready to proceed.
-- Always end with a summary: N critical, N major, N minor findings.
+This is a loop, not a one-shot. You keep going until the code is clean.
+
+1. **If CRITICAL or MAJOR issues found:**
+   - Fix them.
+   - Re-run tests. All tests must pass.
+   - **Re-invoke the full review from scratch with fresh eyes.** You are reviewing the *current state* of the code, not checking whether your fixes look right. Reset your mental model and review as if seeing the code for the first time again.
+   - Repeat until no CRITICAL or MAJOR findings remain.
+
+2. **If only MINOR issues (or none):**
+   - State that the code passes review and is ready to proceed.
+   - Suggest the next workflow step (next `/build-phase`, or `/verify` if all phases are done).
+
+Always end with a summary: N critical, N major, N minor findings, N review rounds.
