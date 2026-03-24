@@ -1,6 +1,6 @@
 ---
 name: build-phase
-description: Execute one phase from a plan file using the Implement → Test → 3rd-Person Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Invokes /3p-review as part of the loop.
+description: Execute one phase from a plan file using the Implement → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Full /3p-review runs after ALL phases complete.
 argument-hint: [plan-file-path] [Phase N]
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -13,7 +13,7 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
 
-## The Loop: Implement → Test → Review → Proceed
+## The Loop: Implement → Test → Self-Review → Proceed
 
 You MUST follow this loop for every phase. Do not skip steps.
 
@@ -31,20 +31,26 @@ You MUST follow this loop for every phase. Do not skip steps.
 3. Command: `uv run pytest tests/ -x` (or the project's test command).
 4. **All tests must pass before proceeding.** If tests fail, fix the implementation — do not modify existing tests to make them pass.
 
-### Step 3: Third-Person Review
+### Step 3: Self-Review
 
-Invoke `/3p-review` on the changes you just made. This is not optional.
+Review your own changes with a critical eye. This is NOT the full `/3p-review` — that happens after ALL phases are complete. This is a quick self-review to catch obvious issues before moving on.
 
-The review follows the full 3p-review protocol: switch personas to an independent Senior Architect who did NOT write this code, who now owns it, and who holds it to world-class standards.
+Check for:
+- Does the implementation match what the plan specified?
+- Are there any obvious bugs, edge cases, or regressions?
+- Does the code follow existing project conventions and patterns?
+- Is anything over-engineered or under-tested?
 
-**This is a loop:** if the review surfaces CRITICAL or MAJOR issues → fix → re-test → re-review from scratch. Repeat until clean. Do not wait for the user to tell you to re-review.
+If you find CRITICAL issues, fix them and re-test before proceeding. For minor concerns, note them — the full `/3p-review` will catch them after all phases.
+
+Present the self-review findings to the human for confirmation before proceeding.
 
 ### Step 4: Proceed
 
 Report:
 - What was implemented
 - Test results (pass/fail count)
-- Review findings, rounds, and fixes applied
+- Self-review findings and any fixes applied
 - Whether you recommend proceeding to the next phase
 
 **Then auto-advance:** if the phase is clean and more phases remain, immediately suggest and begin the next phase. Do not wait for the user to say "proceed" unless the plan requires a human decision gate.
@@ -55,7 +61,7 @@ If the user tells you that code was written by another agent (Cursor, Copilot, a
 
 1. **Do NOT re-implement.** The code is already written.
 2. **Immediately run Step 2 (Test)** — verify the external model's work passes tests.
-3. **Then run Step 3 (3p-review)** — review the external model's code with full rigor. External models are more likely to have drifted from project conventions.
+3. **Then run Step 3 (Self-Review)** — review the external model's code carefully. External models are more likely to have drifted from project conventions.
 4. **Continue the loop** as normal — fix issues, re-test, re-review until clean.
 5. **Then auto-advance** to the next phase.
 
@@ -72,10 +78,12 @@ When the plan includes behavioral specifications or acceptance criteria, use `/t
 
 When all phases in the plan are complete:
 1. Run the FULL test suite: `uv run pytest tests/ -x`
-2. Move the plan from `docs/plans/` to `docs/plans/done/`
-3. Report the final status
+2. Invoke `/3p-review` for a **holistic review of the entire feature**. This is the full third-person review — the independent Senior Architect persona with fresh eyes, reviewing ALL changes across ALL phases as a whole. This is where architectural coherence, cross-cutting concerns, and systemic issues are caught.
+3. Fix any issues found, re-test, and re-review until clean.
+4. Move the plan from `docs/plans/` to `docs/plans/done/`
+5. Report the final status and suggest `/verify` for final evidence-based verification.
 
 ## What Happens Next
 
 If more phases remain, suggest `/build-phase <plan-file> Phase N+1`.
-If all phases are complete, the feature is done — suggest any follow-up work if appropriate.
+If all phases are complete and `/3p-review` is clean, suggest `/verify` for final validation.

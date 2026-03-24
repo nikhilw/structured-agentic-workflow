@@ -203,16 +203,21 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      - *Example:* "Do not use `any` types in TypeScript; define strict interfaces for all API payloads."
      - *Example:* "Always use the public APIs of third-party libraries; do not import internal private modules."
 
-5. **List Your Workflow Skills in `CLAUDE.md`**
-   - Skills installed globally (in `~/.claude/skills/`) or at project level (in `.claude/skills/`) are automatically discovered by the agent. However, explicitly listing them in `CLAUDE.md` ensures they are loaded into context at the start of every conversation, so the agent knows the workflow exists and can suggest phase transitions proactively.
-   - *Example:*
+5. **List Your Workflow Skills in Your Agent's Config File**
+   - Skills installed globally are automatically discovered by the agent. However, explicitly listing them in your agent's project-level config file ensures they are loaded into context at the start of every conversation, so the agent knows the workflow exists and can suggest phase transitions proactively.
+   - The config file depends on your agent:
+     - **Claude Code:** `CLAUDE.md` (project root)
+     - **Cursor:** `.cursorrules` (project root)
+     - **Gemini CLI:** `GEMINI.md` (project root)
+     - **GitHub Copilot:** `.github/copilot-instructions.md`
+   - *Example (add to whichever file your agent uses):*
      ```markdown
      ## Workflow Skills
      - `agentic-workflow` — orchestrates the structured development lifecycle
      - `/brainstorm` — explore problem space, challenge the design, produce decision documents
      - `/write-plan` — write phased plans to docs/plans/new/
-     - `/build-phase` — execute one plan phase with test + review
-     - `/3p-review` — independent third-person code review
+     - `/build-phase` — execute one plan phase with test + self-review
+     - `/3p-review` — independent third-person code review (after all build phases)
      - `/triage` — recommend next task minimizing context thrash
      - `/test-driven-development` — RED-GREEN-REFACTOR discipline
      - `/debug` — systematic root cause investigation
@@ -223,7 +228,7 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
 
 ## 2. The Development Lifecycle
 
-Every significant change must follow a rigid, iterative cycle: **Brainstorm → Plan → Build → 3rd-Person Review**.
+Every significant change must follow a rigid, iterative cycle: **Brainstorm → Plan → Build → 3rd-Person Review → Verify**.
 
 ```mermaid
 flowchart TD
@@ -252,21 +257,23 @@ flowchart TD
         direction TB
         I[Implement phase] --> T[Test]
         T -- "fail" --> I
-        T -- "pass" --> R1
-
-        subgraph Review ["3p-review loop · /3p-review"]
-            R1[Review with fresh eyes] --> R2{CRITICAL or<br/>MAJOR found?}
-            R2 -- "yes" --> R3[Fix issues] --> R4[Re-test] --> R1
-            R2 -- "no" --> R5[Review passed]
-        end
-
-        R5 --> Next{More phases?}
+        T -- "pass" --> SR[Self-review<br/>agent + human]
+        SR -- "issues found" --> I
+        SR -- "clean" --> Next{More phases?}
         Next -- "yes" --> I
     end
 
-    Next -- "no" --> V1
+    Next -- "no" --> R1
 
-    subgraph Verify ["4. Verify · /verify"]
+    subgraph FullReview ["4. Holistic Review · /3p-review"]
+        R1[Senior Architect persona<br/>fresh eyes on ALL changes] --> R2{CRITICAL or<br/>MAJOR found?}
+        R2 -- "yes" --> R3[Fix issues] --> R4[Re-test] --> R1
+        R2 -- "no" --> R5[Review passed]
+    end
+
+    R5 --> V1
+
+    subgraph Verify ["5. Verify · /verify"]
         V1[Run full test suite] --> V2[Evidence before claims]
     end
 
@@ -307,33 +314,40 @@ Plans are not throwaway conversation artifacts—they are versioned project asse
 3.  **Parallel workflow:** Plans can accumulate in `plans/new/` while you focus on other work. You choose *when* to pick them up—based on your available tokens, your own availability, and the complexity of the task. This decouples planning velocity from implementation velocity and lets you run both in parallel.
 
 ### Step 3: The Build Phase (The Phase-Wise Loop)
-Execute the plan strictly **one phase at a time** using the internal loop: `Implement -> Test -> Review -> Proceed`.
+Execute the plan strictly **one phase at a time** using the internal loop: `Implement -> Test -> Self-Review -> Proceed`.
 
 1.  **Implement:**
     *   *Prompt Example:* *"Execute Phase 1 (Database Schema) from `docs/plans/offline-sync.md`. Stop when finished."*
 2.  **Test:**
     *   Run the unit/integration tests for that specific module.
-3.  **Third-Person Review (Crucial):**
-    *   Immediately after the code is written, force the AI to switch personas.
-    *   The philosophy: **"I didn't write this code, but after this review it is my responsibility. It must meet my world-class standards."** This is not a rubber stamp—it is the moment you reap the benefits of pair programming. The original author has blind spots; the reviewer does not share them. If the code ships with a flaw, the reviewer owns that failure.
-    *   *Prompt Example:* *"Now, act as an independent 3rd-person Senior Architect who didn't write this code. Review it for bugs, messy heuristics, and 'lazy code'. Check it against our predefined Clean Code skills. Be brutal."*
-    *   This review can also be invoked independently at any time via `/3p-review`—not just within the build loop.
+3.  **Self-Review:**
+    *   The agent reviews its own changes with a critical eye — does the code match the plan, follow conventions, have obvious bugs? The human confirms before proceeding.
+    *   This is a lightweight per-phase check, not the full third-person review. It keeps each phase honest without the overhead of a full persona switch.
 4.  **Proceed:**
-    *   *Prompt Example:* *"Tests pass and 3rd-person review is clear. Proceed to Phase 2."*
+    *   *Prompt Example:* *"Tests pass and self-review is clear. Proceed to Phase 2."*
+
+### Step 4: Holistic Third-Person Review
+
+After ALL build phases are complete, invoke the full `/3p-review`. This is where the independent Senior Architect persona — who did NOT write this code — reviews the **entire feature** across all phases with fresh eyes.
+
+*   The philosophy: **"I didn't write this code, but after this review it is my responsibility. It must meet my world-class standards."** This is not a rubber stamp — it is the moment you reap the benefits of pair programming. The original author has blind spots; the reviewer does not share them.
+*   The reviewer looks at architectural coherence, cross-cutting concerns, and systemic issues that only become visible when reviewing the full change set — not just individual phases.
+*   This is a loop: if the review surfaces CRITICAL or MAJOR issues → fix → re-test → re-review from scratch until clean.
+*   `/3p-review` can also be invoked independently at any time — not just at the end of a build cycle.
 
 #### Evolving Toward BDD/TDD
 
 The Build Phase naturally lends itself to a test-first discipline. When plan phases include behavioral specifications or acceptance criteria, the implementation order should evolve toward:
 
-1.  **Red:** Write the failing test first—encode the expected behavior before writing any implementation.
+1.  **Red:** Write the failing test first — encode the expected behavior before writing any implementation.
 2.  **Green:** Write the minimum code to make the test pass. No more.
 3.  **Refactor:** Clean up while keeping all tests green. This is where the Boy Scout Rule applies.
 
-This BDD/TDD loop nests inside the existing phase loop: for each phase, you write tests first, implement to green, refactor, then proceed to the Third-Person Review. The combination of test-first discipline and independent review produces code with both high correctness and high quality.
+This BDD/TDD loop nests inside the existing phase loop: for each phase, you write tests first, implement to green, refactor, then proceed to self-review. The combination of test-first discipline and independent holistic review produces code with both high correctness and high quality.
 
 The `test-driven-development` skill enforces this discipline. Invoke it with `/test-driven-development` during any build phase.
 
-**Final Validation:** At the end of the complete build (all phases), ALL project tests must pass. No feature is "done" until the suite is green.
+**Final Validation:** At the end of the complete build (all phases), after `/3p-review` passes, ALL project tests must pass. No feature is "done" until the suite is green.
 
 ---
 
