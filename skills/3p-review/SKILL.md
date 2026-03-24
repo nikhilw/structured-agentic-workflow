@@ -27,45 +27,53 @@ Review: **$ARGUMENTS**
 
 If no specific target is given, review the most recent changes (use `git diff` or `git diff --cached`).
 
-## Review Checklist
+---
 
-### Correctness
+## Procedure — THIS IS A LOOP
+
+You execute the steps below **repeatedly** until the code is clean. This is not optional. Do not write a final summary and stop after round 1 if there were CRITICAL or MAJOR findings. You must loop.
+
+### Round N: Review
+
+Run through the full checklist below. For **every round**, re-read the actual code from disk — do not rely on your memory of what it looked like before your fixes.
+
+#### Correctness
 - [ ] Does it actually do what it claims to do?
 - [ ] Edge cases: null/empty inputs, boundary values, overflow, off-by-one
 - [ ] Error paths: what happens when things go wrong?
 - [ ] Concurrency: race conditions, thread safety, deadlocks
 
-### Architecture
+#### Architecture
 - [ ] Does this fit the existing patterns in the codebase, or does it introduce a new one?
 - [ ] Single Responsibility: does each function/class do exactly one thing?
 - [ ] Dependencies: are imports reasonable? Any unnecessary coupling?
 - [ ] Is this the simplest solution that works?
 
-### Codebase Consistency & Refactoring Opportunities
+#### Codebase Consistency & Refactoring Opportunities
 Go beyond the changed files. Grep and read surrounding code to answer these:
 - [ ] **Consistency check:** Does the new code solve a problem the same way it is solved elsewhere in the codebase? If not, which approach should win — and should the other call sites be updated?
 - [ ] **Pattern extraction:** Do the new changes duplicate logic that already exists (or now exists in two places)? Identify opportunities to extract shared helpers, base classes, or utilities.
 - [ ] **Convention drift:** Does the new code introduce naming, structure, or error-handling conventions that conflict with established patterns nearby? Flag it.
 - [ ] **Ripple refactoring:** Now that this code exists, is there older code that should be simplified or consolidated to use the same approach? List specific files and functions.
 
-### Clean Code
+#### Clean Code
 - [ ] Naming: can you understand what everything does from its name alone?
 - [ ] Functions: small, focused, max 3 arguments, no flag parameters
 - [ ] No magic numbers, no hardcoded strings that should be constants
 - [ ] No dead code, no commented-out code, no TODO/FIXME without a ticket
 
-### Security
+#### Security
 - [ ] Input validation at system boundaries
 - [ ] No injection risks (SQL, command, template)
 - [ ] No secrets in code, no hardcoded credentials
 - [ ] Access control: can this be called by unauthorized users?
 
-### Tests
+#### Tests
 - [ ] Are the tests testing behavior, not implementation details?
 - [ ] Do the tests cover the happy path AND the failure modes?
 - [ ] Would the tests catch a regression if someone changes this code?
 
-## Output Format
+### Round N: Report Findings
 
 For each finding:
 
@@ -80,18 +88,32 @@ Severities:
 - **MINOR** — Nice to fix. Style issues, minor simplifications.
 - **GOOD** — Call out things done well. Reinforce good patterns.
 
-## After the Review — The Fix-and-Re-Review Loop
+### Round N: Gate Check — LOOP OR EXIT
 
-This is a loop, not a one-shot. You keep going until the code is clean.
+**If ANY CRITICAL or MAJOR findings exist:**
+1. Fix them now.
+2. Re-run tests. All tests must pass.
+3. **Go back to "Round N: Review" above.** Increment N. Re-read the code from disk. Run the full checklist again. You are reviewing the code as it exists NOW, not checking whether your fixes were correct.
 
-1. **If CRITICAL or MAJOR issues found:**
-   - Fix them.
-   - Re-run tests. All tests must pass.
-   - **Re-invoke the full review from scratch with fresh eyes.** You are reviewing the *current state* of the code, not checking whether your fixes look right. Reset your mental model and review as if seeing the code for the first time again.
-   - Repeat until no CRITICAL or MAJOR findings remain.
+**If only MINOR findings (or none):**
+1. The code passes review.
+2. Write the final summary (see below).
+3. Suggest the next workflow step (next `/build-phase`, or `/verify` if all phases are done).
 
-2. **If only MINOR issues (or none):**
-   - State that the code passes review and is ready to proceed.
-   - Suggest the next workflow step (next `/build-phase`, or `/verify` if all phases are done).
+**DO NOT skip the re-review. DO NOT write a final summary and offer to commit if CRITICAL or MAJOR issues were found in this round. Fix them and loop.**
 
-Always end with a summary: N critical, N major, N minor findings, N review rounds.
+---
+
+## Final Summary (only after gate check passes)
+
+```
+## Review Complete
+
+Rounds: N
+Round 1: X critical, Y major, Z minor
+Round 2: X critical, Y major, Z minor
+...
+Final: 0 critical, 0 major, Z minor
+
+Status: PASSED — ready to proceed
+```
