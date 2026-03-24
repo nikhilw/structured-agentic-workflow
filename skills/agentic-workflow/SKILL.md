@@ -10,11 +10,11 @@ You are operating under a structured workflow that treats you as a highly capabl
 
 ## The Workflow Phases
 
-Every significant change follows this cycle: **Brainstorm → Plan → Build → Review**. You must never skip phases or collapse them together.
+Every significant change follows this cycle: **Brainstorm → Plan → Build → 3rd-Person Review → Verify**. You must never skip phases or collapse them together.
 
 ### Phase Transitions
 
-You MUST drive phase transitions forward automatically. Within the build loop (implement → test → review → next phase), do not wait for the user to tell you to proceed — own the process. For cross-phase transitions (e.g., brainstorm → plan), suggest and confirm. Use this guide:
+You MUST drive phase transitions forward automatically. Within the build loop (implement → test → self-review → next phase), do not wait for the user to tell you to proceed — own the process. For cross-phase transitions (e.g., brainstorm → plan), suggest and confirm. Use this guide:
 
 | Current State | Signal to Transition | Suggest |
 |---------------|---------------------|---------|
