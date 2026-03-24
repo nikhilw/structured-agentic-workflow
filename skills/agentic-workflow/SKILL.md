@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow
-description: The Structured Agentic Development Workflow — orchestrates brainstorming, write-plan, build-phase, 3p-review, triage, test-driven-development, debug, and verify skills. Use when starting new work, switching between development phases, or when the user asks about the workflow.
+description: The Structured Agentic Development Workflow — orchestrates brainstorm, write-plan, build-phase, 3p-review, triage, test-driven-development, debug, and verify skills. Use when starting new work, switching between development phases, or when the user asks about the workflow.
 user-invocable: false
 ---
 
@@ -18,7 +18,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 
 | Current State | Signal to Transition | Suggest |
 |---------------|---------------------|---------|
-| Open-ended discussion | User describes a problem or feature need | → `/brainstorming` |
+| Open-ended discussion | User describes a problem or feature need | → `/brainstorm` |
 | Brainstorm complete | Options explored, user has picked a direction | → `/write-plan` |
 | Plan approved | User says "approved", "let's build", or "proceed" | → `/build-phase` |
 | Implementing code | About to write production code | → `/test-driven-development` (write test first) |
@@ -66,7 +66,7 @@ For best results, list the workflow skills in your project's `CLAUDE.md` so they
 ```markdown
 ## Workflow Skills
 - `agentic-workflow` — orchestrates the structured development lifecycle
-- `/brainstorming` — explore problem space, create design docs (from superpowers)
+- `/brainstorm` — explore problem space, challenge the design, produce decision documents
 - `/write-plan` — write phased plans to docs/plans/new/
 - `/build-phase` — execute one plan phase with test + review
 - `/test-driven-development` — RED-GREEN-REFACTOR, test first always (from superpowers)

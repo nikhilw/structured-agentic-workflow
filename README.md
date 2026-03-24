@@ -78,10 +78,12 @@ All skills use the standard `SKILL.md` format supported by all four agents.
 
 The installer symlinks these skills from the `skills/` directory:
 
+**Core workflow skills:**
+
 | Skill | Source | Description |
 |-------|--------|-------------|
 | `agentic-workflow` | This project | Orchestrates the full development lifecycle |
-| `brainstorming` | [superpowers](https://github.com/obra/superpowers) | Explore problem space, create design docs |
+| `brainstorm` | This project | Explore approaches, challenge the design, estimate impact, produce decision documents |
 | `write-plan` | This project | Write phased implementation plans |
 | `build-phase` | This project | Execute one plan phase with test + review loop |
 | `3p-review` | This project | Independent third-person code review |
@@ -89,7 +91,12 @@ The installer symlinks these skills from the `skills/` directory:
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
 | `debug` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
 | `verify` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
-| `brainstorm-simple` | This project | Explore approaches, challenge the design, estimate impact, produce decision documents |
+
+**Optional vendor skills (installed but not part of the workflow):**
+
+| Skill | Source | Description |
+|-------|--------|-------------|
+| `brainstorming` | [superpowers](https://github.com/obra/superpowers) | Interactive brainstorming with visual companion and spec review loop. Not used by the workflow — available if you prefer it over `/brainstorm`. |
 
 ### Manual Installation
 
@@ -144,7 +151,7 @@ ln -sf "$(pwd)/skills/triage" ~/.claude/skills/triage
 ln -sf "$(pwd)/skills/test-driven-development" ~/.claude/skills/test-driven-development
 ln -sf "$(pwd)/skills/debug" ~/.claude/skills/debug
 ln -sf "$(pwd)/skills/verify" ~/.claude/skills/verify
-ln -sf "$(pwd)/skills/brainstorm-simple" ~/.claude/skills/brainstorm-simple
+ln -sf "$(pwd)/skills/brainstorm" ~/.claude/skills/brainstorm
 ```
 
 **Windows (PowerShell — requires Developer Mode or admin):**
@@ -202,7 +209,7 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      ```markdown
      ## Workflow Skills
      - `agentic-workflow` — orchestrates the structured development lifecycle
-     - `/brainstorming` — explore problem space before planning
+     - `/brainstorm` — explore problem space, challenge the design, produce decision documents
      - `/write-plan` — write phased plans to docs/plans/new/
      - `/build-phase` — execute one plan phase with test + review
      - `/3p-review` — independent third-person code review
@@ -228,7 +235,7 @@ Do not ask the AI to "build offline support." Ask it to explore the problem spac
 
 #### Decision Documents
 
-Brainstorming sessions are where architectural decisions happen. The `/brainstorm-simple` skill will offer to save the discussion as a **decision document** to `docs/discussions/YYYY-MM-DD-<topic>.md` — a structured record of which approaches were considered, the impact of each, why the chosen approach won, and what was rejected. These documents are invaluable when someone later asks "why did we do it this way?"
+Brainstorming sessions are where architectural decisions happen. The `/brainstorm` skill will offer to save the discussion as a **decision document** to `docs/discussions/YYYY-MM-DD-<topic>.md` — a structured record of which approaches were considered, the impact of each, why the chosen approach won, and what was rejected. These documents are invaluable when someone later asks "why did we do it this way?"
 
 ### Step 2: The Planning Phase
 The AI must write a formal technical specification *before* writing any code.

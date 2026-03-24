@@ -1,5 +1,5 @@
 ---
-name: brainstorm-simple
+name: brainstorm
 description: Explore a problem space before planning. Proposes architectural approaches with trade-offs, challenges the obvious solution, estimates impact, and produces a decision document. Code is the LAST thing we touch — this skill never writes code or plans.
 argument-hint: [problem or feature description]
 allowed-tools: Read, Grep, Glob, Agent, Write
