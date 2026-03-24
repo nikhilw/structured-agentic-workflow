@@ -12,7 +12,8 @@ Thumbs.db
 # Temp
 superpowers-temp/
 
-# Superpowers-sourced skills (generated from vendor/ at install time)
+# Superpowers (fetched by pull-superpowers.sh at install time)
+vendor/
 skills/brainstorming/
 skills/test-driven-development/
 skills/debug/
