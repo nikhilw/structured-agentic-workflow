@@ -21,6 +21,23 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 4. **Be hyper-granular.** Write the plan so that a different agent — possibly a smaller, faster model — can execute it without ambiguity. Name specific files, functions, classes, and test cases.
 5. **Include test criteria for each phase.** What tests must pass before the phase is considered complete?
 
+## Before Writing the Plan — Codebase Analysis
+
+Before writing a single phase, you MUST investigate the existing codebase. Read code, grep for patterns, understand what's already there. This analysis feeds directly into the plan and prevents the review from catching issues that should have been designed out.
+
+### Consistency & Patterns
+- **How is this problem solved elsewhere?** Grep for similar functionality. If the codebase already has a pattern for this (e.g., a base class, a utility, a convention), the plan MUST use it — not invent a new one.
+- **What can be extracted or reused?** If the new feature shares logic with existing code, the plan should include a phase for extracting the common pattern first.
+- **What naming and structural conventions exist?** The plan must follow them. Name new files, classes, and functions consistent with their neighbors.
+
+### Security
+- **Does this feature touch user input, external APIs, or stored data?** If yes, the plan must include input validation, output encoding, or access control steps in the relevant phases.
+- **Does this introduce new attack surface?** (new endpoints, new file I/O, new shell commands, new credentials) If yes, call it out in Risks & Mitigations.
+
+### Architecture Fit
+- **Does this change respect existing boundaries?** (module boundaries, layer separation, dependency direction) If the feature requires crossing a boundary, that's a design decision — make it explicit and justify it.
+- **What existing code will this interact with?** List the specific files, classes, and functions. The plan must account for their interfaces, not assume them.
+
 ## Plan Document Structure
 
 ```markdown
@@ -31,6 +48,12 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 
 ## Context
 [What exists today, what changes, and why]
+
+## Codebase Analysis
+- **Existing patterns used:** [patterns/utilities this plan reuses]
+- **New patterns introduced:** [if any — justify why existing patterns don't fit]
+- **Security considerations:** [attack surface, input boundaries, access control]
+- **Files/modules affected:** [list with brief description of each interaction]
 
 ## Phases
 
