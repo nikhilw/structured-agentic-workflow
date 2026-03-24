@@ -89,7 +89,7 @@ The installer symlinks these skills from the `skills/` directory:
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
 | `debug` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
 | `verify` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
-| `brainstorm-simple` | This project | Lightweight brainstorming — simpler/faster alternative to `/brainstorming` |
+| `brainstorm-simple` | This project | Explore approaches, challenge the design, estimate impact, produce decision documents |
 
 ### Manual Installation
 
@@ -219,12 +219,16 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
 Every significant change must follow a rigid, iterative cycle: **Brainstorm → Plan → Build → 3rd-Person Review**.
 
 ### Step 1: The Brainstorm Phase
-Do not ask the AI to "build offline support." Ask it to explore the problem space.
+Do not ask the AI to "build offline support." Ask it to explore the problem space. **Code is the last thing we touch** — the brainstorm phase enforces a hard gate against any implementation.
 
 *   **Prompt Example:** *"We need offline support for SyncScribe. Analyze our current WebSocket sync layer in `frontend/src/sync/` and propose three architectural ways to queue local edits for reconnection. Consider IndexedDB vs localStorage."*
-*   **The Human's Active Role:** While the AI generates its analysis, **you are doing parallel research** (via Perplexity or Google). 
-*   **The Pivot:** Often, you will discover a library or approach the AI missed. 
+*   **The Human's Active Role:** While the AI generates its analysis, **you are doing parallel research** (via Perplexity or Google).
+*   **The Pivot:** Often, you will discover a library or approach the AI missed.
     *   *Human response:* *"Your IndexedDB proposal is good, but I just found a new library `RxDB` that handles conflict resolution better. Let's discard these three options and pivot to exploring an RxDB adapter approach instead."*
+
+#### Decision Documents
+
+Brainstorming sessions are where architectural decisions happen. The `/brainstorm-simple` skill will offer to save the discussion as a **decision document** to `docs/discussions/YYYY-MM-DD-<topic>.md` — a structured record of which approaches were considered, the impact of each, why the chosen approach won, and what was rejected. These documents are invaluable when someone later asks "why did we do it this way?"
 
 ### Step 2: The Planning Phase
 The AI must write a formal technical specification *before* writing any code.

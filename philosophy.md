@@ -26,10 +26,10 @@ Every significant change follows: **Brainstorm → Plan → Build → Review**.
 
 The temptation to jump straight to code is enormous — the AI *wants* to code, and you *want* results. But the ten minutes you spend brainstorming and planning save hours of debugging and rework. The phases exist because each one catches a different class of error:
 
-- **Brainstorm** catches wrong approaches before you invest in them
+- **Brainstorm** catches wrong approaches before you invest in them — and produces a decision document recording *why* the chosen approach won
 - **Plan** catches architectural misunderstandings before they become code
 - **Build** (with tests) catches implementation bugs immediately
-- **Review** catches the blind spots of the author
+- **Review** catches the blind spots of the author and challenges whether the design itself is right
 
 ### 2. Plans Are Project Assets, Not Conversation Artifacts
 
@@ -37,6 +37,7 @@ Plans are written to disk (`docs/plans/new/`), not kept in the agent's head. Thi
 
 - **Agent decoupling:** The agent that plans does not have to be the agent that builds. You can brainstorm with Claude Opus, then hand the plan to Gemini Flash for execution. The plan file is the contract between them.
 - **Brainstorm preservation:** When the plan is a file on disk, the agent stays in thinking mode. If the plan lives only in conversation context, the agent immediately wants to implement it, cutting short the critical design phase.
+- **Decision documentation:** Brainstorming sessions produce decision documents (`docs/discussions/`) that record which approaches were considered, why the chosen approach won, and what was rejected. This is the architectural decision record — invaluable when someone asks "why did we do it this way?" six months later.
 - **Parallel staging:** Plans accumulate in `new/` as pre-invested design work. You choose when to execute — based on your available tokens, your time, and the task's complexity.
 
 ### 3. The Reviewer Owns the Code
@@ -53,7 +54,13 @@ AI conversations have a finite context window, and loading new context is expens
 - When context is rich, pick work that **leverages what's already loaded** — even if something else is technically higher priority
 - Let plans accumulate — with AI-assisted development, "later" means minutes or hours, not months
 
-### 5. Keep the Agent Honest
+### 5. Code Is the Last Thing You Touch
+
+The temptation to jump straight to code is enormous — the AI *wants* to code, and you *want* results. This is exactly why the workflow enforces a hard gate: no code until the design is explored, challenged, and documented.
+
+This is not bureaucracy. It is the recognition that the cheapest time to change a decision is before a single line of code exists. A brainstorming session that discovers "we should use a different data model" costs five minutes. Discovering that after 2,000 lines of implementation costs a day.
+
+### 6. Keep the Agent Honest
 
 Tools like Claude Code have built-in plan mode, but plan mode alone does not keep the agent *focused*. Left to its own devices, the agent will:
 
@@ -64,7 +71,7 @@ Tools like Claude Code have built-in plan mode, but plan mode alone does not kee
 
 `CLAUDE.md` is the leash. Predefined skills are the guardrails. The structured workflow is the track. Together, they keep the agent honest, informed, and aligned — without you needing to repeat context every conversation.
 
-### 6. Compose, Don't Reinvent
+### 7. Compose, Don't Reinvent
 
 This workflow is an **orchestration layer** — it defines *when* and *why* to do things. It is designed to compose with execution-level skill libraries (like [obra/superpowers](https://github.com/obra/superpowers)) that define *how* to do specific things well.
 
