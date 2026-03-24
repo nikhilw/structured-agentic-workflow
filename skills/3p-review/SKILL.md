@@ -49,6 +49,13 @@ Run through the full checklist below. For **every round**, re-read the actual co
 - [ ] Dependencies: are imports reasonable? Any unnecessary coupling?
 - [ ] Is this the simplest solution that works?
 
+#### Design Challenge
+Step back from the code and question the approach itself:
+- [ ] **Is this the right design?** If we were building this from scratch, would we make this same decision — or is this just the path of least resistance given what exists?
+- [ ] **Is there a simpler solution?** Could a smaller, more minimal change achieve the same outcome? Are we over-engineering?
+- [ ] **Is there a better structural approach?** Even if it requires broader changes — a different data model, a different abstraction, removing something instead of adding — would it be fundamentally better? Flag it as a MAJOR finding with `[DESIGN ALTERNATIVE]` if so.
+- [ ] **Are we solving the root problem or patching a symptom?** If this fix will need to be revisited when the underlying issue surfaces again, say so.
+
 #### Codebase Consistency & Refactoring Opportunities
 Go beyond the changed files. Grep and read surrounding code to answer these:
 - [ ] **Consistency check:** Does the new code solve a problem the same way it is solved elsewhere in the codebase? If not, which approach should win — and should the other call sites be updated?

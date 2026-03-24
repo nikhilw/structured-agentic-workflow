@@ -32,17 +32,31 @@ Restate the problem in your own words. Identify the core need vs. nice-to-haves.
 What exists today? What code, patterns, or infrastructure is already in place that this work touches?
 
 ### 3. Proposed Approaches
+
+You MUST include both ends of the spectrum — don't just propose variations of the same idea:
+
+- **At least one minimal approach:** What is the smallest, simplest change that solves the core problem? Could this be a 10-line fix instead of a new module?
+- **At least one structural/ambitious approach:** If we were building this from scratch with no legacy constraints, what would the ideal design look like? Even if it requires broader changes, name it — the user decides whether the scope is worth it.
+
 For each approach:
 - **Name:** A short descriptive name
 - **How it works:** 2-3 sentence summary
 - **Pros:** What makes this attractive
 - **Cons:** What are the risks or costs
 - **Complexity:** Low / Medium / High
+- **Scope of change:** How many files/modules touched? Is this localized or cross-cutting?
 
-### 4. Recommendation
+### 4. Challenge the Obvious Solution
+
+Before making your recommendation, ask yourself:
+- **If we were starting from zero, would we design it this way?** If not, what would we do differently — and is it worth doing that now?
+- **Are we solving the right problem?** Or are we patching a symptom of a deeper structural issue?
+- **Is there an approach that makes the problem disappear entirely** instead of managing its complexity? (Different data model, removing a feature, changing an interface)
+
+### 5. Recommendation
 Which approach do you recommend and why? What would change your recommendation?
 
-### 5. Open Questions
+### 6. Open Questions
 What do you need the human to clarify before planning begins?
 
 ## What Happens Next
