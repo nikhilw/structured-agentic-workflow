@@ -225,6 +225,58 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
 
 Every significant change must follow a rigid, iterative cycle: **Brainstorm → Plan → Build → 3rd-Person Review**.
 
+```mermaid
+flowchart TD
+    Start([New feature / bug / task]) --> Brainstorm
+
+    subgraph Brainstorm ["/brainstorm"]
+        B1[Explore problem space] --> B2[Propose approaches<br/>minimal ↔ structural]
+        B2 --> B3[Challenge the obvious solution]
+        B3 --> B4[Save decision document<br/>docs/discussions/]
+    end
+
+    Brainstorm --> Plan
+
+    subgraph Plan ["/write-plan"]
+        P1[Codebase analysis<br/>patterns · security · architecture] --> P2[Write phased plan<br/>zero ambiguity for external models]
+        P2 --> P3[Save to docs/plans/new/]
+    end
+
+    Plan --> Approve{Human reviews<br/>& approves plan}
+    Approve -- revise --> Plan
+    Approve -- approved --> Build
+
+    subgraph Build ["/build-phase — per phase"]
+        direction TB
+        I[Implement phase] --> T[Test]
+        T -- fail --> I
+        T -- pass --> R
+
+        subgraph R ["/3p-review loop"]
+            R1[Review with fresh eyes] --> R2{CRITICAL or<br/>MAJOR found?}
+            R2 -- yes --> R3[Fix issues] --> R4[Re-test] --> R1
+            R2 -- no --> R5[Review passed]
+        end
+
+        R5 --> Next{More phases?}
+        Next -- yes --> I
+    end
+
+    Next -- no --> Verify
+
+    subgraph Verify ["/verify"]
+        V1[Run full test suite] --> V2[Evidence before claims]
+    end
+
+    Verify --> Done([Feature complete])
+
+    style Brainstorm fill:#e8f4fd,stroke:#2196F3
+    style Plan fill:#e8f4fd,stroke:#2196F3
+    style Build fill:#fff3e0,stroke:#FF9800
+    style R fill:#fce4ec,stroke:#E91E63
+    style Verify fill:#e8f5e9,stroke:#4CAF50
+```
+
 ### Step 1: The Brainstorm Phase
 Do not ask the AI to "build offline support." Ask it to explore the problem space. **Code is the last thing we touch** — the brainstorm phase enforces a hard gate against any implementation.
 
