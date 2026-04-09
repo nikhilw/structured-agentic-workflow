@@ -323,17 +323,17 @@ Plans are not throwaway conversation artifacts—they are versioned project asse
 3.  **Parallel workflow:** Plans can accumulate in `plans/new/` while you focus on other work. You choose *when* to pick them up—based on your available tokens, your own availability, and the complexity of the task. This decouples planning velocity from implementation velocity and lets you run both in parallel.
 
 ### Step 3: The Build Phase (The Phase-Wise Loop)
-Execute the plan strictly **one phase at a time** using the internal loop: `TDD -> Implement -> Test -> Self-Review -> Proceed`.
+Execute the plan strictly **one phase at a time** using the internal loop: `Read Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed`.
 
 The build phase can be executed by the **same model** that planned, or handed off to a **different model** (smaller, faster, cheaper). The plan is the contract — it contains all decisions, so the dev model just executes.
 
-1.  **TDD (Mandatory):**
-    *   Every phase starts with `/test-driven-development`. Write the failing test first (red), implement to green, then refactor. No production code without a failing test first.
-2.  **Implement:**
+1.  **Read the Plan:**
     *   *Prompt Example:* *"Execute Phase 1 (Database Schema) from `docs/plans/offline-sync.md`."*
     *   If the plan is ambiguous or contradictory, the dev model surfaces the discrepancy to the user — it does not guess or make design decisions.
-3.  **Test:**
-    *   Run the unit/integration tests for that specific module.
+2.  **TDD — Write Tests, Then Implement (Mandatory):**
+    *   Every phase uses `/test-driven-development`. Write the failing tests first (red), implement the minimum code to pass (green), then refactor. Writing the tests is the *beginning* of the phase, not the end — the model must complete all three steps.
+3.  **Test Suite:**
+    *   Run the full test suite for the affected modules to catch regressions.
 4.  **Self-Review:**
     *   The agent reviews its own changes with a critical eye — does the code match the plan, follow conventions, have obvious bugs? The human confirms before proceeding.
     *   This is a lightweight per-phase check, not the full third-person review. It keeps each phase honest without the overhead of a full persona switch.
@@ -342,7 +342,7 @@ The build phase can be executed by the **same model** that planned, or handed of
 
 #### The Handoff Summary
 
-After all phases are complete, the build agent generates a **handoff summary** — a concise report of what was built, any deviations from the plan, implementation notes, and open concerns. If the build was done by a different model, this summary is the artifact the user carries back to the planning model for review.
+After all phases are complete, the build agent generates a **handoff summary** — a concise report of what was built, any deviations from the plan, implementation notes, and open concerns. The build agent then **stops** — it does not proceed to review or verification. If the build was done by a different model, the user carries this summary back to the planning model.
 
 ### Step 4: Holistic Third-Person Review
 

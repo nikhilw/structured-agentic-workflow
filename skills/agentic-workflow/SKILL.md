@@ -37,7 +37,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 1. **Never jump to code during brainstorm.** Brainstorm produces options and analysis, not implementations.
 2. **Never implement without a plan.** Plans are written to `docs/plans/new/` as versioned project assets.
 3. **Plans decouple the planning agent from the building agent.** The agent that brainstorms and plans does not have to be the agent that builds. Plans are the contract between them.
-4. **Execute one phase at a time.** Each phase goes through Implement → Test → Self-Review before proceeding. The full `/3p-review` runs after ALL phases are complete.
+4. **Execute one phase at a time.** Each phase goes through Read Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review before proceeding. The full `/3p-review` runs after ALL phases are complete.
 5. **Test first, always.** Use `/test-driven-development` — no production code without a failing test first.
 6. **3rd-person review is a mindset, not a checkbox.** The reviewer owns the code now — it must meet world-class standards.
 7. **Debug systematically, not randomly.** Use `/debug` — investigate root cause before proposing fixes.

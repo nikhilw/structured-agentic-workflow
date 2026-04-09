@@ -1,6 +1,6 @@
 ---
 name: build-phase
-description: Execute one phase from a plan file using the Implement → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Full /3p-review runs after ALL phases complete.
+description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases — does NOT run /3p-review or /verify.
 argument-hint: [plan-file-path] [Phase N]
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -13,26 +13,34 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
 
-## The Loop: Implement → Test → Self-Review → Proceed
+## The Loop: Read Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed
 
-You MUST follow this loop for every phase. Do not skip steps.
+You MUST follow this loop for every phase. Do not skip steps. Every step produces output — do not stop after one step.
 
-### Step 1: Implement
+### Step 1: Read the Plan
 
 1. Read the plan file and locate the specified phase.
-2. Implement exactly what the plan describes — no more, no less.
-3. Do not refactor surrounding code unless the plan explicitly calls for it.
-4. Do not add features, error handling, or "improvements" beyond what is specified.
-5. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, STOP and flag it to the user. Do not guess or make design decisions that the plan should have made. The user may need to take the issue back to the planning model.
+2. Understand what the phase requires: files to modify/create, expected behavior, test criteria.
+3. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, STOP and flag it to the user. Do not guess or make design decisions that the plan should have made. The user may need to take the issue back to the planning model.
 
-### Step 2: Test
+### Step 2: TDD — Write Tests, Then Implement
+
+Use `/test-driven-development`. This is mandatory for every phase.
+
+1. **Red:** Write the failing tests first — encode the expected behavior from the plan's test criteria before writing any production code.
+2. **Green:** Implement the minimum code to make the tests pass. Implement exactly what the plan describes — no more, no less. Do not refactor surrounding code unless the plan explicitly calls for it.
+3. **Refactor:** Clean up while keeping all tests green.
+
+**You must complete all three steps.** Do not stop after writing tests. The tests exist to drive the implementation — writing them is the beginning of the phase, not the end.
+
+### Step 3: Run the Full Test Suite
 
 1. Run the tests specified in the plan's "Test criteria" for this phase.
-2. If no specific tests are listed, run the tests for the modules you modified.
+2. Also run any tests for other modules you modified — check for regressions.
 3. Command: `uv run pytest tests/ -x` (or the project's test command).
 4. **All tests must pass before proceeding.** If tests fail, fix the implementation — do not modify existing tests to make them pass.
 
-### Step 3: Self-Review
+### Step 4: Self-Review
 
 Review your own changes with a critical eye. This is NOT the full `/3p-review` — that happens after ALL phases are complete. This is a quick self-review to catch obvious issues before moving on.
 
@@ -46,7 +54,7 @@ If you find CRITICAL issues, fix them and re-test before proceeding. For minor c
 
 Present the self-review findings to the human for confirmation before proceeding.
 
-### Step 4: Proceed
+### Step 5: Proceed
 
 Report:
 - What was implemented
@@ -61,22 +69,12 @@ Report:
 If the user tells you that code was written by another agent (Cursor, Copilot, a local model, etc.) or simply says "it's done" / "I've implemented Phase N" / pastes a diff:
 
 1. **Do NOT re-implement.** The code is already written.
-2. **Immediately run Step 2 (Test)** — verify the external model's work passes tests.
-3. **Then run Step 3 (Self-Review)** — review the external model's code carefully. External models are more likely to have drifted from project conventions.
+2. **Immediately run Step 3 (Test Suite)** — verify the external model's work passes tests.
+3. **Then run Step 4 (Self-Review)** — review the external model's code carefully. External models are more likely to have drifted from project conventions.
 4. **Continue the loop** as normal — fix issues, re-test, re-review until clean.
 5. **Then auto-advance** to the next phase.
 
 The user should not have to tell you to continue the workflow. You own the process from the moment they hand you back control.
-
-## TDD Is Mandatory
-
-You MUST use `/test-driven-development` for every phase. This is not optional, regardless of whether the plan explicitly mentions TDD.
-
-1. Write the failing test first (red)
-2. Implement the minimum code to pass (green)
-3. Refactor while keeping tests green (refactor)
-
-No production code without a failing test first.
 
 ## Phase Completion
 
@@ -112,6 +110,6 @@ This summary serves as the handoff artifact. If a different model is doing the r
 
 If more phases remain, suggest `/build-phase <plan-file> Phase N+1`.
 
-If all phases are complete, present the handoff summary and suggest the next workflow step:
-- **Same thread:** proceed to `/3p-review` for holistic review of the entire feature.
-- **Different model doing review:** the user takes the handoff summary to the planning model, which runs `/3p-review` → `/verify`.
+If all phases are complete, present the handoff summary and **STOP**.
+
+**Do NOT proceed to `/3p-review`, `/verify`, or any other workflow phase.** Your job as the build agent ends at the handoff summary. The user decides what happens next — they may continue in this thread or take the summary to a different model for review. Wait for the user's instruction.
