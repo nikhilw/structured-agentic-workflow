@@ -23,6 +23,7 @@ You MUST follow this loop for every phase. Do not skip steps.
 2. Implement exactly what the plan describes — no more, no less.
 3. Do not refactor surrounding code unless the plan explicitly calls for it.
 4. Do not add features, error handling, or "improvements" beyond what is specified.
+5. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, STOP and flag it to the user. Do not guess or make design decisions that the plan should have made. The user may need to take the issue back to the planning model.
 
 ### Step 2: Test
 
@@ -67,23 +68,50 @@ If the user tells you that code was written by another agent (Cursor, Copilot, a
 
 The user should not have to tell you to continue the workflow. You own the process from the moment they hand you back control.
 
-## BDD/TDD Integration
+## TDD Is Mandatory
 
-When the plan includes behavioral specifications or acceptance criteria, use `/test-driven-development` and follow this order:
+You MUST use `/test-driven-development` for every phase. This is not optional, regardless of whether the plan explicitly mentions TDD.
+
 1. Write the failing test first (red)
 2. Implement the minimum code to pass (green)
 3. Refactor while keeping tests green (refactor)
+
+No production code without a failing test first.
 
 ## Phase Completion
 
 When all phases in the plan are complete:
 1. Run the FULL test suite: `uv run pytest tests/ -x`
-2. Invoke `/3p-review` for a **holistic review of the entire feature**. This is the full third-person review — the independent Senior Architect persona with fresh eyes, reviewing ALL changes across ALL phases as a whole. This is where architectural coherence, cross-cutting concerns, and systemic issues are caught.
-3. Fix any issues found, re-test, and re-review until clean.
-4. Move the plan from `docs/plans/` to `docs/plans/done/`
-5. Report the final status and suggest `/verify` for final evidence-based verification.
+2. Generate a **handoff summary** — a concise report of the entire build:
+
+```markdown
+## Build Handoff Summary
+
+**Plan:** [plan file path]
+
+### Per-Phase Summary
+- **Phase 1: [Name]** — [what was done, any deviations from plan]
+- **Phase 2: [Name]** — [what was done, any deviations from plan]
+...
+
+### Implementation Notes
+- [Decisions made during implementation, if any]
+- [Anything surprising or worth flagging]
+- [Discrepancies found in the plan and how they were resolved]
+
+### Test Results
+- [Full suite pass/fail count]
+
+### Concerns / Open Questions
+- [Anything the reviewer should pay special attention to]
+```
+
+This summary serves as the handoff artifact. If a different model is doing the review, the user carries this summary to the planning model.
 
 ## What Happens Next
 
 If more phases remain, suggest `/build-phase <plan-file> Phase N+1`.
-If all phases are complete and `/3p-review` is clean, suggest `/verify` for final validation.
+
+If all phases are complete, present the handoff summary and suggest the next workflow step:
+- **Same thread:** proceed to `/3p-review` for holistic review of the entire feature.
+- **Different model doing review:** the user takes the handoff summary to the planning model, which runs `/3p-review` → `/verify`.

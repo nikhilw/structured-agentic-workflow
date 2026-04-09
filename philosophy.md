@@ -22,20 +22,22 @@ This is not a limitation. This is a superpower. You can now operate at the speed
 
 ### 1. Never Skip Phases
 
-Every significant change follows: **Brainstorm → Plan → Build → Review**.
+Every significant change follows: **Brainstorm → Plan → Build → 3rd-Person Review → Verify**.
 
 The temptation to jump straight to code is enormous — the AI *wants* to code, and you *want* results. But the ten minutes you spend brainstorming and planning save hours of debugging and rework. The phases exist because each one catches a different class of error:
 
 - **Brainstorm** catches wrong approaches before you invest in them — and produces a decision document recording *why* the chosen approach won
 - **Plan** catches architectural misunderstandings before they become code
-- **Build** (with tests) catches implementation bugs immediately
-- **Review** catches the blind spots of the author and challenges whether the design itself is right
+- **Build** (with TDD + self-review) catches implementation bugs immediately, phase by phase
+- **3rd-Person Review** catches the blind spots of the author and challenges whether the design itself is right — holistically, across the entire feature
+- **Verify** provides evidence that the feature actually works before anyone claims it's done
 
 ### 2. Plans Are Project Assets, Not Conversation Artifacts
 
 Plans are written to disk (`docs/plans/new/`), not kept in the agent's head. This is deliberate:
 
-- **Agent decoupling:** The agent that plans does not have to be the agent that builds. You can brainstorm with Claude Opus, then hand the plan to Gemini Flash for execution. The plan file is the contract between them.
+- **Agent decoupling:** The agent that plans does not have to be the agent that builds. You brainstorm and plan with a capable model (Claude Opus), then hand the plan to a smaller, faster model (Gemini Flash, GPT-4o-mini, a local model) for execution. The plan file is the contract between them — it must contain all decisions so the dev model just executes.
+- **Multi-model workflow:** Planning and building are different cognitive tasks. Planning requires deep reasoning about architecture, trade-offs, and design. Building requires fast, accurate code generation. Using different models for each plays to their strengths and saves cost. The handoff summary bridges them back together for review.
 - **Brainstorm preservation:** When the plan is a file on disk, the agent stays in thinking mode. If the plan lives only in conversation context, the agent immediately wants to implement it, cutting short the critical design phase.
 - **Decision documentation:** Brainstorming sessions produce decision documents (`docs/discussions/`) that record which approaches were considered, why the chosen approach won, and what was rejected. This is the architectural decision record — invaluable when someone asks "why did we do it this way?" six months later.
 - **Parallel staging:** Plans accumulate in `new/` as pre-invested design work. You choose when to execute — based on your available tokens, your time, and the task's complexity.

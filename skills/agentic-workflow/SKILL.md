@@ -20,13 +20,15 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 |---------------|---------------------|---------|
 | Open-ended discussion | User describes a problem or feature need | → `/brainstorm` |
 | Brainstorm complete | Options explored, user has picked a direction | → `/write-plan` |
-| Plan approved | User says "approved", "let's build", or "proceed" | → `/build-phase` |
+| Plan approved | User says "approved", "let's build", or "proceed" | Move plan from `new/` to `docs/plans/`. → `/build-phase` |
 | Implementing code | About to write production code | → `/test-driven-development` (write test first) |
 | Phase complete | Tests pass, self-review clear | → next `/build-phase` or "all phases complete" |
-| All build phases complete | Every phase implemented, tested, self-reviewed | → `/3p-review` (holistic review of entire feature) |
+| All build phases complete | Handoff summary generated | → `/3p-review` (holistic review of entire feature) |
+| User returns with handoff summary | Build was done by a different model | → `/3p-review` (review the external model's full output) |
 | Code written (any context) | User wants quality assurance | → `/3p-review` |
+| 3p-review passed | Review clean, no critical/major issues | → `/verify` (always — do not skip or wait to be asked) |
 | Bug, test failure, unexpected behavior | Something is broken | → `/debug` (investigate before fixing) |
-| About to claim work is done | Ready to commit, PR, or move on | → `/verify` (evidence before claims) |
+| Verify passed | Evidence confirms feature works | Move plan from `docs/plans/` to `docs/plans/done/`. Feature complete. |
 | Context loaded with project files | User asks "what should I work on?" | → `/triage` |
 | Low context / fresh conversation | Bugs exist in backlog | → `/triage` (will recommend bugs) |
 
@@ -41,8 +43,10 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 7. **Debug systematically, not randomly.** Use `/debug` — investigate root cause before proposing fixes.
 8. **Evidence before claims.** Use `/verify` — never claim work is done without running verification commands and confirming output.
 9. **Triage minimizes context thrash.** When recommending work, factor in what is already loaded in the current conversation context — don't suggest work that requires loading entirely different modules.
-10. **Resume automatically after external execution.** When the user returns after handing a phase to an external model, immediately pick up the workflow: test the work, review it, fix issues, and advance to the next phase. Do not wait to be told.
+10. **Resume automatically after external execution.** When the user returns after handing build to an external model (with a handoff summary or simply saying "it's done"), immediately pick up the workflow: run `/3p-review` on the full feature, then `/verify`, then archive the plan. Do not wait to be told.
 11. **The review loop is a loop.** After `/3p-review` finds issues and they are fixed, re-review from scratch. Repeat until clean. Do not stop after one round.
+12. **Enforce the plan lifecycle.** Plans move through `new/` → `plans/` → `done/`. Move to `plans/` when build starts. Move to `done/` after verify passes. Do not leave plans stranded in the wrong directory.
+13. **After 3p-review, always verify.** The chain is `/3p-review` → `/verify` → archive plan. Do not stop after review and wait for the user to ask for verify. Do not skip plan archival.
 
 ## Plan Directory Lifecycle
 

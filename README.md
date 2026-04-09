@@ -251,19 +251,26 @@ flowchart TD
 
     P3 --> Approve{Human reviews<br/>& approves plan}
     Approve -- "revise" --> P1
-    Approve -- "approved" --> I
+    Approve -- "approved" --> MovePlan[Move plan<br/>new/ → plans/]
+    MovePlan --> ModelChoice{Same model<br/>or handoff?}
+    ModelChoice -- "same thread" --> I
+    ModelChoice -- "different model" --> ExtBuild([Dev model builds<br/>all phases])
+    ExtBuild --> ReturnSummary[User returns with<br/>handoff summary]
+    ReturnSummary --> R1
 
     subgraph Build ["3. Build · /build-phase — per phase"]
         direction TB
-        I[Implement phase] --> T[Test]
-        T -- "fail" --> I
+        I[TDD: write failing test] --> Impl[Implement to green]
+        Impl --> T[Run tests]
+        T -- "fail" --> Impl
         T -- "pass" --> SR[Self-review<br/>agent + human]
-        SR -- "issues found" --> I
+        SR -- "issues found" --> Impl
         SR -- "clean" --> Next{More phases?}
         Next -- "yes" --> I
     end
 
-    Next -- "no" --> R1
+    Next -- "no" --> HS[Generate handoff summary]
+    HS --> R1
 
     subgraph FullReview ["4. Holistic Review · /3p-review"]
         R1[Senior Architect persona<br/>fresh eyes on ALL changes] --> R2{CRITICAL or<br/>MAJOR found?}
@@ -277,7 +284,8 @@ flowchart TD
         V1[Run full test suite] --> V2[Evidence before claims]
     end
 
-    V2 --> Done([Feature complete])
+    V2 --> Archive[Move plan<br/>plans/ → done/]
+    Archive --> Done([Feature complete])
 ```
 
 ### Step 1: The Brainstorm Phase
@@ -293,11 +301,12 @@ Do not ask the AI to "build offline support." Ask it to explore the problem spac
 Brainstorming sessions are where architectural decisions happen. The `/brainstorm` skill will offer to save the discussion as a **decision document** to `docs/discussions/YYYY-MM-DD-<topic>.md` — a structured record of which approaches were considered, the impact of each, why the chosen approach won, and what was rejected. These documents are invaluable when someone later asks "why did we do it this way?"
 
 ### Step 2: The Planning Phase
-The AI must write a formal technical specification *before* writing any code.
+The AI must write a formal technical specification *before* writing any code. The plan must resolve **all** design decisions — the dev model executes, it does not design.
 
 *   **Model Scoping:** You can specify which model should handle the build.
     *   *Prompt Example:* *"Write a detailed technical plan for the RxDB adapter. Save it to `docs/plans/offline-sync.md`. Divide this into isolated Phases. **Plan this specifically for a smaller model (e.g., Gemini 2.5 Flash)** to execute—be hyper-granular and explicit."*
 *   **Human Role:** Review the Markdown plan. Correct architectural misunderstandings. Approve the plan.
+*   **On approval:** Move the plan from `docs/plans/new/` to `docs/plans/` — this marks it as the active plan.
 
 #### The Plan Directory Workflow: `plans/`, `plans/new/`, `plans/done/`
 
@@ -314,40 +323,41 @@ Plans are not throwaway conversation artifacts—they are versioned project asse
 3.  **Parallel workflow:** Plans can accumulate in `plans/new/` while you focus on other work. You choose *when* to pick them up—based on your available tokens, your own availability, and the complexity of the task. This decouples planning velocity from implementation velocity and lets you run both in parallel.
 
 ### Step 3: The Build Phase (The Phase-Wise Loop)
-Execute the plan strictly **one phase at a time** using the internal loop: `Implement -> Test -> Self-Review -> Proceed`.
+Execute the plan strictly **one phase at a time** using the internal loop: `TDD -> Implement -> Test -> Self-Review -> Proceed`.
 
-1.  **Implement:**
-    *   *Prompt Example:* *"Execute Phase 1 (Database Schema) from `docs/plans/offline-sync.md`. Stop when finished."*
-2.  **Test:**
+The build phase can be executed by the **same model** that planned, or handed off to a **different model** (smaller, faster, cheaper). The plan is the contract — it contains all decisions, so the dev model just executes.
+
+1.  **TDD (Mandatory):**
+    *   Every phase starts with `/test-driven-development`. Write the failing test first (red), implement to green, then refactor. No production code without a failing test first.
+2.  **Implement:**
+    *   *Prompt Example:* *"Execute Phase 1 (Database Schema) from `docs/plans/offline-sync.md`."*
+    *   If the plan is ambiguous or contradictory, the dev model surfaces the discrepancy to the user — it does not guess or make design decisions.
+3.  **Test:**
     *   Run the unit/integration tests for that specific module.
-3.  **Self-Review:**
+4.  **Self-Review:**
     *   The agent reviews its own changes with a critical eye — does the code match the plan, follow conventions, have obvious bugs? The human confirms before proceeding.
     *   This is a lightweight per-phase check, not the full third-person review. It keeps each phase honest without the overhead of a full persona switch.
-4.  **Proceed:**
+5.  **Proceed:**
     *   *Prompt Example:* *"Tests pass and self-review is clear. Proceed to Phase 2."*
+
+#### The Handoff Summary
+
+After all phases are complete, the build agent generates a **handoff summary** — a concise report of what was built, any deviations from the plan, implementation notes, and open concerns. If the build was done by a different model, this summary is the artifact the user carries back to the planning model for review.
 
 ### Step 4: Holistic Third-Person Review
 
-After ALL build phases are complete, invoke the full `/3p-review`. This is where the independent Senior Architect persona — who did NOT write this code — reviews the **entire feature** across all phases with fresh eyes.
+After ALL build phases are complete (and the handoff summary is generated), invoke the full `/3p-review`. If the build was done by a different model, the user returns to the planning model, which runs this review.
 
 *   The philosophy: **"I didn't write this code, but after this review it is my responsibility. It must meet my world-class standards."** This is not a rubber stamp — it is the moment you reap the benefits of pair programming. The original author has blind spots; the reviewer does not share them.
 *   The reviewer looks at architectural coherence, cross-cutting concerns, and systemic issues that only become visible when reviewing the full change set — not just individual phases.
 *   This is a loop: if the review surfaces CRITICAL or MAJOR issues → fix → re-test → re-review from scratch until clean.
 *   `/3p-review` can also be invoked independently at any time — not just at the end of a build cycle.
 
-#### Evolving Toward BDD/TDD
+### Step 5: Verify and Archive
 
-The Build Phase naturally lends itself to a test-first discipline. When plan phases include behavioral specifications or acceptance criteria, the implementation order should evolve toward:
+After `/3p-review` passes, immediately run `/verify` — evidence before claims. Then move the plan from `docs/plans/` to `docs/plans/done/`. The feature is complete.
 
-1.  **Red:** Write the failing test first — encode the expected behavior before writing any implementation.
-2.  **Green:** Write the minimum code to make the test pass. No more.
-3.  **Refactor:** Clean up while keeping all tests green. This is where the Boy Scout Rule applies.
-
-This BDD/TDD loop nests inside the existing phase loop: for each phase, you write tests first, implement to green, refactor, then proceed to self-review. The combination of test-first discipline and independent holistic review produces code with both high correctness and high quality.
-
-The `test-driven-development` skill enforces this discipline. Invoke it with `/test-driven-development` during any build phase.
-
-**Final Validation:** At the end of the complete build (all phases), after `/3p-review` passes, ALL project tests must pass. No feature is "done" until the suite is green.
+**Final Validation:** ALL project tests must pass. No feature is "done" until the suite is green and the plan is archived.
 
 ---
 
@@ -390,4 +400,4 @@ Whenever you find an incorrect behavior or a rule violation, **update the AI's m
 Treat refactoring as a feature:
 1. Ask the AI to analyze the monolith and propose domain boundaries.
 2. Generate a phased refactoring plan.
-3. Execute using the `Implement -> Test -> Review` loop for every single file extraction.
+3. Execute using the `TDD -> Implement -> Test -> Self-Review` loop for every single file extraction.

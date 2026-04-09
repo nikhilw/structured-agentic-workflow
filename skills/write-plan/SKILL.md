@@ -82,7 +82,7 @@ Before writing a single phase, you MUST investigate the existing codebase. Read 
 
 This plan is designed as a **contract between agents**. The agent that writes this plan does not have to be the agent that executes it — it may be a smaller model (Gemini Flash, GPT-4o-mini), a different tool (Cursor Composer, Copilot), or a local model with no conversation history.
 
-**This means the plan must eliminate ALL decision uncertainty:**
+**This means the plan must resolve ALL decisions. No open questions may remain:**
 
 - Be explicit about file paths, function signatures, and expected behavior
 - Do not rely on "context from earlier in the conversation"
@@ -92,11 +92,20 @@ This plan is designed as a **contract between agents**. The agent that writes th
 - **Specify exact function signatures, class names, and return types** — not just descriptions of what they should do.
 - **Specify exact test assertions** — not just "write tests for this". Name the test functions, the inputs, and the expected outputs.
 - **If a step requires installing a package, name it** with the exact install command.
+- **Resolve all design trade-offs in the plan itself.** The plan need not include all the code, but it MUST include all decisions. The dev model's job is to execute, not to design.
 
 **Self-test:** Before saving the plan, re-read each phase and ask: "Could a junior developer with access to the codebase but zero context about our conversation execute this phase without asking a single clarifying question?" If no, add more detail.
 
 ## What Happens Next
 
 After the human reviews and approves the plan:
-1. Move it from `docs/plans/new/` to `docs/plans/`
-2. Begin execution with `/build-phase <plan-file> Phase 1`
+1. **Move it from `docs/plans/new/` to `docs/plans/`** — this marks it as the active plan. Do this immediately upon approval, do not leave it in `new/`.
+2. The user will choose one of two paths:
+
+**Path A — Same model continues to build:**
+Begin execution with `/build-phase <plan-file> Phase 1`. The workflow continues in this thread through build → 3p-review → verify.
+
+**Path B — User hands off to a different model for build:**
+The user takes the plan file to a smaller/faster model (Gemini Flash, Cursor, Copilot, a local model) for execution. The dev model will build all phases and produce a **handoff summary**. The user will return to this planning model with that summary, and the workflow resumes with `/3p-review` → `/verify`.
+
+Ask the user which path they prefer. If they don't specify, suggest both options.
