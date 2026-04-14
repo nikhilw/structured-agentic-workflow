@@ -26,21 +26,42 @@ The **Structured Agentic Development Workflow** treats the AI not as a magical j
 
 ## Installation
 
-### Quick Start
+### Quick Start (Recommended)
+
+Install via the [skills](https://www.npmjs.com/package/skills) CLI — works with Claude Code, Cursor, Gemini CLI, GitHub Copilot, and 40+ other agents:
+
+```bash
+# Install workflow skills for your agent
+npx skills add nikhilw/structured-agentic-workflow
+
+# Install for a specific agent
+npx skills add nikhilw/structured-agentic-workflow -a claude-code
+
+# Install superpowers skills separately (TDD, debug, verify)
+npx skills add obra/superpowers -s test-driven-development -s systematic-debugging -s verification-before-completion
+```
+
+The `npx skills` CLI will discover all skills in the repo, let you pick which ones to install, and symlink them into your agent's skills directory.
+
+> **Note:** The superpowers skills (test-driven-development, debug, verify) live in a separate repo and must be installed separately. The workflow works without them, but they are strongly recommended — the build phase expects `/test-driven-development`, and the workflow enforces `/verify` after every review.
+
+### Alternative: Install Script
+
+If you prefer a single command that pulls superpowers and installs everything at once:
 
 ```bash
 # Clone the repo
 git clone https://github.com/nikhilw/structured-agentic-workflow.git
 cd structured-agentic-workflow
 
-# Install for all supported agents
+# Install for all supported agents (pulls superpowers automatically)
 ./install.sh
 
 # Or on Windows (PowerShell — requires Developer Mode or admin)
 .\install.ps1
 ```
 
-### What the Installer Does
+### What the Install Script Does
 
 1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers) (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/` with appropriate renaming.
 2. **Symlinks all skills** into the global skills directory for each supported agent:
@@ -83,6 +104,7 @@ The installer symlinks these skills from the `skills/` directory:
 | Skill | Source | Description |
 |-------|--------|-------------|
 | `agentic-workflow` | This project | Orchestrates the full development lifecycle |
+| `workflow-config` | This project | Configure workflow preferences (TDD/BDD, caveman output style) |
 | `brainstorm` | This project | Explore approaches, challenge the design, estimate impact, produce decision documents |
 | `write-plan` | This project | Write phased implementation plans |
 | `build-phase` | This project | Execute one plan phase with test + review loop |
@@ -97,6 +119,48 @@ The installer symlinks these skills from the `skills/` directory:
 | Skill | Source | Description |
 |-------|--------|-------------|
 | `brainstorming` | [superpowers](https://github.com/obra/superpowers) | Interactive brainstorming with visual companion and spec review loop. Not used by the workflow — available if you prefer it over `/brainstorm`. |
+
+### Configuring the Workflow
+
+The workflow supports configurable preferences via the `/workflow-config` skill:
+
+```
+/workflow-config enable caveman full
+/workflow-config use bdd
+```
+
+#### Testing Methodology
+
+- **TDD** (default) — Red-Green-Refactor via `/test-driven-development`
+- **BDD** — Given-When-Then scenarios and feature files
+
+Only one can be active at a time. The core rule — "test first, always" — applies regardless.
+
+#### Output Style: Caveman Compatibility
+
+The workflow integrates with the [caveman](https://www.npmjs.com/package/@anthropics/skills) brevity style. When enabled, all workflow phases adapt their prose to the requested level:
+
+| Level | Style |
+|-------|-------|
+| `off` (default) | Normal verbose output |
+| `lite` | Shorter prose, all technical detail preserved |
+| `full` | Terse bullets, minimal preamble |
+| `ultra` | Maximum compression, sentence fragments |
+
+Technical accuracy is never sacrificed — only verbosity changes.
+
+**This workflow does not bundle or vendor caveman.** Caveman compatibility is built in — each skill checks memory for the configured brevity level and adapts its output independently. If you also want caveman to govern the agent's base system prompt (outside of workflow skills), install the caveman package separately.
+
+#### What Cannot Be Configured
+
+These are core workflow guarantees and cannot be disabled:
+
+- **Verification** (`/verify`) — always mandatory
+- **Phase order** — Brainstorm → Plan → Build → 3p-Review → Verify
+- **Plan lifecycle** — `new/` → `plans/` → `done/`
+- **Review loop** — loops until clean
+
+Preferences are persisted to agent memory and apply across sessions.
 
 ### Manual Installation
 
@@ -214,6 +278,7 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      ```markdown
      ## Workflow Skills
      - `agentic-workflow` — orchestrates the structured development lifecycle
+     - `/workflow-config` — configure workflow preferences (TDD/BDD, caveman output style)
      - `/brainstorm` — explore problem space, challenge the design, produce decision documents
      - `/write-plan` — write phased plans to docs/plans/new/
      - `/build-phase` — execute one plan phase with test + self-review
