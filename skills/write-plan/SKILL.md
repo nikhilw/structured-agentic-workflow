@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Write, Agent
 
 You are entering the **Planning Phase** of the Structured Agentic Development Workflow.
 
+> **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
+
 ## Your Mission
 
 Write a detailed, phased implementation plan for: **$ARGUMENTS**

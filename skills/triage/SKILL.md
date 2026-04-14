@@ -8,6 +8,8 @@ allowed-tools: Read, Grep, Glob
 
 You are entering the **Triage Phase** of the Structured Agentic Development Workflow.
 
+> **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
+
 ## Your Mission
 
 Analyze the current state — backlog, context, and resources — and recommend the highest-value next task.

@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Agent, Write
 
 You are entering the **Brainstorm Phase** of the Structured Agentic Development Workflow.
 
+> **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
+
 <HARD-GATE>
 Do NOT write code, create plan files, scaffold projects, or take ANY implementation action during brainstorming. Code is the LAST thing we touch — not the first. This applies regardless of how simple the task seems. You are thinking, not building.
 </HARD-GATE>

@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 
 You are entering the **Build Phase** of the Structured Agentic Development Workflow.
 
+> **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
+
 ## Your Mission
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
