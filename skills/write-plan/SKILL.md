@@ -101,13 +101,13 @@ This plan is designed as a **contract between agents**. The agent that writes th
 ## What Happens Next
 
 After the human reviews and approves the plan:
-1. **Move it from `docs/plans/new/` to `docs/plans/`** — this marks it as the active plan. Do this immediately upon approval, do not leave it in `new/`.
+1. **Move it from `docs/plans/new/` to `docs/plans/`** using plain `mv` (not `git mv` — the plan file may not be tracked by git yet). This marks it as the active plan. Do this immediately upon approval, do not leave it in `new/`.
 2. The user will choose one of two paths:
 
 **Path A — Same model continues to build:**
 Begin execution with `/build-phase <plan-file> Phase 1`. The workflow continues in this thread through build → 3p-review → verify.
 
 **Path B — User hands off to a different model for build:**
-The user takes the plan file to a smaller/faster model (Gemini Flash, Cursor, Copilot, a local model) for execution. The dev model will build all phases and produce a **handoff summary**. The user will return to this planning model with that summary, and the workflow resumes with `/3p-review` → `/verify`.
+The user takes the plan file to a smaller/faster model (Gemini Flash, Cursor, Copilot, a local model) for execution. The dev model will build all phases and produce a **handoff summary**. The user will return to this planning model with that summary, and the workflow resumes with `/3p-review` → `/verification-before-completion`.
 
 Ask the user which path they prefer. If they don't specify, suggest both options.

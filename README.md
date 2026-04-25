@@ -37,13 +37,15 @@ npx skills add nikhilw/structured-agentic-workflow
 # Install for a specific agent
 npx skills add nikhilw/structured-agentic-workflow -a claude-code
 
-# Install superpowers skills separately (TDD, debug, verify)
+# Install superpowers skills separately (test-driven-development, systematic-debugging, verification-before-completion)
 npx skills add obra/superpowers -s test-driven-development -s systematic-debugging -s verification-before-completion
 ```
 
 The `npx skills` CLI will discover all skills in the repo, let you pick which ones to install, and symlink them into your agent's skills directory.
 
-> **Note:** The superpowers skills (test-driven-development, debug, verify) live in a separate repo and must be installed separately. The workflow works without them, but they are strongly recommended — the build phase expects `/test-driven-development`, and the workflow enforces `/verify` after every review.
+> **Note:** The superpowers skills (`test-driven-development`, `systematic-debugging`, `verification-before-completion`) live in a separate repo and must be installed separately. The workflow works without them, but they are strongly recommended — the build phase expects `/test-driven-development`, and the workflow enforces `/verification-before-completion` after every review.
+>
+> We keep the upstream skill names verbatim (`systematic-debugging`, `verification-before-completion`) rather than renaming them to `debug`/`verify`. The `npx skills` CLI has no rename flag, so keeping the upstream names means installs via `npx skills` and installs via our `install.sh` both end up with identically-named skills.
 
 ### Alternative: Install Script
 
@@ -63,7 +65,7 @@ cd structured-agentic-workflow
 
 ### What the Install Script Does
 
-1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers) (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/` with appropriate renaming.
+1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers) (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/` under their upstream names.
 2. **Symlinks all skills** into the global skills directory for each supported agent:
 
 | Agent | Skills Directory |
@@ -111,8 +113,8 @@ The installer symlinks these skills from the `skills/` directory:
 | `3p-review` | This project | Independent third-person code review |
 | `triage` | This project | Recommend next task, minimize context thrash |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
-| `debug` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
-| `verify` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
+| `systematic-debugging` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
+| `verification-before-completion` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
 
 **Optional vendor skills (installed but not part of the workflow):**
 
@@ -155,7 +157,7 @@ Technical accuracy is never sacrificed — only verbosity changes.
 
 These are core workflow guarantees and cannot be disabled:
 
-- **Verification** (`/verify`) — always mandatory
+- **Verification** (`/verification-before-completion`) — always mandatory
 - **Phase order** — Brainstorm → Plan → Build → 3p-Review → Verify
 - **Plan lifecycle** — `new/` → `plans/` → `done/`
 - **Review loop** — loops until clean
@@ -182,15 +184,11 @@ cp -r /tmp/superpowers/skills/systematic-debugging vendor/superpowers/
 cp -r /tmp/superpowers/skills/verification-before-completion vendor/superpowers/
 cp /tmp/superpowers/LICENSE vendor/superpowers/
 
-# Copy into skills/ with our naming
+# Copy into skills/ under their upstream names
 cp -r /tmp/superpowers/skills/brainstorming skills/brainstorming
 cp -r /tmp/superpowers/skills/test-driven-development skills/test-driven-development
-cp -r /tmp/superpowers/skills/systematic-debugging skills/debug
-cp -r /tmp/superpowers/skills/verification-before-completion skills/verify
-
-# Patch the skill name in renamed skills so /debug and /verify work
-sed -i 's/^name: systematic-debugging$/name: debug/' skills/debug/SKILL.md
-sed -i 's/^name: verification-before-completion$/name: verify/' skills/verify/SKILL.md
+cp -r /tmp/superpowers/skills/systematic-debugging skills/systematic-debugging
+cp -r /tmp/superpowers/skills/verification-before-completion skills/verification-before-completion
 
 # Clean up
 rm -rf /tmp/superpowers
@@ -213,8 +211,8 @@ ln -sf "$(pwd)/skills/build-phase" ~/.claude/skills/build-phase
 ln -sf "$(pwd)/skills/3p-review" ~/.claude/skills/3p-review
 ln -sf "$(pwd)/skills/triage" ~/.claude/skills/triage
 ln -sf "$(pwd)/skills/test-driven-development" ~/.claude/skills/test-driven-development
-ln -sf "$(pwd)/skills/debug" ~/.claude/skills/debug
-ln -sf "$(pwd)/skills/verify" ~/.claude/skills/verify
+ln -sf "$(pwd)/skills/systematic-debugging" ~/.claude/skills/systematic-debugging
+ln -sf "$(pwd)/skills/verification-before-completion" ~/.claude/skills/verification-before-completion
 ln -sf "$(pwd)/skills/brainstorm" ~/.claude/skills/brainstorm
 ```
 
@@ -285,8 +283,8 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      - `/3p-review` — independent third-person code review (after all build phases)
      - `/triage` — recommend next task minimizing context thrash
      - `/test-driven-development` — RED-GREEN-REFACTOR discipline
-     - `/debug` — systematic root cause investigation
-     - `/verify` — evidence before completion claims
+     - `/systematic-debugging` — systematic root cause investigation
+     - `/verification-before-completion` — evidence before completion claims
      ```
 
 ---
@@ -345,7 +343,7 @@ flowchart TD
 
     R5 --> V1
 
-    subgraph Verify ["5. Verify · /verify"]
+    subgraph Verify ["5. Verify · /verification-before-completion"]
         V1[Run full test suite] --> V2[Evidence before claims]
     end
 
@@ -371,7 +369,7 @@ The AI must write a formal technical specification *before* writing any code. Th
 *   **Model Scoping:** You can specify which model should handle the build.
     *   *Prompt Example:* *"Write a detailed technical plan for the RxDB adapter. Save it to `docs/plans/offline-sync.md`. Divide this into isolated Phases. **Plan this specifically for a smaller model (e.g., Gemini 2.5 Flash)** to execute—be hyper-granular and explicit."*
 *   **Human Role:** Review the Markdown plan. Correct architectural misunderstandings. Approve the plan.
-*   **On approval:** Move the plan from `docs/plans/new/` to `docs/plans/` — this marks it as the active plan.
+*   **On approval:** Move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` (not `git mv` — the plan file may not be tracked by git yet). This marks it as the active plan.
 
 #### The Plan Directory Workflow: `plans/`, `plans/new/`, `plans/done/`
 
@@ -420,7 +418,7 @@ After ALL build phases are complete (and the handoff summary is generated), invo
 
 ### Step 5: Verify and Archive
 
-After `/3p-review` passes, immediately run `/verify` — evidence before claims. Then move the plan from `docs/plans/` to `docs/plans/done/`. The feature is complete.
+After `/3p-review` passes, immediately run `/verification-before-completion` — evidence before claims. Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv` (not `git mv` — the plan file may not be tracked by git yet). The feature is complete.
 
 **Final Validation:** ALL project tests must pass. No feature is "done" until the suite is green and the plan is archived.
 

@@ -16,5 +16,5 @@ superpowers-temp/
 vendor/
 skills/brainstorming/
 skills/test-driven-development/
-skills/debug/
-skills/verify/
+skills/systematic-debugging/
+skills/verification-before-completion/

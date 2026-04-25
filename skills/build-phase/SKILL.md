@@ -1,6 +1,6 @@
 ---
 name: build-phase
-description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases — does NOT run /3p-review or /verify.
+description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases — does NOT run /3p-review or /verification-before-completion.
 argument-hint: [plan-file-path] [Phase N]
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -114,4 +114,4 @@ If more phases remain, suggest `/build-phase <plan-file> Phase N+1`.
 
 If all phases are complete, present the handoff summary and **STOP**.
 
-**Do NOT proceed to `/3p-review`, `/verify`, or any other workflow phase.** Your job as the build agent ends at the handoff summary. The user decides what happens next — they may continue in this thread or take the summary to a different model for review. Wait for the user's instruction.
+**Do NOT proceed to `/3p-review`, `/verification-before-completion`, or any other workflow phase.** Your job as the build agent ends at the handoff summary. The user decides what happens next — they may continue in this thread or take the summary to a different model for review. Wait for the user's instruction.

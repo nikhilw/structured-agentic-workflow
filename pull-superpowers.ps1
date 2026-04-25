@@ -19,19 +19,17 @@ $VendorDir = Join-Path $ScriptDir "vendor" "superpowers"
 $RepoUrl = "https://github.com/obra/superpowers.git"
 $Branch = "main"
 
-# Skills we adopt from superpowers
+# Skills we adopt from superpowers.
+#
+# We keep the upstream names verbatim so users who install via
+# `npx skills add obra/superpowers` (which has no rename flag) and users who
+# install via our install script end up with identically-named skills.
 $Skills = @(
     "brainstorming"
     "test-driven-development"
     "systematic-debugging"
     "verification-before-completion"
 )
-
-# Map superpowers names to our skill names (when different)
-$SkillRenames = @{
-    "systematic-debugging"          = "debug"
-    "verification-before-completion" = "verify"
-}
 
 function Remove-VendoredSkills {
     Write-Host "Removing vendored superpowers skills..."
@@ -80,7 +78,7 @@ function Fetch-SuperpowersSkills {
 
         Pop-Location
 
-        # Copy vendored skills into skills/ (applying renames)
+        # Copy vendored skills into skills/ (names preserved from upstream)
         Write-Host ""
         Write-Host "Installing superpowers into skills/..."
         $skillsDir = Join-Path $ScriptDir "skills"
@@ -89,23 +87,20 @@ function Fetch-SuperpowersSkills {
             $vendorSrc = Join-Path $VendorDir $skill
             if (-not (Test-Path $vendorSrc)) { continue }
 
-            $targetName = if ($SkillRenames.ContainsKey($skill)) { $SkillRenames[$skill] } else { $skill }
-            $dst = Join-Path $skillsDir $targetName
-
+            $dst = Join-Path $skillsDir $skill
             if (Test-Path $dst) { Remove-Item $dst -Recurse -Force }
             Copy-Item $vendorSrc $dst -Recurse
+            Write-Host "  copied   $skill/ -> skills/$skill/"
+        }
 
-            # Patch the name: field in SKILL.md to match our directory name
-            if ($targetName -ne $skill) {
-                $skillMd = Join-Path $dst "SKILL.md"
-                if (Test-Path $skillMd) {
-                    (Get-Content $skillMd) -replace "^name: $skill$", "name: $targetName" |
-                        Set-Content $skillMd
-                }
-                Write-Host "  copied   $skill/ -> skills/$targetName/ (name patched)"
-            } else {
-                Write-Host "  copied   $skill/ -> skills/$skill/"
-            }
+        # Strip the `superpowers:` namespace prefix on cross-references so the
+        # skills resolve in agents that don't understand plugin-style namespacing.
+        $debugSkill = Join-Path $skillsDir "systematic-debugging" "SKILL.md"
+        if (Test-Path $debugSkill) {
+            (Get-Content $debugSkill) `
+                -replace "superpowers:test-driven-development", "/test-driven-development" `
+                -replace "superpowers:verification-before-completion", "/verification-before-completion" |
+                Set-Content $debugSkill
         }
 
         Write-Host ""

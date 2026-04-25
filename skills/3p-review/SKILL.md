@@ -107,7 +107,7 @@ Severities:
 **If only MINOR findings (or none):**
 1. The code passes review.
 2. Write the final summary (see below).
-3. Suggest the next workflow step — typically `/verify` for final evidence-based validation.
+3. Suggest the next workflow step — typically `/verification-before-completion` for final evidence-based validation.
 
 **DO NOT skip the re-review. DO NOT write a final summary and offer to commit if CRITICAL or MAJOR issues were found in this round. Fix them and loop.**
 
