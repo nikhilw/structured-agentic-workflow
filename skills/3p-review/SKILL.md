@@ -1,7 +1,7 @@
 ---
 name: 3p-review
 description: Independent third-person code review. Use after ALL build phases are complete for a holistic review of the entire feature, or anytime the user wants a quality gate. Switches persona to a Senior Architect who did NOT write the code and now owns it — it must meet world-class standards.
-argument-hint: [file path, function name, or "recent changes"]
+argument-hint: "[file path, function name, or 'recent changes']"
 allowed-tools: Read, Grep, Glob, Edit, Bash
 ---
 

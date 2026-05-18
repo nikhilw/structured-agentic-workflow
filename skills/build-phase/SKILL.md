@@ -1,7 +1,7 @@
 ---
 name: build-phase
 description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases — does NOT run /3p-review or /verification-before-completion.
-argument-hint: [plan-file-path] [Phase N]
+argument-hint: "[plan-file-path] [Phase N]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
 
