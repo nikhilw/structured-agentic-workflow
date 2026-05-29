@@ -36,6 +36,17 @@ Review: **$ARGUMENTS**
 
 If no specific target is given, review the most recent changes (use `git diff` or `git diff --cached`).
 
+### Handoff Summary Mode
+
+If `$ARGUMENTS` contains a Build Handoff Summary (or references one), activate handoff mode:
+
+1. **Extract the concerns** listed under "Concerns" in the summary.
+2. **Treat each concern as a mandatory checklist item** — in addition to the standard review checklist, you must explicitly investigate and resolve every concern before the review can pass.
+3. **Report on each concern** in your findings, even if the verdict is "investigated and dismissed."
+4. **Note any deviations** listed in the Phase Status section — verify the deviations were handled correctly and didn't introduce problems.
+
+Concerns from the handoff summary are not suggestions. They are the build model's own flags about its own work — treat them as MAJOR findings until you can prove otherwise.
+
 ---
 
 ## Procedure — THIS IS A LOOP

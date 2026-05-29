@@ -30,8 +30,9 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 | Plan approved | User says "approved", "let's build", or "proceed" | Move plan from `new/` to `docs/plans/` with `mv` (plain shell — not `git mv`; the plan may not be tracked yet). → `/build-phase` |
 | Implementing code | About to write production code | → `/test-driven-development` (default) or BDD-style tests (if BDD is configured in memory) |
 | Phase complete | Tests pass, self-review clear | → next `/build-phase` or "all phases complete" |
-| All build phases complete | Handoff summary generated | → `/3p-review` (holistic review of entire feature) |
-| User returns with handoff summary | Build was done by a different model | → `/3p-review` (review the external model's full output) |
+| All build phases complete (same model) | Handoff summary generated | → `/3p-review` (holistic review of entire feature) |
+| All build phases complete (build model) | Build model has run its own `/3p-review` and generated handoff summary | STOP — user carries handoff summary to main model |
+| User returns with handoff summary | Build was done by a different model | → `/3p-review` **with the handoff summary as argument** (review the external model's full output and address all concerns from the summary) |
 | Code written (any context) | User wants quality assurance | → `/3p-review` |
 | 3p-review passed | Review clean, no critical/major issues | → `/verification-before-completion` (always — do not skip or wait to be asked) |
 | Bug, test failure, unexpected behavior | Something is broken | → `/systematic-debugging` (investigate before fixing) |
@@ -50,7 +51,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 7. **Debug systematically, not randomly.** Use `/systematic-debugging` — investigate root cause before proposing fixes.
 8. **Evidence before claims.** Use `/verification-before-completion` — never claim work is done without running verification commands and confirming output.
 9. **Triage minimizes context thrash.** When recommending work, factor in what is already loaded in the current conversation context — don't suggest work that requires loading entirely different modules.
-10. **Resume automatically after external execution.** When the user returns after handing build to an external model (with a handoff summary or simply saying "it's done"), immediately pick up the workflow: run `/3p-review` on the full feature, then `/verification-before-completion`, then archive the plan. Do not wait to be told.
+10. **Resume automatically after external execution.** When the user returns after handing build to an external model (with a handoff summary or simply saying "it's done"), immediately pick up the workflow: run `/3p-review` **passing the handoff summary as argument** so it reviews the full feature AND addresses every concern from the summary. Then `/verification-before-completion`, then archive the plan. Do not wait to be told.
 11. **The review loop is a loop.** After `/3p-review` finds issues and they are fixed, re-review from scratch. Repeat until clean. Do not stop after one round.
 12. **Enforce the plan lifecycle.** Plans move through `new/` → `plans/` → `done/`. Move to `plans/` when build starts. Move to `done/` after verify passes. Use plain `mv` (not `git mv`) — the plan file may not be tracked by git yet. Do not leave plans stranded in the wrong directory.
 13. **After 3p-review, always verify.** The chain is `/3p-review` → `/verification-before-completion` → archive plan. Do not stop after review and wait for the user to ask for verify. Do not skip plan archival.

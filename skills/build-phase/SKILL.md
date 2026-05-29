@@ -1,6 +1,6 @@
 ---
 name: build-phase
-description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases — does NOT run /3p-review or /verification-before-completion.
+description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases. When running as a dedicated build model, also runs /3p-review before handoff — does NOT run /verification-before-completion.
 argument-hint: "[plan-file-path] [Phase N]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -81,37 +81,29 @@ The user should not have to tell you to continue the workflow. You own the proce
 ## Phase Completion
 
 When all phases in the plan are complete:
-1. Run the FULL test suite: `uv run pytest tests/ -x`
-2. Generate a **handoff summary** — a concise report of the entire build:
 
-```markdown
+1. Run the FULL test suite: `uv run pytest tests/ -x`
+2. **If you are a dedicated build model** (the user set up this session with a smaller/faster model specifically for the build phase): run `/3p-review` on the full implementation. It must pass (zero open findings) before you proceed.
+3. Generate a **handoff summary** — cover only what deviated and what concerns remain:
+
 ## Build Handoff Summary
 
 **Plan:** [plan file path]
 
-### Per-Phase Summary
-- **Phase 1: [Name]** — [what was done, any deviations from plan]
-- **Phase 2: [Name]** — [what was done, any deviations from plan]
-...
+### Deviations
+- **Phase 2: [Name]** — [what changed and why, one line]
+- (Only list phases that deviated. If nothing deviated, write "None.")
 
-### Implementation Notes
-- [Decisions made during implementation, if any]
-- [Anything surprising or worth flagging]
-- [Discrepancies found in the plan and how they were resolved]
+### Concerns
+- [Anything the reviewer should specifically investigate or validate]
+- (If none, write "None.")
 
-### Test Results
-- [Full suite pass/fail count]
-
-### Concerns / Open Questions
-- [Anything the reviewer should pay special attention to]
-```
-
-This summary serves as the handoff artifact. If a different model is doing the review, the user carries this summary to the planning model.
+This summary is the handoff artifact. The user carries it to the main model for the post-handoff review.
 
 ## What Happens Next
 
 If more phases remain, suggest `/build-phase <plan-file> Phase N+1`.
 
-If all phases are complete, present the handoff summary and **STOP**.
+If all phases are complete and you are the **main model**: present the handoff summary — the agentic-workflow will drive you into `/3p-review`.
 
-**Do NOT proceed to `/3p-review`, `/verification-before-completion`, or any other workflow phase.** Your job as the build agent ends at the handoff summary. The user decides what happens next — they may continue in this thread or take the summary to a different model for review. Wait for the user's instruction.
+If all phases are complete and you are the **dedicated build model**: present the handoff summary and **STOP**. Do not proceed to `/3p-review` or any other phase. The user carries the summary to the main model.
