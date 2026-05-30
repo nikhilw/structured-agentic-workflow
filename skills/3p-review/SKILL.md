@@ -47,6 +47,19 @@ If `$ARGUMENTS` contains a Build Handoff Summary (or references one), activate h
 
 Concerns from the handoff summary are not suggestions. They are the build model's own flags about its own work — treat them as MAJOR findings until you can prove otherwise.
 
+### Integration-Seam Gate (BLOCKING — do not sign off without clearing this)
+
+Green tests do NOT prove a feature works. Tests that mock the load-bearing seam (the bus, the socket, the DB, the network boundary the feature exists to cross) prove only that the mock was called. The most expensive defects live in the un-exercised wiring between components, precisely where unit tests stop.
+
+Before any PASS verdict:
+
+1. **Identify the feature's value path** — the chain of components data must traverse for the feature to deliver its value (e.g. worker → tool → event_bus → SSE → browser). Name it explicitly in your review.
+2. **Require one no-mock test across that path**, OR evidenced manual verification (a screenshot, a captured log line, a curl transcript). If neither exists, that is a **CRITICAL finding** — the feature is unverified, regardless of how many unit tests pass.
+3. **Any handoff concern of the form "X not integration-tested" / "manual E2E not executed" / "live ... not verified" is BLOCKING.** It cannot be "investigated and dismissed" by reading code or running mocked tests — clear it only by exercising the real seam or by the human explicitly risk-accepting it in writing.
+4. **Wiring assertions must target the LEAF.** A test asserting an intermediate holder received a dependency (`session.factory.event_bus is bus`) is insufficient; assert the actual consumer that uses it received it. If a dependency is passed down N levels, the test must reach level N.
+
+A feature whose value is "A flows to B" is not done until you have watched A reach B with no mock standing in for the path.
+
 ---
 
 ## Procedure — THIS IS A LOOP
