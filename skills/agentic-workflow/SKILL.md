@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow
-description: The Structured Agentic Development Workflow — orchestrates brainstorm, write-plan, build-phase, 3p-review, triage, test-driven-development, systematic-debugging, and verification-before-completion skills. Use when starting new work, switching between development phases, or when the user asks about the workflow.
+description: The Structured Agentic Development Workflow — orchestrates brainstorm, write-plan, build-phase, 3p-review, handoff-summary, triage, test-driven-development, systematic-debugging, and verification-before-completion skills. Use when starting new work, switching between development phases, or when the user asks about the workflow. A dedicated build model uses the build-model workflow instead of this one.
 user-invocable: false
 ---
 
@@ -30,9 +30,9 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 | Plan approved | User says "approved", "let's build", or "proceed" | Move plan from `new/` to `docs/plans/` with `mv` (plain shell — not `git mv`; the plan may not be tracked yet). → `/build-phase` |
 | Implementing code | About to write production code | → `/test-driven-development` (default) or BDD-style tests (if BDD is configured in memory) |
 | Phase complete | Tests pass, self-review clear | → next `/build-phase` or "all phases complete" |
-| All build phases complete (same model) | Handoff summary generated | → `/3p-review` (holistic review of entire feature) |
-| All build phases complete (build model) | Build model has run its own `/3p-review` and generated handoff summary | STOP — user carries handoff summary to main model |
-| User returns with handoff summary | Build was done by a different model | → `/3p-review` **with the handoff summary as argument** (review the external model's full output and address all concerns from the summary) |
+| All build phases complete (main model) | `/build-phase` reported completion, full suite passes | → `/3p-review` → `/handoff-summary` (build record) → `/verification-before-completion` |
+| Dedicated build model session | User launched the session to build a plan with a smaller/faster model | This is not your workflow — use `/build-model`, which drives `/build-phase` → `/3p-review` → `/handoff-summary` → STOP |
+| User returns with handoff summary | Build was done by a different model (e.g. a dedicated build model) | → `/3p-review` **with the handoff summary as argument** (review the full output and address all concerns from the summary), then `/verification-before-completion` |
 | Code written (any context) | User wants quality assurance | → `/3p-review` |
 | 3p-review passed | Review clean, no critical/major issues | → `/verification-before-completion` (always — do not skip or wait to be asked) |
 | Bug, test failure, unexpected behavior | Something is broken | → `/systematic-debugging` (investigate before fixing) |
@@ -83,8 +83,10 @@ For best results, list the workflow skills in your project's config file (`CLAUD
 - `/workflow-config` — configure workflow preferences (TDD/BDD, caveman output style)
 - `/brainstorm` — explore problem space, challenge the design, produce decision documents
 - `/write-plan` — write phased plans to docs/plans/new/
-- `/build-phase` — execute one plan phase with test + self-review
+- `/build-phase` — execute plan phases with test + self-review; produces a build completion report (no review/handoff)
+- `/build-model` — dedicated build-model workflow: build-phase → 3p-review → handoff-summary → stop (alternative entry point to this workflow, for a smaller/faster build session)
 - `/3p-review` — independent third-person code review (after all build phases)
+- `/handoff-summary` — emit the fixed Build Handoff Summary artifact after review passes
 - `/test-driven-development` — RED-GREEN-REFACTOR, test first always (from superpowers)
 - `/systematic-debugging` — 4-phase root cause investigation (from superpowers)
 - `/verification-before-completion` — evidence before claims (from superpowers)

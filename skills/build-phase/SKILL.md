@@ -1,6 +1,6 @@
 ---
 name: build-phase
-description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Produces a handoff summary after all phases. When running as a dedicated build model, also runs /3p-review before handoff — does NOT run /verification-before-completion.
+description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Builds phase by phase and produces a build completion report. Review (/3p-review) and handoff (/handoff-summary) are driven by the orchestrating workflow — agentic-workflow for the main model, build-model for a dedicated build model — not by this skill.
 argument-hint: "[plan-file-path] [Phase N]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -82,28 +82,18 @@ The user should not have to tell you to continue the workflow. You own the proce
 
 When all phases in the plan are complete:
 
-1. Run the FULL test suite: `uv run pytest tests/ -x`
-2. **If you are a dedicated build model** (the user set up this session with a smaller/faster model specifically for the build phase): run `/3p-review` on the full implementation. It must pass (zero open findings) before you proceed.
-3. Generate a **handoff summary** — cover only what deviated and what concerns remain:
+1. Run the FULL test suite: `uv run pytest tests/ -x`. All tests must pass.
+2. Produce a short **build completion report**: which phases were built, the final test result (pass/fail count), and a one-line note on any phase that deviated from the plan.
 
-## Build Handoff Summary
+This skill ends here. Building is one responsibility — review and handoff are owned by the **orchestrating workflow**, not by this skill. Do **not** run `/3p-review`, write the handoff summary, or verify from inside build-phase.
 
-**Plan:** [plan file path]
+- `agentic-workflow` (main model) drives `/3p-review` → `/handoff-summary` → `/verification-before-completion`.
+- `build-model` (dedicated build model) drives `/3p-review` → `/handoff-summary` → STOP.
 
-### Deviations
-- **Phase 2: [Name]** — [what changed and why, one line]
-- (Only list phases that deviated. If nothing deviated, write "None.")
-
-### Concerns
-- [Anything the reviewer should specifically investigate or validate]
-- (If none, write "None.")
-
-This summary is the handoff artifact. The user carries it to the main model for the post-handoff review.
+Whichever launched you takes over once you report completion. You do not need to decide which — just report and hand back.
 
 ## What Happens Next
 
-If more phases remain, suggest `/build-phase <plan-file> Phase N+1`.
+If more phases remain, auto-advance: suggest and begin `/build-phase <plan-file> Phase N+1`.
 
-If all phases are complete and you are the **main model**: present the handoff summary — the agentic-workflow will drive you into `/3p-review`.
-
-If all phases are complete and you are the **dedicated build model**: present the handoff summary and **STOP**. Do not proceed to `/3p-review` or any other phase. The user carries the summary to the main model.
+When all phases are complete, present the build completion report and return control to the orchestrating workflow. That workflow drives review and handoff next — do not start them yourself.
