@@ -109,8 +109,10 @@ The installer symlinks these skills from the `skills/` directory:
 | `workflow-config` | This project | Configure workflow preferences (TDD/BDD, caveman output style) |
 | `brainstorm` | This project | Explore approaches, challenge the design, estimate impact, produce decision documents |
 | `write-plan` | This project | Write phased implementation plans |
-| `build-phase` | This project | Execute one plan phase with test + review loop |
+| `build-phase` | This project | Execute plan phases with test + self-review; emits a build completion report (no review/handoff) |
+| `build-model` | This project | Dedicated build-model workflow — orchestrates build-phase → 3p-review → handoff-summary → stop |
 | `3p-review` | This project | Independent third-person code review |
+| `handoff-summary` | This project | Emit the fixed-format Build Handoff Summary after review passes |
 | `triage` | This project | Recommend next task, minimize context thrash |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
 | `systematic-debugging` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
@@ -208,7 +210,9 @@ ln -sf "$(pwd)/skills/agentic-workflow" ~/.claude/skills/agentic-workflow
 ln -sf "$(pwd)/skills/brainstorming" ~/.claude/skills/brainstorming
 ln -sf "$(pwd)/skills/write-plan" ~/.claude/skills/write-plan
 ln -sf "$(pwd)/skills/build-phase" ~/.claude/skills/build-phase
+ln -sf "$(pwd)/skills/build-model" ~/.claude/skills/build-model
 ln -sf "$(pwd)/skills/3p-review" ~/.claude/skills/3p-review
+ln -sf "$(pwd)/skills/handoff-summary" ~/.claude/skills/handoff-summary
 ln -sf "$(pwd)/skills/triage" ~/.claude/skills/triage
 ln -sf "$(pwd)/skills/test-driven-development" ~/.claude/skills/test-driven-development
 ln -sf "$(pwd)/skills/systematic-debugging" ~/.claude/skills/systematic-debugging
@@ -279,8 +283,10 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      - `/workflow-config` — configure workflow preferences (TDD/BDD, caveman output style)
      - `/brainstorm` — explore problem space, challenge the design, produce decision documents
      - `/write-plan` — write phased plans to docs/plans/new/
-     - `/build-phase` — execute one plan phase with test + self-review
+     - `/build-phase` — execute plan phases with test + self-review (emits a build completion report)
+     - `/build-model` — dedicated build-model workflow (build → 3p-review → handoff → stop)
      - `/3p-review` — independent third-person code review (after all build phases)
+     - `/handoff-summary` — emit the fixed-format Build Handoff Summary artifact
      - `/triage` — recommend next task minimizing context thrash
      - `/test-driven-development` — RED-GREEN-REFACTOR discipline
      - `/systematic-debugging` — systematic root cause investigation
@@ -317,7 +323,7 @@ flowchart TD
     Approve -- "approved" --> MovePlan[Move plan<br/>new/ → plans/]
     MovePlan --> ModelChoice{Same model<br/>or handoff?}
     ModelChoice -- "same thread" --> I
-    ModelChoice -- "different model" --> ExtBuild([Dev model builds<br/>all phases])
+    ModelChoice -- "different model" --> ExtBuild([Dev model · /build-model<br/>build → 3p-review → handoff])
     ExtBuild --> ReturnSummary[User returns with<br/>handoff summary]
     ReturnSummary --> R1
 
@@ -332,8 +338,7 @@ flowchart TD
         Next -- "yes" --> I
     end
 
-    Next -- "no" --> HS[Generate handoff summary]
-    HS --> R1
+    Next -- "no" --> R1
 
     subgraph FullReview ["4. Holistic Review · /3p-review"]
         R1[Senior Architect persona<br/>fresh eyes on ALL changes] --> R2{CRITICAL or<br/>MAJOR found?}
@@ -341,7 +346,8 @@ flowchart TD
         R2 -- "no" --> R5[Review passed]
     end
 
-    R5 --> V1
+    R5 --> HS[Generate handoff record<br/>/handoff-summary]
+    HS --> V1
 
     subgraph Verify ["5. Verify · /verification-before-completion"]
         V1[Run full test suite] --> V2[Evidence before claims]
@@ -390,6 +396,13 @@ Execute the plan strictly **one phase at a time** using the internal loop: `Read
 
 The build phase can be executed by the **same model** that planned, or handed off to a **different model** (smaller, faster, cheaper). The plan is the contract — it contains all decisions, so the dev model just executes.
 
+There are two entry points, and which one you launch decides who drives review and handoff — there is no "am I the build model?" guesswork inside the skills:
+
+- **Same model:** the `agentic-workflow` orchestrator drives `/build-phase` through each phase, then `/3p-review`, `/handoff-summary`, and `/verification-before-completion`.
+- **Dedicated build model:** launch the session with `/build-model`. It is a self-contained mini-workflow that runs `/build-phase` across all phases, then `/3p-review` (looping until clean), then `/handoff-summary`, then **stops**. It does not verify — the user carries the handoff summary back to the main model for fresh-eyes re-review and verification.
+
+`/build-phase` itself is **model-agnostic**: it builds phases and produces a build completion report. Review and handoff are owned by whichever workflow launched it, never by `build-phase`.
+
 1.  **Read the Plan:**
     *   *Prompt Example:* *"Execute Phase 1 (Database Schema) from `docs/plans/offline-sync.md`."*
     *   If the plan is ambiguous or contradictory, the dev model surfaces the discrepancy to the user — it does not guess or make design decisions.
@@ -405,11 +418,13 @@ The build phase can be executed by the **same model** that planned, or handed of
 
 #### The Handoff Summary
 
-After all phases are complete, the build agent generates a **handoff summary** — a concise report of what was built, any deviations from the plan, implementation notes, and open concerns. The build agent then **stops** — it does not proceed to review or verification. If the build was done by a different model, the user carries this summary back to the planning model.
+When a build is complete **and reviewed**, the dedicated `/handoff-summary` skill emits a fixed-format **Build Handoff Summary** — a concise record of the `/3p-review` result, any deviations from the plan, and open concerns. It lives in its own skill so the exact template is loaded into context at the moment it is written, which keeps the format consistent across runs.
+
+A dedicated build model (`/build-model`) produces this summary *after* its own `/3p-review`, then **stops** — it does not verify. The user carries the summary back to the main model, which re-reviews the full change set with fresh eyes before verifying. (`/build-phase` no longer generates the summary itself — it just reports build completion and hands back to the orchestrating workflow.)
 
 ### Step 4: Holistic Third-Person Review
 
-After ALL build phases are complete (and the handoff summary is generated), invoke the full `/3p-review`. If the build was done by a different model, the user returns to the planning model, which runs this review.
+After all build phases are complete, invoke the full `/3p-review` on the entire change set. For a same-model build, `agentic-workflow` drives you into the review automatically (review → handoff record → verify). For a dedicated build model, `/build-model` already ran this review before handing off — and when the user returns with the handoff summary, the main model runs `/3p-review` **again** with fresh eyes. That second, independent review is the whole point of the handoff.
 
 *   The philosophy: **"I didn't write this code, but after this review it is my responsibility. It must meet my world-class standards."** This is not a rubber stamp — it is the moment you reap the benefits of pair programming. The original author has blind spots; the reviewer does not share them.
 *   The reviewer looks at architectural coherence, cross-cutting concerns, and systemic issues that only become visible when reviewing the full change set — not just individual phases.
