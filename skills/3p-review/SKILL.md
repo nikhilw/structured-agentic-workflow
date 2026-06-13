@@ -144,7 +144,7 @@ Severities (severity affects *priority*, not whether it gets fixed — everythin
 **Only when there are zero open findings (CRITICAL = 0, MAJOR = 0, MINOR = 0):**
 1. The code passes review.
 2. Write the final summary (see below).
-3. Suggest the next workflow step — typically `/verification-before-completion` for final evidence-based validation.
+3. Suggest the next workflow step — `/verification-before-completion`. You proved the *code* is sound; that step is a different, final gate before commit: one more **fresh** full-suite run *now*, plus a line-by-line check against the plan's requirements. It is not another review — do not let it be waved off as "redundant because review just ran the tests."
 
 **DO NOT exit the loop with open MINOR findings.** "We can clean those up later" is exactly how codebases rot. You are the person who said this code was good enough — make it actually good enough. The only legitimate way to dismiss a finding is to demonstrate (in writing) that it was wrong on inspection; "low priority" is not a dismissal.
 

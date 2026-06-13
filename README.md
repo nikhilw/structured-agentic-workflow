@@ -433,7 +433,7 @@ After all build phases are complete, invoke the full `/3p-review` on the entire 
 
 ### Step 5: Verify and Archive
 
-After `/3p-review` passes, immediately run `/verification-before-completion` — evidence before claims. Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv` (not `git mv` — the plan file may not be tracked by git yet). The feature is complete.
+After `/3p-review` passes, immediately run `/verification-before-completion` — evidence before claims. This is **not a second review**: `/3p-review` proved the *code* is sound, while verification proves the *claim of "done" is true right now*. It adds two things the review doesn't guarantee — a **fresh** full-suite run at the actual moment of completion (review may have passed several edits ago), and a **line-by-line check against the plan's requirements** (review judges completeness only qualitatively). It also covers the bug / quick-fix path, which skips full review. Don't skip it on the grounds that "review already ran the tests." Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv` (not `git mv` — the plan file may not be tracked by git yet). The feature is complete.
 
 **Final Validation:** ALL project tests must pass. No feature is "done" until the suite is green and the plan is archived.
 
