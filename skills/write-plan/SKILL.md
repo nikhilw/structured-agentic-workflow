@@ -21,7 +21,9 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 2. **Save the plan to `docs/plans/new/<feature-name>.md`** — not to `docs/plans/` (that is for active plans only).
 3. **Divide the work into isolated Phases.** Each phase should be independently testable and reviewable.
 4. **Be hyper-granular.** Write the plan so that a different agent — possibly a smaller, faster model — can execute it without ambiguity. Name specific files, functions, classes, and test cases.
-5. **Include test criteria for each phase.** What tests must pass before the phase is considered complete?
+5. **Include test criteria for each phase**, expressed as the **exact command + expected output** — not a vague "tests pass". The executing model needs an objective stop condition, not a judgment call.
+6. **Write down the foresight, don't leave it in your head.** A smaller build model builds exactly what is specified and fills every silence with the happy path. The errors it makes are not bad guesses — they are *gaps*: failure modes, lifetimes, error codes, and cross-component interactions you anticipated but never wrote down. The Failure-Mode & Interaction Analysis below is where that foresight becomes part of the contract.
+7. **Name the seam test for every value path.** Green unit tests do not prove the wiring works. For each path data must traverse to deliver value (e.g. worker → DB, request → handler → response), the plan MUST name a no-mock test that exercises the real seam. If you don't name it, the build model will not write it.
 
 ## Before Writing the Plan — Codebase Analysis
 
@@ -40,6 +42,20 @@ Before writing a single phase, you MUST investigate the existing codebase. Read 
 - **Does this change respect existing boundaries?** (module boundaries, layer separation, dependency direction) If the feature requires crossing a boundary, that's a design decision — make it explicit and justify it.
 - **What existing code will this interact with?** List the specific files, classes, and functions. The plan must account for their interfaces, not assume them.
 
+### Failure-Mode & Interaction Analysis
+
+This is the highest-value part of the analysis for a handed-off build. The build model implements each piece correctly in isolation and misses how the pieces fail or interact. Anticipate those misses here and write them into the relevant phases as concrete requirements — not as vague warnings.
+
+Work through each of these and resolve them in the plan:
+
+- **Lifetimes & expiry.** Does anything have a TTL, timeout, cache duration, token/cookie lifetime, or session window? For each: what happens at the moment it expires, and does its lifetime have to be coordinated with another component's? *(A cookie expiring at the access-token TTL silently breaks the next mutating request — name that requirement, don't let the build model discover it.)*
+- **Error & status codes at every boundary.** Enumerate the failure codes/exceptions each seam can emit (401 vs 403, timeout, 409, validation error) and specify exactly **who handles each one**. A reactive handler that only handles one code will be defeated by the others.
+- **State transitions & lifecycle paths.** For anything started, it must be stopped/cancelled/cleaned up. Specify the cancellation and shutdown paths explicitly, including concurrent cleanup (multiple tasks cancelled together must each be awaited — a shared suppressor leaks the second). Name the path; do not assume "finally" is enough.
+- **Cross-component interactions.** For each pair of components that touch: "when A changes/fails, what must B do?" Make the dependency explicit in both phases.
+- **Concurrency & ordering.** Races, ordering assumptions, partial failure, retries. If two things run together, state what happens if one fails first.
+
+Every item you surface here becomes either a phase implementation step or a named test below. An anticipated failure mode with no corresponding test is not actually handled.
+
 ## Plan Document Structure
 
 ```markdown
@@ -57,6 +73,15 @@ Before writing a single phase, you MUST investigate the existing codebase. Read 
 - **Security considerations:** [attack surface, input boundaries, access control]
 - **Files/modules affected:** [list with brief description of each interaction]
 
+## Failure Modes & Interactions
+- **Lifetimes/expiry:** [each TTL/timeout/session and its behavior at expiry + coordination requirement]
+- **Boundary error codes:** [code/exception → who handles it]
+- **Lifecycle/cancellation:** [start → stop/cleanup path for each long-lived thing]
+- **Cross-component interactions:** [when A changes/fails → what B must do]
+
+## Value Paths & Seam Tests
+- **[value path, e.g. worker → DB heartbeat]:** named no-mock test → [test name + what it asserts at the real seam]
+
 ## Phases
 
 ### Phase 1: [Name]
@@ -67,8 +92,9 @@ Before writing a single phase, you MUST investigate the existing codebase. Read 
 **Implementation details:**
 1. [Step-by-step instructions]
 
-**Test criteria:**
-- [ ] [Specific test that must pass]
+**Test criteria:** (each as command + expected output)
+- [ ] `exact command to run` → [expected output / assertion that proves the phase is done]
+- [ ] Seam test (if this phase completes a value path): `command` → [no-mock assertion across the real seam]
 
 ### Phase 2: [Name]
 ...
@@ -96,7 +122,11 @@ This plan is designed as a **contract between agents**. The agent that writes th
 - **If a step requires installing a package, name it** with the exact install command.
 - **Resolve all design trade-offs in the plan itself.** The plan need not include all the code, but it MUST include all decisions. The dev model's job is to execute, not to design.
 
-**Self-test:** Before saving the plan, re-read each phase and ask: "Could a junior developer with access to the codebase but zero context about our conversation execute this phase without asking a single clarifying question?" If no, add more detail.
+**Self-test:** Before saving the plan, re-read each phase and ask:
+- "Could a junior developer with access to the codebase but zero context about our conversation execute this phase without asking a single clarifying question?" If no, add more detail.
+- "For every long-lived thing, TTL, and boundary I introduced — did I write down what happens at expiry/failure and who handles each error code?" If a failure mode lives only in my head, it will not be built. Move it into Failure Modes & Interactions.
+- "Does every value path have a named no-mock seam test in the plan?" An anticipated interaction with no test is not handled — the build model will skip it.
+- "Is every test criterion an exact command with an expected result, not a vague 'tests pass'?"
 
 ## What Happens Next
 
