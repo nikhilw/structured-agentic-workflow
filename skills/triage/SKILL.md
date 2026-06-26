@@ -1,7 +1,7 @@
 ---
 name: triage
 description: Recommend what to work on next by reading the backlog (bugs.md, features.md, plans/) and considering what is already loaded in the current conversation context. Minimizes context thrash — prefers tasks aligned with current context. Recommends bugs when context is low, features when resources are plentiful.
-allowed-tools: Read, Grep, Glob
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 # Triage — What Should We Work On Next?
@@ -26,11 +26,21 @@ This matters because **switching to work that requires loading entirely differen
 
 ## Step 2: Read the Backlog
 
-Check these sources:
-- `docs/plans/bugs.md` — known bugs
-- `docs/plans/features.md` — planned features
+Check the `workflow-config:use-github-issues` preference in your memory.
+
+### If `false` (default) or not set:
+Check these local files (GitHub integration is disabled):
+- `bugs.md` or `docs/plans/bugs.md` — known bugs
+- `features.md` or `docs/plans/features.md` — planned features
 - `docs/plans/new/` — plans written but not yet started
 - `docs/plans/` — any active plans in progress
+
+### If `true`:
+Resolve the target repository the same way `/github-backlog` does — use `workflow-config:github-repo` if set, otherwise derive `owner/repo` from `git remote get-url origin` (handling both SSH and HTTPS forms). Then use the configured GitHub MCP server's tools to fetch the backlog (and optionally project board `workflow-config:github-project-id`):
+- Fetch open issues labeled `bug` (known bugs).
+- Fetch open issues labeled `feature` or `enhancement` (planned features).
+- Check `docs/plans/new/` — plans written but not yet started.
+- Check `docs/plans/` — any active plans in progress.
 
 ## Step 3: Apply the Selection Strategy
 
@@ -57,7 +67,7 @@ Check these sources:
 ## Recommended Next Task
 
 **Task:** [description]
-**Source:** [bugs.md #3 / plans/new/offline-sync.md / features.md #7]
+**Source:** [bugs.md #3 / plans/new/offline-sync.md / features.md #7 OR GitHub Issue #123 / plans/new/offline-sync.md]
 **Why now:** [context alignment + priority reasoning]
 **Context cost:** [Low — already loaded / Medium — partial overlap / High — fresh context needed]
 

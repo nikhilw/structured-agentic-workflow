@@ -34,13 +34,21 @@ When caveman is enabled, ALL workflow skills (brainstorm, write-plan, build-phas
 
 **Important:** This workflow does NOT bundle or vendor the Caveman skills package. If the user wants caveman to also govern the agent's base system prompt (outside of workflow skills), they should install the caveman package separately (e.g., via `npx @anthropics/skills`). The workflow's caveman compatibility works independently — it adapts workflow skill output regardless of whether the caveman package is installed.
 
+### GitHub Issues Integration
+- **use-github-issues false** (default) — Use local files (`features.md`, `bugs.md`, or under `docs/plans/`) for tracking backlog. GitHub integration is disabled.
+- **use-github-issues true** — Enable GitHub integration to track backlog via GitHub Issues and Projects through a GitHub MCP server. The target repository is auto-derived from the local `origin` remote, so no further configuration is required for the common case.
+
+Optional GitHub keys (only set when you need to override the defaults):
+- **workflow-config:github-repo** — Override the repository, in `owner/repo` format (e.g., `nikhilw/structured-agentic-workflow`). Leave unset to auto-derive from `git remote get-url origin`. Useful when issues live in a different repo than `origin`.
+- **workflow-config:github-project-id** — The number or ID of a GitHub Project (V2) board to sync cards to.
+
 ## How to Persist
 
 Save each preference as a memory entry in your agent's persistent memory system. Use whatever memory mechanism your platform provides — the key requirement is that the preference survives across conversation sessions.
 
 **Memory entries should be structured as:**
-- **Key:** `workflow-config:<preference-name>` (e.g., `workflow-config:testing-methodology`, `workflow-config:caveman-level`)
-- **Value:** The chosen setting (e.g., `bdd`, `full`)
+- **Key:** `workflow-config:<preference-name>` (e.g., `workflow-config:testing-methodology`, `workflow-config:caveman-level`, `workflow-config:use-github-issues`, `workflow-config:github-repo`, `workflow-config:github-project-id`)
+- **Value:** The chosen setting (e.g., `bdd`, `full`, `true`/`false`, `owner/repo`)
 
 ## What You Cannot Configure
 
@@ -59,6 +67,9 @@ After saving preferences, confirm what was set:
 
 - Testing methodology: [TDD / BDD]
 - Output style: [normal / caveman lite / caveman full / caveman ultra]
+- Use GitHub Issues: [true / false]
+- GitHub repo: [owner/repo override / auto-derived from origin]
+- GitHub Project ID: [project ID or not set]
 
 These preferences are saved to memory and will apply to all future workflow phases.
 ```

@@ -114,6 +114,7 @@ The installer symlinks these skills from the `skills/` directory:
 | `3p-review` | This project | Independent third-person code review |
 | `handoff-summary` | This project | Emit the fixed-format Build Handoff Summary after review passes |
 | `triage` | This project | Recommend next task, minimize context thrash |
+| `github-backlog` | This project | Maintain and manage features and bugs on GitHub |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
 | `systematic-debugging` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
 | `verification-before-completion` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
@@ -288,6 +289,7 @@ Create a dedicated `docs/` or `.ai/` directory in your project root containing:
      - `/3p-review` — independent third-person code review (after all build phases)
      - `/handoff-summary` — emit the fixed-format Build Handoff Summary artifact
      - `/triage` — recommend next task minimizing context thrash
+     - `/github-backlog` — maintain and manage features and bugs on GitHub (when github provider is enabled)
      - `/test-driven-development` — RED-GREEN-REFACTOR discipline
      - `/systematic-debugging` — systematic root cause investigation
      - `/verification-before-completion` — evidence before completion claims
