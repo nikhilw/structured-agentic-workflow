@@ -28,6 +28,7 @@ Explore the problem space for: **$ARGUMENTS**
 5. **DO propose 2-4 architectural approaches** with clear trade-offs for each.
 6. **DO identify risks, unknowns, and dependencies** that will affect the plan.
 7. **DO research third-party packages** via their documentation (not source code) if relevant.
+8. **Delegate exploration sparingly, and cheaply.** Subagents multiply cost and latency — each re-establishes context, re-explores, and reports back, and then you re-read the report. Spawn one only for a genuinely wide survey (several unrelated modules, a large unfamiliar surface); handle anything you could finish in a handful of tool calls yourself. When you do delegate, **pin the cheapest model that can do the job** — grep, enumerate, and summarize is clerical work, and a subagent that inherits your model by default charges brainstorm-model rates for it. Brief it to return findings, not raw file contents: the saving is that you read a short report instead of forty files, and a subagent that dumps everything back into your context has cost you money instead of saving it. Keep spawn counts low, brief each one precisely the first time, and commit to what it reports instead of re-deriving it. Never delegate the thinking — the trade-off analysis and recommendation are yours.
 
 ## Output Structure
 

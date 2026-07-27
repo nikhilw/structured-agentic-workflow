@@ -24,6 +24,7 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 5. **Include test criteria for each phase**, expressed as the **exact command + expected output** — not a vague "tests pass". The executing model needs an objective stop condition, not a judgment call.
 6. **Write down the foresight, don't leave it in your head.** A smaller build model builds exactly what is specified and fills every silence with the happy path. The errors it makes are not bad guesses — they are *gaps*: failure modes, lifetimes, error codes, and cross-component interactions you anticipated but never wrote down. The Failure-Mode & Interaction Analysis below is where that foresight becomes part of the contract.
 7. **Name the seam test for every value path.** Green unit tests do not prove the wiring works. For each path data must traverse to deliver value (e.g. worker → DB, request → handler → response), the plan MUST name a no-mock test that exercises the real seam. If you don't name it, the build model will not write it.
+8. **Length comes from resolved decisions, not prose.** "Hyper-granular" is an instruction about *decision density*, not word count. Every file path, signature, error code, and test assertion earns its space — that specificity is the whole contract. Padding does not: restated context, redundant summaries, motivational framing, the same decision explained in three places, or a template section left in with nothing under it. A plan is long because the work has many decisions, never because the writing is loose. If a paragraph carries no decision the build model needs, cut it.
 
 ## Before Writing the Plan — Codebase Analysis
 
@@ -55,6 +56,16 @@ Work through each of these and resolve them in the plan:
 - **Concurrency & ordering.** Races, ordering assumptions, partial failure, retries. If two things run together, state what happens if one fails first.
 
 Every item you surface here becomes either a phase implementation step or a named test below. An anticipated failure mode with no corresponding test is not actually handled.
+
+### Delegating the analysis
+
+Subagents multiply cost and latency: each one re-establishes context, re-explores, reports back, and then you re-read the report. Delegate only when the payoff clearly exceeds that overhead.
+
+- **Do delegate** a genuinely wide investigation — several unrelated modules to survey, a large unfamiliar surface to map. Send those in one message so they run concurrently.
+- **Do NOT delegate** work you could finish in a handful of tool calls (a few file reads, one grep, checking a convention), and do not delegate review or verification of your own plan — that belongs in your main loop.
+- **Pin the cheapest model that can do the job.** Mechanical breadth work — grep, enumerate call sites, list what exists, summarize a module — does not need the planning model. Reserve the expensive model for the judgment: trade-offs, decisions, the plan itself. If your harness lets a subagent inherit the parent's model by default, override it explicitly; an un-pinned subagent costs planning-model rates for clerical work.
+- **The saving is context compression, so brief for a summary.** The win is that you read a short report instead of forty files. Ask for findings — paths, patterns, the specific answer — not raw file contents. A subagent that dumps everything it read back into your context has cost you money instead of saving it.
+- **Keep spawn counts low.** If one subagent can do it, use one. Brief it precisely the first time rather than launching, waiting, and re-briefing. Once it reports back, commit to its findings — do not re-derive them yourself.
 
 ## Plan Document Structure
 
@@ -124,6 +135,7 @@ This plan is designed as a **contract between agents**. The agent that writes th
 
 **Self-test:** Before saving the plan, re-read each phase and ask:
 - "Could a junior developer with access to the codebase but zero context about our conversation execute this phase without asking a single clarifying question?" If no, add more detail.
+- "Is there a section here a build model could delete without losing a decision?" If yes, cut it. These two questions pull against each other on purpose — detail that resolves ambiguity earns its length, prose that restates earns nothing.
 - "For every long-lived thing, TTL, and boundary I introduced — did I write down what happens at expiry/failure and who handles each error code?" If a failure mode lives only in my head, it will not be built. Move it into Failure Modes & Interactions.
 - "Does every value path have a named no-mock seam test in the plan?" An anticipated interaction with no test is not handled — the build model will skip it.
 - "Is every test criterion an exact command with an expected result, not a vague 'tests pass'?"
