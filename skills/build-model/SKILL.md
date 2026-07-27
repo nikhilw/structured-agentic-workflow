@@ -23,7 +23,7 @@ Run these steps **in order**. Each step has a clear owner; do not collapse them 
 
 2. **Review — `/3p-review`.** Run a holistic third-person review of the **entire** implementation. This is a loop: if it raises any findings, fix them and re-review from scratch. Continue until **zero open findings**. Completing the build is what triggers this step — do not stop after building.
 
-3. **Hand off — `/handoff-summary`.** Emit the Build Handoff Summary in its exact format. Record the `/3p-review` result in the summary's `3p-review` line.
+3. **Hand off — `/handoff-summary`.** Emit the Build Handoff Summary in its exact format. Review is a gate, not content — the summary does not restate the `/3p-review` result.
 
 4. **Pause.** Present the handoff summary and **STOP**. Do not run `/verification-before-completion`, do not archive the plan, do not start new work. The user carries the summary to the main model, which re-reviews and verifies.
 

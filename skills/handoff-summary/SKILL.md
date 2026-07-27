@@ -13,7 +13,7 @@ You are emitting the **Build Handoff Summary** — the single artifact that carr
 
 ## When this runs
 
-This skill is invoked **after** the build is complete and **after** `/3p-review` has passed. It does not build, test, or review — it only produces the handoff record. If `/3p-review` has not run yet, stop and run it first; the summary records the review result.
+This skill is invoked **after** the build is complete and **after** `/3p-review` has passed. It does not build, test, or review — it only produces the handoff record. If `/3p-review` has not run yet, stop and run it first. `/3p-review` is its own artifact — the handoff summary does not restate or reference its findings.
 
 ## Your only job
 
@@ -23,8 +23,6 @@ Reproduce the template below **exactly** — same headings, same order, same cas
 ## Build Handoff Summary
 
 **Plan:** [plan file path]
-
-**3p-review:** [PASS — zero open findings | the findings that were raised and how each was resolved]
 
 ### Deviations
 - **Phase N: [Name]** — [what changed and why, one line]
@@ -39,7 +37,7 @@ Reproduce the template below **exactly** — same headings, same order, same cas
 
 - **Be honest and specific.** Deviations and concerns are the whole point — an empty summary that hides real drift defeats the purpose. If a phase departed from the plan, say so and why.
 - **Keep it to deviations and concerns.** This is not a feature description or a changelog. Do not restate what the plan already says.
-- **The `3p-review` line is mandatory.** It is the evidence that review happened. If review surfaced findings, list them and how each was resolved — do not write "PASS" unless the review is genuinely clean.
+- **Do not mention `/3p-review`.** Review is its own artifact with its own outcome; the handoff summary is not the place to report it. Any residual concern worth carrying forward belongs under Concerns, in your own words, not attributed back to the review.
 
 ## What happens next
 
