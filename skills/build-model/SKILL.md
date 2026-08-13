@@ -27,6 +27,19 @@ Run these steps **in order**. Each step has a clear owner; do not collapse them 
 
 4. **Pause.** Present the handoff summary and **STOP**. Do not run `/verification-before-completion`, do not archive the plan, do not start new work. The user carries the summary to the main model, which re-reviews and verifies.
 
+## If the main model sends back a Rework Brief
+
+The reviewing model returns rework here when the findings are too many or too systemic for it to fix without losing its independence. When you receive one:
+
+1. **Work it item by item, in severity order.** Each item states where, what is wrong, what is required, and the command that proves it. Do not redesign around it — the required change is already decided.
+2. **Failing test first, every time.** Reproduce the defect, then fix it. An item fixed with no test that was red first is not done.
+3. **Fix the Systemic section as one change**, at every site listed — not site-by-site with three different shapes of fix.
+4. **Respect "Do not touch."** Files outside the brief's scope stay untouched, including anything already dirty in the worktree.
+5. **Run the "Do not regress" commands** at the end, plus the full suite.
+6. **Re-emit `/handoff-summary`** with the rework reflected, then STOP. The reviewing model restarts its review from scratch — your report is a claim it will re-verify, not evidence it will accept.
+
+If an item is wrong or impossible as written, say so explicitly with the reason and stop on that item. Do not silently substitute a different fix.
+
 ## Why these boundaries
 
 - **`build-phase` builds; it does not review or hand off.** Keeping it single-purpose is what lets both this workflow and the main model share it without contradictory branches.
@@ -35,7 +48,7 @@ Run these steps **in order**. Each step has a clear owner; do not collapse them 
 
 ## Guardrails
 
-- **Surface plan discrepancies, don't paper over them.** `/build-phase` will stop and flag an ambiguous or contradictory plan. Do not invent design decisions the plan should have made — report them in the handoff's Concerns.
+- **Surface plan problems, don't paper over them.** `/build-phase` halts on a plan that is ambiguous, contradictory, *or wrong* — and you are expected to use judgment, not just follow instructions. When you hit a technical, architectural, or practical defect in the plan, stop, state it, propose the fix, and let the user decide. Do not invent design decisions the plan should have made, and do not silently build your own better idea. Anything unresolved goes in the handoff's Concerns.
 - **The review loop is a loop.** One clean pass is required; any fix triggers a fresh review.
 - **Never skip the handoff.** Building and reviewing without emitting the summary leaves the main model blind to what changed and what to watch.
 - **Stop means stop.** After the handoff, your job is done. Do not continue into verification or the next plan.

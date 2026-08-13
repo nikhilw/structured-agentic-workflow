@@ -79,6 +79,8 @@ cd structured-agentic-workflow
 
 All skills use the standard `SKILL.md` format supported by all four agents.
 
+A few skills ship supporting files alongside their `SKILL.md` (for example `3p-review/deep-audits.md`, loaded only when the change touches derived state, migrations, or third-party dependencies). Both install paths symlink the **whole skill directory**, so these travel with the skill automatically — `npx skills add` and `install.sh` alike. Supporting files are always kept inside the skill that uses them, never shared across skill directories, because `npx skills` lets users install skills individually and a cross-directory reference would break for anyone who does.
+
 ### Targeting a Specific Agent
 
 ```bash
@@ -111,7 +113,7 @@ The installer symlinks these skills from the `skills/` directory:
 | `write-plan` | This project | Write phased implementation plans |
 | `build-phase` | This project | Execute plan phases with test + self-review; emits a build completion report (no review/handoff) |
 | `build-model` | This project | Dedicated build-model workflow — orchestrates build-phase → 3p-review → handoff-summary → stop |
-| `3p-review` | This project | Independent third-person code review |
+| `3p-review` | This project | Independent third-person code review; returns a Rework Brief when there is too much to fix in place |
 | `handoff-summary` | This project | Emit the fixed-format Build Handoff Summary after review passes |
 | `triage` | This project | Recommend next task, minimize context thrash |
 | `github-backlog` | This project | Maintain and manage features and bugs on GitHub |
