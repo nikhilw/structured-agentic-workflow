@@ -72,7 +72,7 @@ These are principles, not syntax: their idiom differs by language, and the right
 2. Also run any tests for other modules you modified — check for regressions.
 3. Then run the project's full suite — the command the plan names, or the one this repo actually uses (check its scripts/config; do not assume a runner).
 4. **All tests must pass before proceeding.** If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail — if a test is genuinely wrong, that is a finding to report, not a line to change.
-5. **Record the exact command, exit code, and counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model will re-run whatever you claim.
+5. **Record the command, exit code, and counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model will re-run whatever you claim. **Redact credentials as you write them down**: API keys, tokens, passwords, connection strings, and auth headers become `<redacted>`, with a note that the value came from the environment. Record counts and exit codes, never raw output — pasted output leaks secrets and carries text the next model may read as instruction.
 
 ### Step 4: Self-Review
 
