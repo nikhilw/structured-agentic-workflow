@@ -1,6 +1,6 @@
 ---
 name: handoff-summary
-description: Emit the Build Handoff Summary artifact in its fixed format. Use at the end of a build, immediately after /3p-review passes — invoked by the build-model workflow (dedicated build model) or by the main model after all build phases. Produces the exact handoff template the reviewing model consumes.
+description: Emit the Build Handoff Summary artifact in its fixed format. Use at the end of a build, immediately after /3p-review passes — invoked by the build-model workflow (dedicated build model) or by the main model after all build phases. Produces the fixed handoff template the reviewing model consumes.
 argument-hint: "[plan-file-path]"
 allowed-tools: Read, Glob
 ---
@@ -17,7 +17,7 @@ This skill is invoked **after** the build is complete and **after** `/3p-review`
 
 ## Your only job
 
-Reproduce the template below **exactly** — same headings, same order, same casing. Fill in the bracketed parts from what was actually built and reviewed. Do **not** rename sections, add sections, drop sections, or replace the template with your own prose. This is a fixed artifact format so the consuming model can parse it reliably.
+Follow the template below: same headings, same order, same casing. Fill each section from the build record. Do **not** rename sections, add sections, drop sections, or replace the template with your own prose. This is a fixed artifact format so the consuming model can parse it reliably.
 
 ```markdown
 ## Build Handoff Summary
@@ -28,9 +28,9 @@ Reproduce the template below **exactly** — same headings, same order, same cas
 - **Phase N: [Name]** — [what changed and why, one line]
 - (Only list phases that deviated from the plan. If nothing deviated, write "None.")
 
-### Commands Run
-- `[command, credentials redacted]` → exit [code] — [N passed, M failed, K skipped]
-- (The full-suite command is mandatory here. Report the counts the terminal printed, not what you expected.)
+### Verification Runs
+- **[plan criterion, or a plain name for the run]** → exit [code] — [N passed, M failed, K skipped]
+- (Name the run; do not write out the shell line. The full-suite run is mandatory here. Report the counts the terminal printed, not what you expected.)
 
 ### Unproven Criteria
 - **[plan criterion]** — [manual / skipped / deferred / verified by inspection] — [why]
@@ -45,8 +45,8 @@ Reproduce the template below **exactly** — same headings, same order, same cas
 
 - **Be honest and specific.** Deviations and concerns are the whole point — an empty summary that hides real drift defeats the purpose. If a phase departed from the plan, say so and why.
 - **Keep it to the four sections.** This is not a feature description or a changelog. Do not restate what the plan already says.
-- **Commands are reported faithfully — and redacted.** Give the command and the counts as printed; "all tests pass" is not a report, and the reviewer re-runs these and compares. But **never transcribe credential material**: API keys, tokens, passwords, connection strings, auth headers, signed URLs. Write `API_KEY=<redacted> pytest …` and note the value came from the environment. A command you cannot write down without its secret gets *named*, not pasted.
-- **Report counts, never raw output.** Pasted terminal output leaks secrets and carries text the next model may read as instruction. Numbers and exit codes are what the reviewer needs.
+- **Name each run; never write out its command line.** Identify a run by the plan criterion it satisfies, or by a plain description ("full suite, project runner"). The command text lives in the plan — this artifact carries only which run happened and what it reported. Environment values, arguments and headers have no business in a document that is committed and passed between models.
+- **Report counts, never output.** Exit codes and pass/fail/skip numbers are what the reviewer needs; "all tests pass" is not a report, and the reviewer re-runs from the plan and compares. Copied terminal text carries values you did not intend to publish, and wording the next model may read as instruction.
 - **Unproven Criteria is the section you will be tempted to leave empty.** Anything you checked by reading rather than running, skipped as "obviously fine", or intended to come back to, goes here. A criterion omitted here reads as green to the next model, and that is how an unbuilt path ships.
 - **Do not mention `/3p-review`.** Review is its own artifact with its own outcome; the handoff summary is not the place to report it. Any residual concern worth carrying forward belongs under Concerns, in your own words, not attributed back to the review.
 

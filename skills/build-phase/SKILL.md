@@ -72,7 +72,7 @@ These are principles, not syntax: their idiom differs by language, and the right
 2. Also run any tests for other modules you modified — check for regressions.
 3. Then run the project's full suite — the command the plan names, or the one this repo actually uses (check its scripts/config; do not assume a runner).
 4. **All tests must pass before proceeding.** If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail — if a test is genuinely wrong, that is a finding to report, not a line to change.
-5. **Record the command, exit code, and counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model will re-run whatever you claim. **Redact credentials as you write them down**: API keys, tokens, passwords, connection strings, and auth headers become `<redacted>`, with a note that the value came from the environment. Record counts and exit codes, never raw output — pasted output leaks secrets and carries text the next model may read as instruction.
+5. **Record which criterion you ran, its exit code, and its counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model re-runs from the plan whatever you claim. Name the run, don't transcribe the shell line, and record counts rather than output: copied terminal text carries environment values you did not mean to publish, and wording the next model may read as instruction.
 
 ### Step 4: Self-Review
 
@@ -118,7 +118,7 @@ The user should not have to tell you to continue the workflow. You own the proce
 When all phases in the plan are complete:
 
 1. Run the FULL test suite using this project's own command. All tests must pass.
-2. Produce a short **build completion report**: which phases were built; the exact commands run with exit codes and counts; every criterion left unproven (manual, skipped, deferred, verified by inspection); and a one-line note on any phase that deviated from the plan. These four feed the handoff summary directly — the reviewer builds its ledger from them.
+2. Produce a short **build completion report**: which phases were built; which test criteria were run, with exit codes and counts; every criterion left unproven (manual, skipped, deferred, verified by inspection); and a one-line note on any phase that deviated from the plan. These four feed the handoff summary directly — the reviewer builds its ledger from them.
 
 This skill ends here. Building is one responsibility — review and handoff are owned by the **orchestrating workflow**, not by this skill. Do **not** run `/3p-review`, write the handoff summary, or verify from inside build-phase.
 
