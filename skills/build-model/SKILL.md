@@ -19,7 +19,9 @@ Build the plan at **$ARGUMENTS** to completion, review it, and hand it off — t
 
 Run these steps **in order**. Each step has a clear owner; do not collapse them or skip ahead. Finishing one step is the trigger to start the next — not a reason to stop.
 
-1. **Build — `/build-phase`.** Start at Phase 1 and advance through every phase. `/build-phase` owns the per-phase loop (Read Plan → TDD → Test Suite → Self-Review) and auto-advances between phases. Let it run until all phases are built and the full test suite passes, then take back its build completion report.
+1. **Build — `/build-phase`.** Start at Phase 1 and advance through every phase. `/build-phase` owns the per-phase loop (Read + Review Plan → TDD → Test Suite → Self-Review) and auto-advances between phases. Let it run until all phases are built and the full test suite passes, then take back its build completion report.
+
+   Its first step at Phase 1 is a **plan review** — fresh eyes on the plan, the mirror of the `/3p-review` you will run in step 2. You did not write this plan, which makes you the only reader of it without the author's assumptions. Take that seriously: a defect found there costs a paragraph, and the same defect found in step 2 costs a full rework loop. Surface and halt; do not redesign.
 
 2. **Review — `/3p-review`.** Run a holistic third-person review of the **entire** implementation. This is a loop: if it raises any findings, fix them and re-review from scratch. Continue until **zero open findings**. Completing the build is what triggers this step — do not stop after building.
 

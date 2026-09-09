@@ -27,12 +27,48 @@ Three roles. Two of them are mandatory; they are allowed to be the same model.
 
 | Role | Does | Needs | Reasonable choices |
 |---|---|---|---|
-| **Planning model** | `/brainstorm`, `/write-plan` — explores the problem, challenges the design, resolves every decision, writes the plan file | Deep reasoning, long context, architectural judgment | Your best available model — Claude Opus, or whatever you reserve for hard thinking |
-| **Build model** | `/build-model` → `/build-phase` per phase → `/3p-review` → `/handoff-summary` | Accurate code generation, tool use, patience | A cheaper/faster model, or a different tool entirely: Cursor, Copilot, Gemini Flash, a local model, a second Claude session on a smaller model |
+| **Planning model** | `/brainstorm`, `/write-plan` — explores the problem, challenges the design, resolves every decision, writes the plan file | Deep reasoning, long context, architectural judgment | Your best available model — Opus 5, or whatever you reserve for hard thinking |
+| **Build model** | `/build-model` → `/build-phase` per phase → `/3p-review` → `/handoff-summary` | Accurate code generation, tool use, patience | **Sonnet 5 is the default choice** — it executes a well-specified plan without needing to design. Also: Cursor, Copilot, Gemini Flash, or a local model |
 | **Review model** *(optional)* | `/3p-review` on the returning change set, then `/verification-before-completion` | Fresh eyes, no authorship bias | Usually the planning model. Occasionally a *third*, deliberately different model — a reviewer that shares no blind spots with either author |
 
 By default the planning model also reviews and verifies. Splitting the reviewer out is an
 upgrade, not a requirement.
+
+### Picking a tier
+
+The plan is what makes a smaller build model viable. The better the plan resolves decisions,
+the less judgment the build model needs, and the further down the tiers you can go:
+
+- **Opus 5 — planning.** Buy its reasoning once, for the work that decides the architecture.
+  Using it to type out a plan it already wrote is the waste this whole split exists to stop.
+- **Sonnet 5 — building.** The default build model. A `/write-plan` output that names exact
+  files, signatures, and test commands leaves execution, not design — which is what this tier
+  is good at. It also has the judgment to run the plan review at the top of `/build-phase`
+  and to halt on a defect rather than building around it.
+- **Haiku 4.5 — mechanical work.** Genuinely viable as a build model when the plan is
+  *unusually* explicit and the phases are small and independent; expect it to halt more often,
+  which is the fence working rather than a failure. Its more reliable home is subagent work,
+  below.
+
+Two things to watch as you go down-tier. The build model still owns a real quality gate — it
+runs `/3p-review` on its own work before handing off — so a tier that cannot hold that bar
+costs you the rework it was supposed to save. And halts go up as the model's tolerance for
+ambiguity goes down: on a thin plan, a cheaper model is not cheaper, it just fails earlier and
+more honestly. Fix the plan, not the tier.
+
+### Subagents follow the same logic
+
+Inside a single session, `/brainstorm` and `/write-plan` may delegate exploration to
+subagents, and the same cost argument applies one level down. Mechanical breadth work — grep,
+enumerate call sites, list what exists, summarize a module — is clerical, and a subagent that
+inherits its parent's model by default charges planning-model rates for it. Pin the cheapest
+tier that can do the job (Haiku-class for clerical sweeps), and brief it to return findings
+rather than raw file contents — the saving is that you read a short report instead of forty
+files, so a subagent that dumps everything back into your context has cost you money instead
+of saving it.
+
+Never delegate the thinking. The trade-off analysis, the recommendation, and the plan itself
+stay with the model you are paying for judgment.
 
 ```mermaid
 flowchart LR
@@ -124,10 +160,15 @@ the cheapest possible moment. The failure you are buying protection from is the 
 model that hits the gap, routes around it inside the files the plan *did* name, and hands back
 something that passes every gate while doing the wrong thing.
 
-`/build-phase` front-loads the cheap half of this with a **pre-flight check** — every name the
-plan uses must exist, and every caller of anything it changes must be named — run before a
-line of code is written. It catches plan/codebase mismatch; it cannot catch how a third-party
-library behaves at runtime, which is what the plan's gate phase is for.
+Most of those halts are front-loaded, because `/build-phase` opens with a **plan review** —
+the mirror image of `/3p-review`. The build model did not write the plan, so it reads it with
+exactly the independence that makes the code review worth running, at a fraction of the cost:
+one document, before any code exists. It checks that the plan matches the codebase and that it
+is buildable as written, then surfaces defects and halts. It does not redesign or
+re-brainstorm — that would burn the cost advantage this session exists for.
+
+It cannot catch how a third-party library behaves at runtime, which is what the plan's gate
+phase is for.
 
 ### If the build comes back badly
 

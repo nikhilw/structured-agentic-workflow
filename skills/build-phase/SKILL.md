@@ -15,31 +15,43 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
 
-## The Loop: Read Plan + Pre-Flight → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed
+## The Loop: Read + Review Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed
 
 You MUST follow this loop for every phase. Do not skip steps. Every step produces output — do not stop after one step.
 
-### Step 1: Read the Plan and Pre-Flight It
+### Step 1: Read and Review the Plan
 
 1. Read the plan file and locate the specified phase.
 2. Understand what the phase requires: files to modify/create, expected behavior, test criteria.
 3. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, STOP and flag it to the user. Do not guess or make design decisions that the plan should have made. The user may need to take the issue back to the planning model.
-4. **Run the pre-flight check below before writing a single line of code.**
+4. **Run the plan review below before writing a single line of code.**
 
-#### Pre-Flight: Does the Plan Still Match the Codebase?
+#### Plan Review — Fresh Eyes on the Plan
 
-The plan was written against the codebase as the planning model understood it. Before building, confirm that understanding was right. This is a **mechanical check, not a judgment call** — do it by looking things up, not by recalling whether the plan seemed reasonable.
+`/3p-review` puts fresh eyes on the **code**, after it is built. This is the mirror image: fresh eyes on the **plan**, before anything is built — and you are the only participant who has them. You did not write this plan. You carry none of the planning model's assumptions about what is obvious, and none of its attachment to the design it chose. That independence is worth what it is worth at review time, and here it costs almost nothing: the plan is one document, and the code does not exist yet.
 
-Two questions, both scoped to the phase you are about to build:
+**The mindset:** *I did not write this plan, but I am about to build it — once I start, its defects become defects in my code.* A defect caught here costs a paragraph. The same defect caught in `/3p-review` costs a rework loop. Caught after four phases of dependent work, it costs the phases too.
 
-- **Does everything the plan names actually exist?** Walk this phase's file paths, functions, classes, signatures, routes, fixtures, config keys, and flags. Look each one up. Anything marked **new** in the plan is expected to be absent — everything else must be found. A name that does not exist is a plan defect, and building "the closest thing" to it is how an invented method that no other code expects gets written.
-- **Does the plan name every caller of what it changes?** For each existing symbol this phase modifies — especially a changed signature or return type — find its call sites and check the plan accounts for them. Where an index exists (`graphify query`, `graphify path`), use it; a grep finds the name, the graph finds what reaches it. **A caller the plan does not name is the single most common plan defect**: a function gains a keyword argument, six test doubles call it at the old arity, and none of them are in the plan's file list.
+**What this is not.** You are not re-brainstorming, not exploring alternatives, and not redesigning. Do not propose a different architecture because you would have picked one — the plan resolved its trade-offs with the user, and re-litigating them burns the cost advantage this session exists for. You read for things that are **wrong, missing, or unbuildable as written**, and you *surface* them; you do not fix them.
 
-On the **first** phase, run both questions across the whole plan, not just Phase 1 — a plan-wide defect should halt before any code exists. On later phases, scope to that phase.
+**The mechanical half — does the plan match the codebase?** Look things up; do not answer from having skimmed the plan.
 
-Report anything either question turns up and **halt before writing code**, following the Standing Rule below. A pre-flight halt costs minutes; the same defect found in review costs a rework loop, and found after four phases of dependent work it costs the phases too.
+- **Does everything the plan names actually exist?** Walk this phase's file paths, functions, classes, signatures, routes, fixtures, config keys, and flags. Anything marked **new** is expected to be absent — everything else must be found. Building "the closest thing" to a name that does not exist is how an invented method that no other code expects gets written.
+- **Does the plan name every caller of what it changes?** For each existing symbol this phase modifies — especially a changed signature or return type — find its call sites and check the plan accounts for them. Where an index exists (`graphify query`, `graphify path`), use it; a grep finds the name, the graph finds what reaches it. **A caller the plan does not name is the single most common plan defect**: a function gains a keyword argument, six test doubles call it at the old arity, and none are in the plan's file list.
 
-**What this check cannot do.** It compares the plan against *your* codebase, so it catches nothing about how a third-party library actually behaves at runtime — a missing transitive dependency, an undocumented metadata rule, an API that doesn't do what its docs say. Those are what the plan's gate phase is for. The two cover different failure classes and neither substitutes for the other.
+**The judgment half — is the plan buildable exactly as written?**
+
+- **Is every decision actually resolved?** "Choose an appropriate X", "consider using Y", a function described but never given a signature — each is a decision handed back to you. Filling one silently is precisely how a plan's gap becomes a code defect that passes every gate. Name it and halt.
+- **Is every test criterion a real command with a real expected result?** A criterion you cannot run, or whose expected output is "tests pass", gives the phase no objective stop condition.
+- **Do the phases run in a safe order?** Anything that could invalidate the plan — a load-bearing assumption, an external API that may not support what is needed, a migration that may not reverse — needs its gate *before* the work depending on it.
+- **Does anything fight the codebase?** A convention it breaks, a boundary it crosses without saying so, an invariant enforced at a layer that cannot actually enforce it.
+- **What is the plan silent about?** The silences are the danger, because you will fill them with the happy path without noticing: error and cancellation paths, expiry, cleanup, concurrency, what a second caller sees. A silence is not permission to guess.
+
+**Scope.** On the **first** phase, review the whole plan — a plan-wide defect should surface before any code exists. On later phases, scope to that phase and to anything upstream that changed since.
+
+**Reporting.** Anything either half turns up: **halt before writing code**, per the Standing Rule below. Report what the plan says, what you found, and the fix you would recommend. Say explicitly that the plan review ran and what it found — a clean review is a claim the reviewing model will read in the handoff, so it should be one you actually made.
+
+**What this review cannot do.** It reads the plan against *your* codebase, so it says nothing about how a third-party library behaves at runtime — a missing transitive dependency, an undocumented metadata rule, an API that does not do what its docs claim. Only running it catches those, which is what the plan's gate phase is for. The two cover different failure classes and neither substitutes for the other.
 
 ### Standing Rule: You Are Not a Typist — Push Back on a Bad Plan
 

@@ -177,15 +177,18 @@ report. Review and handoff belong to whichever workflow launched it, never to `b
 
 Within a phase:
 
-1. **Read the plan, then pre-flight it.** Before writing any code, check the plan against the
-   codebase mechanically: does every name it uses exist (or is it marked **new**), and does it
-   name every caller of what it changes? A caller the plan missed — a signature gains an
-   argument, six test doubles still call the old arity — is the most common plan defect, and
-   it is found by machine in seconds. If it is ambiguous, contradictory, or does not match the
-   codebase, the build model surfaces the discrepancy and halts with a proposed fix; it does
-   not guess and does not make design decisions.
-   The pre-flight compares the plan against *your* code, so it says nothing about third-party
-   runtime behaviour — that is what the plan's gate phase is for.
+1. **Read the plan, then review it.** Before any code is written, `/build-phase` runs a
+   **plan review** — the mirror image of `/3p-review`. Where `/3p-review` puts fresh eyes on
+   the code after it is built, this puts fresh eyes on the plan before it is built, and the
+   build model is the only participant who has them: it did not write the plan and carries
+   none of the planning model's assumptions. It reads for two things — does the plan match the
+   codebase (every name exists or is marked **new**; every caller of anything it changes is
+   accounted for), and is it buildable exactly as written (decisions actually resolved, test
+   criteria that are real commands, gates ordered before what depends on them, and whatever
+   the plan is silent about). It surfaces defects and halts with a proposed fix; it does not
+   redesign, re-brainstorm, or guess.
+   The review reads the plan against *your* code, so it says nothing about third-party runtime
+   behaviour — that is what the plan's gate phase is for.
 2. **TDD, mandatory.** Failing test first (red), minimum code to pass (green), then refactor.
    Writing the test is the *beginning* of the phase, not the end.
 3. **Full test suite** for the affected modules, to catch regressions.

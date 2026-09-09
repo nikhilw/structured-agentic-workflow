@@ -86,10 +86,12 @@ A fuller template — standing quality bar, architecture facts, hard rules, and 
 `agentic-workflow` drives these transitions for you — you rarely type the middle three. Ask
 `/triage` when you are not sure what to pick up next.
 
-**To hand the build to a cheaper model:** approve the plan, `mv` it to `docs/plans/`, then in
-the other tool run `/build-model docs/plans/offline-sync.md`. It builds every phase, reviews
-its own work, emits a handoff summary, and stops. Bring that summary back to your main model,
-which re-reviews with fresh eyes and verifies.
+**To hand the build to a cheaper model** (Sonnet is the usual choice, or another tool
+entirely): approve the plan, `mv` it to `docs/plans/`, then in that session run
+`/build-model docs/plans/offline-sync.md`. It reviews the plan first and halts if it finds a
+defect, then builds every phase, reviews its own work, emits a handoff summary, and stops.
+Bring that summary back to your main model, which re-reviews with fresh eyes and verifies.
+Tier guidance is in [multi-model.md](docs/multi-model.md).
 
 ### The skills
 
@@ -132,9 +134,8 @@ is the best known, and this workflow composes with it rather than competing. Fiv
 this one apart:
 
 **1 · The build model doesn't have to be the planning model.**
-Because the plan is a *file* that resolves every decision, you can brainstorm and plan with
-your strongest model, then hand the plan to Cursor, Gemini Flash, Copilot, or a local model
-to execute. Frontier reasoning is the scarcest resource in agentic development, and most of
+Because the plan is a *file* that resolves every decision, you can plan with Opus and build
+with Sonnet — or hand the plan to Cursor, Gemini Flash, Copilot, or a local model entirely. Frontier reasoning is the scarcest resource in agentic development, and most of
 the tokens a coding agent burns are not reasoning at all — they are reading files, writing
 boilerplate, and re-running tests. This workflow is built so you stop paying frontier prices
 for typing. → [multi-model.md](docs/multi-model.md)
