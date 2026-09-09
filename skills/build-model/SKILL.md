@@ -48,6 +48,8 @@ If an item is wrong or impossible as written, say so explicitly with the reason 
 
 ## Guardrails
 
+- **Re-read the plan from disk at the start of every batch.** A resumed thread carries the *conversation*, not the *file*. If the plan was corrected between batches — by the user, by the planning model, or by you after a halt — your thread still remembers the version you discussed, and that memory silently wins over the file you never re-opened. Re-read before acting, and re-read especially right after a correction, when the gap between thread and disk is widest and freshest. The same applies to a Rework Brief you are resuming mid-way.
+- **Stage by path when you share a working tree.** If another agent or session has uncommitted work in the same tree, `git add -A` and `git commit -a` sweep it into your commit. Add the specific paths your build touched. (This is a shared-tree hazard: when the build runs in its own git worktree, isolation handles it — but never assume you have one without checking.)
 - **Surface plan problems, don't paper over them.** `/build-phase` halts on a plan that is ambiguous, contradictory, *or wrong* — and you are expected to use judgment, not just follow instructions. When you hit a technical, architectural, or practical defect in the plan, stop, state it, propose the fix, and let the user decide. Do not invent design decisions the plan should have made, and do not silently build your own better idea. Anything unresolved goes in the handoff's Concerns.
 - **The review loop is a loop.** One clean pass is required; any fix triggers a fresh review.
 - **Never skip the handoff.** Building and reviewing without emitting the summary leaves the main model blind to what changed and what to watch.

@@ -177,9 +177,15 @@ report. Review and handoff belong to whichever workflow launched it, never to `b
 
 Within a phase:
 
-1. **Read the plan.** If it is ambiguous or contradictory, the build model surfaces the
-   discrepancy — it does not guess and does not make design decisions. A plan defect halts
-   the phase with a proposed fix.
+1. **Read the plan, then pre-flight it.** Before writing any code, check the plan against the
+   codebase mechanically: does every name it uses exist (or is it marked **new**), and does it
+   name every caller of what it changes? A caller the plan missed — a signature gains an
+   argument, six test doubles still call the old arity — is the most common plan defect, and
+   it is found by machine in seconds. If it is ambiguous, contradictory, or does not match the
+   codebase, the build model surfaces the discrepancy and halts with a proposed fix; it does
+   not guess and does not make design decisions.
+   The pre-flight compares the plan against *your* code, so it says nothing about third-party
+   runtime behaviour — that is what the plan's gate phase is for.
 2. **TDD, mandatory.** Failing test first (red), minimum code to pass (green), then refactor.
    Writing the test is the *beginning* of the phase, not the end.
 3. **Full test suite** for the affected modules, to catch regressions.

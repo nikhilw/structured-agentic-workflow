@@ -15,15 +15,31 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
 
-## The Loop: Read Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed
+## The Loop: Read Plan + Pre-Flight → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed
 
 You MUST follow this loop for every phase. Do not skip steps. Every step produces output — do not stop after one step.
 
-### Step 1: Read the Plan
+### Step 1: Read the Plan and Pre-Flight It
 
 1. Read the plan file and locate the specified phase.
 2. Understand what the phase requires: files to modify/create, expected behavior, test criteria.
 3. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, STOP and flag it to the user. Do not guess or make design decisions that the plan should have made. The user may need to take the issue back to the planning model.
+4. **Run the pre-flight check below before writing a single line of code.**
+
+#### Pre-Flight: Does the Plan Still Match the Codebase?
+
+The plan was written against the codebase as the planning model understood it. Before building, confirm that understanding was right. This is a **mechanical check, not a judgment call** — do it by looking things up, not by recalling whether the plan seemed reasonable.
+
+Two questions, both scoped to the phase you are about to build:
+
+- **Does everything the plan names actually exist?** Walk this phase's file paths, functions, classes, signatures, routes, fixtures, config keys, and flags. Look each one up. Anything marked **new** in the plan is expected to be absent — everything else must be found. A name that does not exist is a plan defect, and building "the closest thing" to it is how an invented method that no other code expects gets written.
+- **Does the plan name every caller of what it changes?** For each existing symbol this phase modifies — especially a changed signature or return type — find its call sites and check the plan accounts for them. Where an index exists (`graphify query`, `graphify path`), use it; a grep finds the name, the graph finds what reaches it. **A caller the plan does not name is the single most common plan defect**: a function gains a keyword argument, six test doubles call it at the old arity, and none of them are in the plan's file list.
+
+On the **first** phase, run both questions across the whole plan, not just Phase 1 — a plan-wide defect should halt before any code exists. On later phases, scope to that phase.
+
+Report anything either question turns up and **halt before writing code**, following the Standing Rule below. A pre-flight halt costs minutes; the same defect found in review costs a rework loop, and found after four phases of dependent work it costs the phases too.
+
+**What this check cannot do.** It compares the plan against *your* codebase, so it catches nothing about how a third-party library actually behaves at runtime — a missing transitive dependency, an undocumented metadata rule, an API that doesn't do what its docs say. Those are what the plan's gate phase is for. The two cover different failure classes and neither substitutes for the other.
 
 ### Standing Rule: You Are Not a Typist — Push Back on a Bad Plan
 

@@ -114,6 +114,21 @@ implementation velocity stop being the same number.
 The build model needs the workflow skills installed in *its* environment too — every skill
 here is a plain `SKILL.md`, which Claude Code, Cursor, Gemini CLI, and Copilot all read.
 
+### Expect halts, and read them correctly
+
+The build model is fenced in: it builds what the plan names and halts rather than inventing a
+way around a gap. That fence converts every gap in the plan into a halt, so budget for a
+relaunch or two — and read a halt as a defect in *your plan*, not as the build model
+underperforming. A halt with an accurate diagnosis and no workaround is the fence working, at
+the cheapest possible moment. The failure you are buying protection from is the opposite: a
+model that hits the gap, routes around it inside the files the plan *did* name, and hands back
+something that passes every gate while doing the wrong thing.
+
+`/build-phase` front-loads the cheap half of this with a **pre-flight check** — every name the
+plan uses must exist, and every caller of anything it changes must be named — run before a
+line of code is written. It catches plan/codebase mismatch; it cannot catch how a third-party
+library behaves at runtime, which is what the plan's gate phase is for.
+
 ### If the build comes back badly
 
 `/3p-review` has a volume threshold. Past roughly eight findings, findings spread across

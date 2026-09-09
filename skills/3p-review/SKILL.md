@@ -54,6 +54,7 @@ State what you are diffing against and cover the **whole** change surface. A rev
    - generated/vendored files, binaries, large assets
    - migrations, schema snapshots, lockfiles, dependency manifests — these change behaviour without looking like code
 3. **Reconcile against the plan.** Files the plan named but that didn't change, and files that changed but the plan never mentioned, are both leads.
+4. **Check whether the tree is yours alone.** If another agent or session has uncommitted work here, the diff in front of you is not this change — it is this change plus theirs, and reviewing the union produces findings against code nobody asked you to review. Separate them by path before you start, say in the summary which paths you attributed to this change, and never `git add -A` to "tidy up" first. (An isolated git worktree removes the problem; confirm you are in one rather than assuming it.)
 
 ### Read the governing artifacts
 
@@ -143,6 +144,16 @@ If the change touches any of these, open **`deep-audits.md`** in this skill's di
 - **Derived state** (caches, indexes, materialized views, generated artifacts)
 - **Migrations or schema changes**
 - **New/upgraded third-party dependencies, or deployment and runtime constraints**
+- **Authority or security boundaries** (authn/authz, trust transitions, tenant or visibility rules)
+- **A seam between components** where one side can change without the other
+
+**Depth is set by these triggers, not by how large the change feels.** A change that trips none of them gets the standard checklist and no deep audit — that is the proportionate form, and running a full derived-state audit against a forty-line logging change is cost, not rigour. But the trigger list is the *only* thing that flexes:
+
+- **The exit condition never flexes.** Zero findings at every severity, and the gates below, apply to every change regardless of size. "It's a small change" is not grounds to wave a MINOR, skip a gate, or stop looping.
+- **Judge the triggers by what the code touches, not by the diff's size.** A four-line change to a permission check trips the authority trigger; a four-hundred-line change that only moves test fixtures around trips nothing.
+- **Record which audits you ran and why** in the summary — the trigger you matched, or the explicit statement that none applied. A reviewer who quietly decided a change was too small to audit leaves no trace; one who names the triggers can be checked.
+
+If you find yourself reasoning "this is minor, so a lighter review is proportionate", stop: that is the rationalization the exit condition exists to block. Scope the *audits* by trigger, then hold the bar.
 
 ### Architecture
 - [ ] Does this fit existing patterns, or introduce a new one?
@@ -204,7 +215,9 @@ Severity sets *priority*, not whether it gets fixed — everything gets fixed:
 - **MINOR** — style, small simplifications, naming polish. Still fixed before sign-off.
 - **GOOD** — things done well. Not a finding.
 
-**The bar every finding must clear.** Name at least one of: a **defect** (wrong result, crash, leak, security hole, broken contract); a **violated contract or convention** (codebase, plan, or decision doc says otherwise); a **concrete maintenance cost** (name the future change it endangers); a **demonstrated simplification** (state the smaller thing that does the same job). Anything else is preference, and preferences are not findings. This bar is what keeps the exit condition honest: since sign-off needs zero findings, a reviewer who can manufacture subjective minors forever has either an infinite loop or a quiet incentive to lower the bar until it ends.
+**Before proposing a simplification, confirm the code runs.** Check that the branch is reachable and the enclosing condition is ever true — for anything non-obvious, prove it with a live run or an assertion, not by reading. Tidier dead code is not an improvement, and "simplify this" written against an unreachable branch is worse than no finding at all: it launders the real defect (the code never executes) into an apparent improvement, and once the tidy version is committed nobody looks again. If the branch turns out to be dead, *that* is the finding, and it is not a MINOR.
+
+**The bar every finding must clear.** Name at least one of: a **defect** (wrong result, crash, leak, security hole, broken contract); a **violated contract or convention** (codebase, plan, or decision doc says otherwise); a **concrete maintenance cost** (name the future change it endangers); a **demonstrated simplification** (state the smaller thing that does the same job, and confirm the code you are shrinking actually executes). Anything else is preference, and preferences are not findings. This bar is what keeps the exit condition honest: since sign-off needs zero findings, a reviewer who can manufacture subjective minors forever has either an infinite loop or a quiet incentive to lower the bar until it ends.
 
 **Findings vs. Follow-ups.** A **Finding** was introduced, touched, or *exposed* by this change, and blocks sign-off — including anything this change made worse or now depends on for correctness. A **Follow-up** is genuinely unrelated pre-existing work; record it in the summary with `file:line` and do not block on it. This is not an escape hatch: "it was already broken" does not downgrade a Finding when the change relies on the broken thing or puts a new caller in front of it. When in doubt, it is a Finding.
 
