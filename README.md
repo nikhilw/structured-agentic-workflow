@@ -1,485 +1,203 @@
 # The Structured Agentic Development Workflow
 
-*A pragmatic approach to building complex software with autonomous AI agents. This methodology shifts the developer's role from Individual Contributor to Engineering Manager, focusing on deterministic outcomes, architectural integrity, and continuous improvement.*
+*Agent skills that keep humans and AI agents focused while building real software — and let
+you spend frontier-model reasoning on design while a cheaper model does the typing.*
+
+Every significant change follows one cycle:
+**Brainstorm → Plan → Build → 3rd-Person Review → Verify.**
+Phases are never skipped, plans are files rather than conversations, and nothing is "done"
+without evidence.
 
 ---
 
-## The Philosophy: Beyond "Vibe Coding"
+## Setup
 
-Working with LLMs for software development often devolves into "vibe-based coding"—you ask for a massive feature, the AI hallucinates a messy implementation, breaks existing dependencies, and you spend the next three hours in debugging hell.
+### 1. Install graphify (recommended)
 
-The **Structured Agentic Development Workflow** treats the AI not as a magical junior developer who can read your mind, but as an incredibly fast, highly capable engineer that *lacks object permanence*. To get senior-level results, you must provide a rigid scaffolding of context, constraints, and deterministic planning.
-
-### The Trade-offs
-
-**Benefits:**
-*   **Architectural Integrity:** You get maintainable, predictably structured code instead of a patchwork of different styles.
-*   **Near-Zero Regressions:** Because changes are isolated and tested phase-by-phase, bugs are caught instantly.
-*   **Elimination of "Vibe-Lost" Time:** You spend less time untangling spaghetti code and more time in active, forward-moving development.
-*   **Role Elevation:** You operate as a Tech Lead defining the "what" and "how," delegating the keystrokes to the agent.
-
-**Drawbacks:**
-*   **Higher Token Consumption:** Planning and context-loading consume significantly more tokens (and therefore money) than zero-shot coding.
-*   **Higher Active Involvement:** You cannot simply prompt "build the app" and walk away. This workflow demands your constant attention as a reviewer and decision-maker.
-
----
-
-## Installation
-
-### Quick Start (Recommended)
-
-Install via the [skills](https://www.npmjs.com/package/skills) CLI — works with Claude Code, Cursor, Gemini CLI, GitHub Copilot, and 40+ other agents:
+Powers codebase search in `/brainstorm` and `/write-plan`. The workflow runs without it —
+both skills fall back to grep after saying so once — but this is where a lot of the quality
+comes from.
 
 ```bash
-# Install workflow skills for your agent
+uv tool install graphifyy   # note the double-y; `graphify` on PyPI is an unrelated package
+graphify install            # registers the /graphify skill with your agent
+```
+
+If the `graphify` command isn't found afterwards, run `uv tool update-shell`. `pipx install
+graphifyy` and `pip install graphifyy` also work.
+
+Add `graphify-out/` to your project's `.gitignore`; it is a build artifact.
+
+### 2. Install the workflow skills
+
+```bash
+# Works with Claude Code, Cursor, Gemini CLI, Copilot, and 40+ other agents
 npx skills add nikhilw/structured-agentic-workflow
 
-# Install for a specific agent
-npx skills add nikhilw/structured-agentic-workflow -a claude-code
-
-# Install superpowers skills separately (test-driven-development, systematic-debugging, verification-before-completion)
+# superpowers supplies TDD, debugging, and verification — strongly recommended
 npx skills add obra/superpowers -s test-driven-development -s systematic-debugging -s verification-before-completion
 ```
 
-The `npx skills` CLI will discover all skills in the repo, let you pick which ones to install, and symlink them into your agent's skills directory.
+Prefer one command that pulls everything? Clone the repo and run `./install.sh`
+(`.\install.ps1` on Windows). Per-agent targets, manual steps, and the full skill inventory
+are in [installation.md](docs/installation.md).
 
-> **Note:** The superpowers skills (`test-driven-development`, `systematic-debugging`, `verification-before-completion`) live in a separate repo and must be installed separately. The workflow works without them, but they are strongly recommended — the build phase expects `/test-driven-development`, and the workflow enforces `/verification-before-completion` after every review.
->
-> We keep the upstream skill names verbatim (`systematic-debugging`, `verification-before-completion`) rather than renaming them to `debug`/`verify`. The `npx skills` CLI has no rename flag, so keeping the upstream names means installs via `npx skills` and installs via our `install.sh` both end up with identically-named skills.
+### 3. Point your project's agent config at the workflow
 
-### Alternative: Install Script
+Add the workflow skills to `CLAUDE.md` / `AGENTS.md` (or `.cursorrules`, `GEMINI.md`,
+`.github/copilot-instructions.md`) so the agent starts every conversation knowing the
+workflow exists and can suggest phase transitions itself:
 
-If you prefer a single command that pulls superpowers and installs everything at once:
+```markdown
+## Workflow Skills
 
-```bash
-# Clone the repo
-git clone https://github.com/nikhilw/structured-agentic-workflow.git
-cd structured-agentic-workflow
+ALWAYS follow the Structured Agentic Development Workflow. These skills are installed
+globally and define the development lifecycle:
 
-# Install for all supported agents (pulls superpowers automatically)
-./install.sh
+- `agentic-workflow` — orchestrates the full lifecycle; suggests phase transitions automatically
+- `/brainstorm` — explore the problem space before planning (no code, no plans)
+- `/write-plan` — write phased plans to `docs/plans/new/` (agent-decoupled)
+- `/build-phase` — execute one plan phase: test-first → implement → test suite → self-review
+- `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
+- `/3p-review` — independent code review; the reviewer owns the code
+- `/handoff-summary` — emit the fixed-format Build Handoff Summary
+- `/verification-before-completion` — evidence before any "done" claim
+- `/triage` — recommend the next task, minimizing context thrash
 
-# Or on Windows (PowerShell — requires Developer Mode or admin)
-.\install.ps1
+Startup default: load `agentic-workflow` at startup.
 ```
 
-### What the Install Script Does
-
-1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers) (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/` under their upstream names.
-2. **Symlinks all skills** into the global skills directory for each supported agent:
-
-| Agent | Skills Directory |
-|-------|-----------------|
-| Claude Code | `~/.claude/skills/` |
-| Cursor | `~/.cursor/skills/` |
-| Gemini CLI | `~/.gemini/skills/` |
-| GitHub Copilot | `~/.config/github-copilot/skills/` |
-
-> **Note:** Cursor also reads `~/.claude/skills/` natively, so installing for Claude Code alone is sufficient if you use both.
-
-All skills use the standard `SKILL.md` format supported by all four agents.
-
-A few skills ship supporting files alongside their `SKILL.md` (for example `3p-review/deep-audits.md`, loaded only when the change touches derived state, migrations, or third-party dependencies). Both install paths symlink the **whole skill directory**, so these travel with the skill automatically — `npx skills add` and `install.sh` alike. Supporting files are always kept inside the skill that uses them, never shared across skill directories, because `npx skills` lets users install skills individually and a cross-directory reference would break for anyone who does.
-
-### Targeting a Specific Agent
-
-```bash
-./install.sh --target claude        # Claude Code only
-./install.sh --target gemini        # Gemini CLI only
-./install.sh --target cursor        # Cursor only
-./install.sh --target copilot       # GitHub Copilot only
-```
-
-### Other Options
-
-```bash
-./install.sh --local                # Skip superpowers pull (use existing vendor/)
-./install.sh --remove               # Remove all symlinks
-./install.sh --remove --target claude  # Remove for a specific agent
-./install.sh --list                 # Show agents and install status
-```
-
-### Installed Skills
-
-The installer symlinks these skills from the `skills/` directory:
-
-**Core workflow skills:**
-
-| Skill | Source | Description |
-|-------|--------|-------------|
-| `agentic-workflow` | This project | Orchestrates the full development lifecycle |
-| `workflow-config` | This project | Configure workflow preferences (TDD/BDD, caveman output style) |
-| `brainstorm` | This project | Explore approaches, challenge the design, estimate impact, produce decision documents |
-| `write-plan` | This project | Write phased implementation plans |
-| `build-phase` | This project | Execute plan phases with test + self-review; emits a build completion report (no review/handoff) |
-| `build-model` | This project | Dedicated build-model workflow — orchestrates build-phase → 3p-review → handoff-summary → stop |
-| `3p-review` | This project | Independent third-person code review; returns a Rework Brief when there is too much to fix in place |
-| `handoff-summary` | This project | Emit the fixed-format Build Handoff Summary after review passes |
-| `triage` | This project | Recommend next task, minimize context thrash |
-| `github-backlog` | This project | Maintain and manage features and bugs on GitHub |
-| `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
-| `systematic-debugging` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
-| `verification-before-completion` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
-
-**Optional vendor skills (installed but not part of the workflow):**
-
-| Skill | Source | Description |
-|-------|--------|-------------|
-| `brainstorming` | [superpowers](https://github.com/obra/superpowers) | Interactive brainstorming with visual companion and spec review loop. Not used by the workflow — available if you prefer it over `/brainstorm`. |
-
-### Configuring the Workflow
-
-The workflow supports configurable preferences via the `/workflow-config` skill:
-
-```
-/workflow-config enable caveman full
-/workflow-config use bdd
-```
-
-#### Testing Methodology
-
-- **TDD** (default) — Red-Green-Refactor via `/test-driven-development`
-- **BDD** — Given-When-Then scenarios and feature files
-
-Only one can be active at a time. The core rule — "test first, always" — applies regardless.
-
-#### Output Style: Caveman Compatibility
-
-The workflow integrates with the [caveman](https://www.npmjs.com/package/@anthropics/skills) brevity style. When enabled, all workflow phases adapt their prose to the requested level:
-
-| Level | Style |
-|-------|-------|
-| `off` (default) | Normal verbose output |
-| `lite` | Shorter prose, all technical detail preserved |
-| `full` | Terse bullets, minimal preamble |
-| `ultra` | Maximum compression, sentence fragments |
-
-Technical accuracy is never sacrificed — only verbosity changes.
-
-**This workflow does not bundle or vendor caveman.** Caveman compatibility is built in — each skill checks memory for the configured brevity level and adapts its output independently. If you also want caveman to govern the agent's base system prompt (outside of workflow skills), install the caveman package separately.
-
-#### What Cannot Be Configured
-
-These are core workflow guarantees and cannot be disabled:
-
-- **Verification** (`/verification-before-completion`) — always mandatory
-- **Phase order** — Brainstorm → Plan → Build → 3p-Review → Verify
-- **Plan lifecycle** — `new/` → `plans/` → `done/`
-- **Review loop** — loops until clean
-
-Preferences are persisted to agent memory and apply across sessions.
-
-### Manual Installation
-
-If the install script doesn't work on your system, you can do it by hand. There are two steps: pulling the superpowers skills, and symlinking everything into your agent's skills directory.
-
-#### Step 1: Pull Superpowers Skills
-
-Clone the superpowers repo and copy the skills you need into `skills/`:
-
-```bash
-# Clone superpowers into a temp directory
-git clone --depth 1 https://github.com/obra/superpowers.git /tmp/superpowers
-
-# Copy the four adopted skills into vendor/ (for reference)
-mkdir -p vendor/superpowers
-cp -r /tmp/superpowers/skills/brainstorming vendor/superpowers/
-cp -r /tmp/superpowers/skills/test-driven-development vendor/superpowers/
-cp -r /tmp/superpowers/skills/systematic-debugging vendor/superpowers/
-cp -r /tmp/superpowers/skills/verification-before-completion vendor/superpowers/
-cp /tmp/superpowers/LICENSE vendor/superpowers/
-
-# Copy into skills/ under their upstream names
-cp -r /tmp/superpowers/skills/brainstorming skills/brainstorming
-cp -r /tmp/superpowers/skills/test-driven-development skills/test-driven-development
-cp -r /tmp/superpowers/skills/systematic-debugging skills/systematic-debugging
-cp -r /tmp/superpowers/skills/verification-before-completion skills/verification-before-completion
-
-# Clean up
-rm -rf /tmp/superpowers
-```
-
-#### Step 2: Symlink Skills
-
-Create symlinks from the `skills/` directory to your agent's global skills directory. Replace `~/.claude/skills` with the appropriate path for your agent (see the table above).
-
-**macOS / Linux:**
-
-```bash
-mkdir -p ~/.claude/skills
-
-# Symlink each skill
-ln -sf "$(pwd)/skills/agentic-workflow" ~/.claude/skills/agentic-workflow
-ln -sf "$(pwd)/skills/brainstorming" ~/.claude/skills/brainstorming
-ln -sf "$(pwd)/skills/write-plan" ~/.claude/skills/write-plan
-ln -sf "$(pwd)/skills/build-phase" ~/.claude/skills/build-phase
-ln -sf "$(pwd)/skills/build-model" ~/.claude/skills/build-model
-ln -sf "$(pwd)/skills/3p-review" ~/.claude/skills/3p-review
-ln -sf "$(pwd)/skills/handoff-summary" ~/.claude/skills/handoff-summary
-ln -sf "$(pwd)/skills/triage" ~/.claude/skills/triage
-ln -sf "$(pwd)/skills/test-driven-development" ~/.claude/skills/test-driven-development
-ln -sf "$(pwd)/skills/systematic-debugging" ~/.claude/skills/systematic-debugging
-ln -sf "$(pwd)/skills/verification-before-completion" ~/.claude/skills/verification-before-completion
-ln -sf "$(pwd)/skills/brainstorm" ~/.claude/skills/brainstorm
-```
-
-**Windows (PowerShell — requires Developer Mode or admin):**
-
-```powershell
-New-Item -ItemType Directory -Path "$env:USERPROFILE\.claude\skills" -Force
-
-# Symlink each skill (run from the repo root)
-$skills = Get-ChildItem -Path ".\skills" -Directory
-foreach ($skill in $skills) {
-    New-Item -ItemType SymbolicLink `
-        -Path "$env:USERPROFILE\.claude\skills\$($skill.Name)" `
-        -Target $skill.FullName -Force
-}
-```
-
-#### Step 3: Verify
-
-```bash
-ls -la ~/.claude/skills/
-```
-
-Each entry should be a symlink pointing back to the `skills/` directory in this repo.
+A fuller template — standing quality bar, architecture facts, hard rules, and what to keep
+*out* of the file — is in [agent-config.md](docs/agent-config.md).
 
 ---
 
-## 1. Project Initialization & Context Scaffolding
+## Use
 
-Before you prompt the AI to write a feature, you must establish its world. Let's imagine a hypothetical project: **SyncScribe**, a real-time collaborative Markdown editor. 
+```
+/brainstorm add offline support to the sync layer   # explore, challenge, decide
+/write-plan offline-sync                            # phased plan → docs/plans/new/
+                                                    # you review it, then: mv to docs/plans/
+/build-phase docs/plans/offline-sync.md Phase 1     # TDD → test → self-review, per phase
+/3p-review                                          # holistic review, loops until clean
+/verification-before-completion                     # fresh evidence, then archive the plan
+```
 
-Create a dedicated `docs/` or `.ai/` directory in your project root containing:
+`agentic-workflow` drives these transitions for you — you rarely type the middle three. Ask
+`/triage` when you are not sure what to pick up next.
 
-1. **`ai-context.md` (The Worldview)**
-   - *Example:* "SyncScribe uses FastAPI (Python 3.13) for the backend and React (TypeScript) for the frontend. We use CRDTs (Yjs) for state resolution. All database interactions must go through the Repository layer."
+**To hand the build to a cheaper model:** approve the plan, `mv` it to `docs/plans/`, then in
+the other tool run `/build-model docs/plans/offline-sync.md`. It builds every phase, reviews
+its own work, emits a handoff summary, and stops. Bring that summary back to your main model,
+which re-reviews with fresh eyes and verifies.
 
-2. **`CLAUDE.md` (The Persistent System Prompt)**
-   - Most agentic coding tools (Claude Code, Cursor, Windsurf) support a project-level instruction file—`CLAUDE.md`, `.cursorrules`, etc. This file is loaded into every conversation automatically and acts as the agent's persistent memory of your project's architecture, conventions, and hard rules.
-   - **Why this matters beyond built-in plan mode:** Tools like Claude Code already have a "plan mode" where the agent plans before building. But plan mode alone does not keep the agent *focused*. Left to its own devices, the agent will start researching tangential topics, propose unnecessary refactors, or drift from your architecture. `CLAUDE.md` is the leash—it keeps the agent honest, informed, and aligned with your project's reality without requiring you to repeat context every conversation.
-   - *Example contents:* "SQLite is the source of truth. Config uses Dynaconf + dataclasses. Entity relationships are stored by NAME not ID. Cost-conscious: use haiku/sonnet for bulk work, opus for planning only."
+### The skills
 
-3. **The Backlog (`features.md`, `bugs.md`)**
-   - A prioritized list of tasks. This grounds the AI. When a task is completed, the AI crosses it off, maintaining a shared sense of progress.
+| Skill | Does |
+|---|---|
+| `agentic-workflow` | Orchestrates the lifecycle and drives phase transitions |
+| `/brainstorm` | Explores approaches, challenges the design, writes a decision document |
+| `/write-plan` | Writes a phased, fully-decided plan to `docs/plans/new/` |
+| `/build-phase` | Executes one phase: test-first → implement → suite → self-review |
+| `/build-model` | Entry point for a dedicated build model: build → review → handoff → stop |
+| `/3p-review` | Independent review that owns the code; loops until clean |
+| `/handoff-summary` | Emits the fixed-format Build Handoff Summary |
+| `/triage` | Recommends the next task, minimizing context thrash |
+| `/github-backlog` | Maintains features and bugs as GitHub issues |
+| `/workflow-config` | Sets TDD/BDD, output brevity, and backlog source |
 
-4. **Global System Prompt & Predefined Skills**
-   - **Initial Prep (The Skill-set):** Equip the AI with predefined skills *before* the first task.
-     - **Clean Code & Patterns:** Hard-code instructions for naming conventions, SOLID principles, and design patterns.
-     - **Project-Specific standards:** Define exactly how configuration management (e.g., Dynaconf) or logging (e.g., RichHandler) should be implemented.
-   - **Strict Rules (The Guardrails):**
-     - *Example:* "Do not use `any` types in TypeScript; define strict interfaces for all API payloads."
-     - *Example:* "Always use the public APIs of third-party libraries; do not import internal private modules."
-
-5. **List Your Workflow Skills in Your Agent's Config File**
-   - Skills installed globally are automatically discovered by the agent. However, explicitly listing them in your agent's project-level config file ensures they are loaded into context at the start of every conversation, so the agent knows the workflow exists and can suggest phase transitions proactively.
-   - The config file depends on your agent:
-     - **Claude Code:** `CLAUDE.md` (project root)
-     - **Cursor:** `.cursorrules` (project root)
-     - **Gemini CLI:** `GEMINI.md` (project root)
-     - **GitHub Copilot:** `.github/copilot-instructions.md`
-   - *Example (add to whichever file your agent uses):*
-     ```markdown
-     ## Workflow Skills
-     - `agentic-workflow` — orchestrates the structured development lifecycle
-     - `/workflow-config` — configure workflow preferences (TDD/BDD, caveman output style)
-     - `/brainstorm` — explore problem space, challenge the design, produce decision documents
-     - `/write-plan` — write phased plans to docs/plans/new/
-     - `/build-phase` — execute plan phases with test + self-review (emits a build completion report)
-     - `/build-model` — dedicated build-model workflow (build → 3p-review → handoff → stop)
-     - `/3p-review` — independent third-person code review (after all build phases)
-     - `/handoff-summary` — emit the fixed-format Build Handoff Summary artifact
-     - `/triage` — recommend next task minimizing context thrash
-     - `/github-backlog` — maintain and manage features and bugs on GitHub (when github provider is enabled)
-     - `/test-driven-development` — RED-GREEN-REFACTOR discipline
-     - `/systematic-debugging` — systematic root cause investigation
-     - `/verification-before-completion` — evidence before completion claims
-     ```
+Plus `test-driven-development`, `systematic-debugging`, and `verification-before-completion`
+from [superpowers](https://github.com/obra/superpowers).
 
 ---
 
-## 2. The Development Lifecycle
+## Documentation
 
-Every significant change must follow a rigid, iterative cycle: **Brainstorm → Plan → Build → 3rd-Person Review → Verify**.
+| Document | What's in it |
+|---|---|
+| [workflow.md](docs/workflow.md) | The full lifecycle, phase by phase, with the complete diagram |
+| [multi-model.md](docs/multi-model.md) | The planning/build/review model split and the two contracts |
+| [agent-config.md](docs/agent-config.md) | What to put in `CLAUDE.md` / `AGENTS.md` |
+| [installation.md](docs/installation.md) | Per-agent targets, script options, manual install, skill inventory |
+| [configuration.md](docs/configuration.md) | `/workflow-config` — TDD/BDD, caveman brevity, GitHub issues |
+| [practices.md](docs/practices.md) | Task selection, refactoring monoliths, the "no surprises" rule |
+| [philosophy.md](docs/philosophy.md) | Why the workflow is shaped this way |
+
+---
+
+## What makes this different
+
+There are other agent-skill libraries — [obra/superpowers](https://github.com/obra/superpowers)
+is the best known, and this workflow composes with it rather than competing. Five things set
+this one apart:
+
+**1 · The build model doesn't have to be the planning model.**
+Because the plan is a *file* that resolves every decision, you can brainstorm and plan with
+your strongest model, then hand the plan to Cursor, Gemini Flash, Copilot, or a local model
+to execute. Frontier reasoning is the scarcest resource in agentic development, and most of
+the tokens a coding agent burns are not reasoning at all — they are reading files, writing
+boilerplate, and re-running tests. This workflow is built so you stop paying frontier prices
+for typing. → [multi-model.md](docs/multi-model.md)
+
+**2 · A review gate that takes ownership.**
+`/3p-review` switches persona to an independent Senior Architect who *owns the code on
+sign-off*, loops until **zero findings of any severity** (minors get fixed, not waved), and
+cannot pass without a no-mock test across the real integration seam. Past a volume threshold
+it refuses to fix things itself and emits a **Rework Brief** instead — a reviewer who rewrites
+half the feature has become its author.
+
+**3 · An enforced lifecycle, not a toolbox.**
+One orchestrator drives the whole cycle with an explicit phase-transition table and a plan
+lifecycle (`new/` → `plans/` → `done/`). The agent owns forward motion instead of stalling
+between phases, and each phase has an exit gate that user approval cannot retroactively
+satisfy.
+
+**4 · The plan carries the foresight.**
+A small build model fills every silence with the happy path. So `/write-plan` forces the
+expensive model to write the foresight *down*: failure modes, lifetimes, error codes and
+their owners, concurrency and aliasing, named seam tests per value path, and exact
+command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
+or marked new.
+
+**5 · Index-first codebase search.**
+`/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/safishamsi/graphify)
+knowledge graph of the repo before proposing anything. The most expensive mistake in a
+brainstorm is reimplementing something that already exists under a name nobody grepped for.
 
 ```mermaid
-flowchart TD
-    Start([New feature / bug / task]) --> B1
+flowchart LR
+    Start([Task]) --> P
 
-    subgraph Brainstorm ["1. Brainstorm · /brainstorm"]
-        B1[Explore problem space] --> B2[Propose approaches<br/>minimal ↔ structural]
-        B2 --> B3[Challenge the obvious solution]
-        B3 --> B4{Human satisfied?}
-        B4 -- "refine / pivot" --> B1
-        B4 -- "direction chosen" --> B5[Save decision document<br/>docs/discussions/]
-    end
-
-    B5 --> P1
-
-    subgraph Plan ["2. Plan · /write-plan"]
-        P1[Codebase analysis<br/>patterns · security · architecture] --> P2[Write phased plan<br/>zero ambiguity for external models]
-        P2 --> P3[Save to docs/plans/new/]
-    end
-
-    P3 --> Approve{Human reviews<br/>& approves plan}
-    Approve -- "revise" --> P1
-    Approve -- "approved" --> MovePlan[Move plan<br/>new/ → plans/]
-    MovePlan --> ModelChoice{Same model<br/>or handoff?}
-    ModelChoice -- "same thread" --> I
-    ModelChoice -- "different model" --> ExtBuild([Dev model · /build-model<br/>build → 3p-review → handoff])
-    ExtBuild --> ReturnSummary[User returns with<br/>handoff summary]
-    ReturnSummary --> R1
-
-    subgraph Build ["3. Build · /build-phase — per phase"]
+    subgraph P ["1 · Planning model — frontier, high reasoning"]
         direction TB
-        I[TDD: write failing test] --> Impl[Implement to green]
-        Impl --> T[Run tests]
-        T -- "fail" --> Impl
-        T -- "pass" --> SR[Self-review<br/>agent + human]
-        SR -- "issues found" --> Impl
-        SR -- "clean" --> Next{More phases?}
-        Next -- "yes" --> I
+        P1["/brainstorm"] --> P2["/write-plan"]
     end
 
-    Next -- "no" --> R1
+    P -->|"plan file<br/>the forward contract"| B
 
-    subgraph FullReview ["4. Holistic Review · /3p-review"]
-        R1[Senior Architect persona<br/>fresh eyes on ALL changes] --> R2{CRITICAL or<br/>MAJOR found?}
-        R2 -- "yes" --> R3[Fix issues] --> R4[Re-test] --> R1
-        R2 -- "no" --> R5[Review passed]
+    subgraph B ["2 · Build model — cheap and fast, or another tool"]
+        direction TB
+        B1["/build-model"] --> B2["/build-phase × N"]
+        B2 --> B3["/3p-review"]
+        B3 --> B4["/handoff-summary"]
     end
 
-    R5 --> HS[Generate handoff record<br/>/handoff-summary]
-    HS --> V1
+    B -->|"handoff summary<br/>the return contract"| R
 
-    subgraph Verify ["5. Verify · /verification-before-completion"]
-        V1[Run full test suite] --> V2[Evidence before claims]
+    subgraph R ["3 · Review model — fresh eyes, planning model by default"]
+        direction TB
+        R1["/3p-review"] --> R2["/verification-before-completion"]
     end
 
-    V2 --> Archive[Move plan<br/>plans/ → done/]
-    Archive --> Done([Feature complete])
+    R --> Done([Feature complete])
 ```
 
-### Step 1: The Brainstorm Phase
-Do not ask the AI to "build offline support." Ask it to explore the problem space. **Code is the last thing we touch** — the brainstorm phase enforces a hard gate against any implementation.
-
-*   **Prompt Example:** *"We need offline support for SyncScribe. Analyze our current WebSocket sync layer in `frontend/src/sync/` and propose three architectural ways to queue local edits for reconnection. Consider IndexedDB vs localStorage."*
-*   **The Human's Active Role:** While the AI generates its analysis, **you are doing parallel research** (via Perplexity or Google).
-*   **The Pivot:** Often, you will discover a library or approach the AI missed.
-    *   *Human response:* *"Your IndexedDB proposal is good, but I just found a new library `RxDB` that handles conflict resolution better. Let's discard these three options and pivot to exploring an RxDB adapter approach instead."*
-
-#### Decision Documents
-
-Brainstorming sessions are where architectural decisions happen. The `/brainstorm` skill will offer to save the discussion as a **decision document** to `docs/discussions/YYYY-MM-DD-<topic>.md` — a structured record of which approaches were considered, the impact of each, why the chosen approach won, and what was rejected. These documents are invaluable when someone later asks "why did we do it this way?"
-
-### Step 2: The Planning Phase
-The AI must write a formal technical specification *before* writing any code. The plan must resolve **all** design decisions — the dev model executes, it does not design.
-
-*   **Model Scoping:** You can specify which model should handle the build.
-    *   *Prompt Example:* *"Write a detailed technical plan for the RxDB adapter. Save it to `docs/plans/offline-sync.md`. Divide this into isolated Phases. **Plan this specifically for a smaller model (e.g., Gemini 2.5 Flash)** to execute—be hyper-granular and explicit."*
-*   **Human Role:** Review the Markdown plan. Correct architectural misunderstandings. Approve the plan.
-*   **On approval:** Move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` (not `git mv` — the plan file may not be tracked by git yet). This marks it as the active plan.
-
-#### The Plan Directory Workflow: `plans/`, `plans/new/`, `plans/done/`
-
-Plans are not throwaway conversation artifacts—they are versioned project assets with a deliberate lifecycle.
-
-*   **`docs/plans/new/`** — Plans that have been brainstormed and written but not yet approved or started. This is the staging area.
-*   **`docs/plans/`** — The active plan currently being executed.
-*   **`docs/plans/done/`** — Completed plans, kept as an audit trail and architectural reference.
-
-**Why write plans to disk instead of keeping them in the agent's head?**
-
-1.  **Agent decoupling:** The agent that *plans* does not have to be the agent that *builds*. You can brainstorm a plan with Claude Opus, then hand the plan file to Gemini Flash or a local model for execution. The plan is the contract between them.
-2.  **Brainstorm preservation:** When the plan lives as a file on disk, the agent does not enter its internal "planning → executing" loop. It stays in brainstorm mode, which is exactly where you want it during the design phase. If the plan lived only in conversation context, the agent would immediately start nagging you to implement it, cutting short the critical thinking phase.
-3.  **Parallel workflow:** Plans can accumulate in `plans/new/` while you focus on other work. You choose *when* to pick them up—based on your available tokens, your own availability, and the complexity of the task. This decouples planning velocity from implementation velocity and lets you run both in parallel.
-
-### Step 3: The Build Phase (The Phase-Wise Loop)
-Execute the plan strictly **one phase at a time** using the internal loop: `Read Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed`.
-
-The build phase can be executed by the **same model** that planned, or handed off to a **different model** (smaller, faster, cheaper). The plan is the contract — it contains all decisions, so the dev model just executes.
-
-There are two entry points, and which one you launch decides who drives review and handoff — there is no "am I the build model?" guesswork inside the skills:
-
-- **Same model:** the `agentic-workflow` orchestrator drives `/build-phase` through each phase, then `/3p-review`, `/handoff-summary`, and `/verification-before-completion`.
-- **Dedicated build model:** launch the session with `/build-model`. It is a self-contained mini-workflow that runs `/build-phase` across all phases, then `/3p-review` (looping until clean), then `/handoff-summary`, then **stops**. It does not verify — the user carries the handoff summary back to the main model for fresh-eyes re-review and verification.
-
-`/build-phase` itself is **model-agnostic**: it builds phases and produces a build completion report. Review and handoff are owned by whichever workflow launched it, never by `build-phase`.
-
-1.  **Read the Plan:**
-    *   *Prompt Example:* *"Execute Phase 1 (Database Schema) from `docs/plans/offline-sync.md`."*
-    *   If the plan is ambiguous or contradictory, the dev model surfaces the discrepancy to the user — it does not guess or make design decisions.
-2.  **TDD — Write Tests, Then Implement (Mandatory):**
-    *   Every phase uses `/test-driven-development`. Write the failing tests first (red), implement the minimum code to pass (green), then refactor. Writing the tests is the *beginning* of the phase, not the end — the model must complete all three steps.
-3.  **Test Suite:**
-    *   Run the full test suite for the affected modules to catch regressions.
-4.  **Self-Review:**
-    *   The agent reviews its own changes with a critical eye — does the code match the plan, follow conventions, have obvious bugs? The human confirms before proceeding.
-    *   This is a lightweight per-phase check, not the full third-person review. It keeps each phase honest without the overhead of a full persona switch.
-5.  **Proceed:**
-    *   *Prompt Example:* *"Tests pass and self-review is clear. Proceed to Phase 2."*
-
-#### The Handoff Summary
-
-When a build is complete **and reviewed**, the dedicated `/handoff-summary` skill emits a fixed-format **Build Handoff Summary** — a concise record of the `/3p-review` result, any deviations from the plan, and open concerns. It lives in its own skill so the exact template is loaded into context at the moment it is written, which keeps the format consistent across runs.
-
-A dedicated build model (`/build-model`) produces this summary *after* its own `/3p-review`, then **stops** — it does not verify. The user carries the summary back to the main model, which re-reviews the full change set with fresh eyes before verifying. (`/build-phase` no longer generates the summary itself — it just reports build completion and hands back to the orchestrating workflow.)
-
-### Step 4: Holistic Third-Person Review
-
-After all build phases are complete, invoke the full `/3p-review` on the entire change set. For a same-model build, `agentic-workflow` drives you into the review automatically (review → handoff record → verify). For a dedicated build model, `/build-model` already ran this review before handing off — and when the user returns with the handoff summary, the main model runs `/3p-review` **again** with fresh eyes. That second, independent review is the whole point of the handoff.
-
-*   The philosophy: **"I didn't write this code, but after this review it is my responsibility. It must meet my world-class standards."** This is not a rubber stamp — it is the moment you reap the benefits of pair programming. The original author has blind spots; the reviewer does not share them.
-*   The reviewer looks at architectural coherence, cross-cutting concerns, and systemic issues that only become visible when reviewing the full change set — not just individual phases.
-*   This is a loop: if the review surfaces CRITICAL or MAJOR issues → fix → re-test → re-review from scratch until clean.
-*   `/3p-review` can also be invoked independently at any time — not just at the end of a build cycle.
-
-### Step 5: Verify and Archive
-
-After `/3p-review` passes, immediately run `/verification-before-completion` — evidence before claims. This is **not a second review**: `/3p-review` proved the *code* is sound, while verification proves the *claim of "done" is true right now*. It adds two things the review doesn't guarantee — a **fresh** full-suite run at the actual moment of completion (review may have passed several edits ago), and a **line-by-line check against the plan's requirements** (review judges completeness only qualitatively). It also covers the bug / quick-fix path, which skips full review. Don't skip it on the grounds that "review already ran the tests." Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv` (not `git mv` — the plan file may not be tracked by git yet). The feature is complete.
-
-**Final Validation:** ALL project tests must pass. No feature is "done" until the suite is green and the plan is archived.
+Both build lanes are optional: the same model can carry the whole cycle. The split is there
+when you want it.
 
 ---
 
-## 3. Task Selection Strategy: Bugs vs. Features
+## License
 
-Not all work is created equal, and your available resources—tokens, time, mental energy—should dictate what you pick up next. This is a deliberate triage strategy, not procrastination.
-
-### When Tokens Are Low: Pick Bugs
-
-Bug fixes are typically small, well-scoped, and self-contained. They require minimal brainstorming and can often be resolved within a single conversation. When your token budget is running low or you only have a short window of availability, bugs are the highest-value work you can do. They improve the product without demanding the deep planning overhead of a new feature.
-
-### When Tokens Are Plentiful: Work on Features and Plans
-
-Feature development requires the full Brainstorm → Plan → Build cycle. It consumes significantly more tokens and demands your sustained attention as a reviewer. Save this work for sessions where you have the budget and the bandwidth.
-
-### Let Plans Accumulate—That's a Feature, Not a Bug
-
-Plans in `docs/plans/new/` are not a backlog to feel guilty about. They are *pre-invested design work* waiting for the right moment. You can brainstorm three plans in the morning, let them sit, and implement them in the afternoon—or next week. This decouples *thinking* from *doing* and lets you work on both in parallel, far more easily than a traditional workflow allows.
-
-**A critical mindset shift:** With AI-assisted development, "later" does not mean months. It means minutes or hours. The time between "plan written" and "feature shipped" has collapsed. So accumulating plans is not deferring work—it is *staging* work for rapid, parallel execution.
-
----
-
-## 4. Continuous Improvement: The Memory Loop
-
-Even with strict planning, AI models drift. The system must adapt immediately to failures. This is the last and most vital step.
-
-### The "No Surprises" Rule
-Always enforce this constraint: **"NEVER modify code without explicit permission. Propose changes one file at a time."**
-
-### Continuous Memory Updates
-Whenever you find an incorrect behavior or a rule violation, **update the AI's memory immediately** with exact, preventative instructions.
-
-*   **Example (Logging violation):** The AI uses `print()` instead of your project's custom logger.
-    *   *Action:* Fix the code, then say: *"You violated our logging standard. Update your `ai-context.md` or memory: 'Rule: Always use `logger = get_logger(__name__)` and never use `print()`. This is non-negotiable.'"*
-*   **Example (Refactoring drift):** The AI refactors a function and removes comments explaining a complex regex.
-    *   *Action:* *"You deleted vital documentation. Restore it and update your memory: 'Do not remove business-logic comments during refactoring without asking first.'"*
-
-### Refactoring Monoliths
-Treat refactoring as a feature:
-1. Ask the AI to analyze the monolith and propose domain boundaries.
-2. Generate a phased refactoring plan.
-3. Execute using the `TDD -> Implement -> Test -> Self-Review` loop for every single file extraction.
+MIT. Superpowers skills are vendored under their own MIT license — see
+`vendor/superpowers/LICENSE`.
