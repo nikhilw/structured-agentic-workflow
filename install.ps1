@@ -131,4 +131,10 @@ if ($List) {
     Write-Host ""
     Write-Host "Done. Skills are now available."
     Write-Host "Verify with:  Get-ChildItem ~\.claude\skills\  (or other agent paths)"
+    if (-not (Get-Command graphify -ErrorAction SilentlyContinue)) {
+        Write-Host ""
+        Write-Host "Recommended: graphify powers codebase search in /brainstorm and /write-plan."
+        Write-Host "  uv tool install graphifyy; graphify install"
+        Write-Host "  (the workflow runs without it - both skills fall back to grep)"
+    }
 }

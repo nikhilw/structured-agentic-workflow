@@ -169,5 +169,11 @@ case "$ACTION" in
         echo ""
         echo "Done. Skills are now available."
         echo "Verify with:  ls -la ~/.claude/skills/  (or other agent paths)"
+        if ! command -v graphify >/dev/null 2>&1; then
+            echo ""
+            echo "Recommended: graphify powers codebase search in /brainstorm and /write-plan."
+            echo "  uv tool install graphifyy && graphify install"
+            echo "  (the workflow runs without it — both skills fall back to grep)"
+        fi
         ;;
 esac
