@@ -33,6 +33,7 @@ A skill must not restate another skill's branch. The "stops after build" bug cam
 - Plans live in `docs/plans/`: `new/` (staged) → `plans/` (active) → `done/` (archived). Move with plain `mv`, not `git mv` — plan files may be untracked.
 - Brainstorm decision docs go to `docs/discussions/YYYY-MM-DD-<topic>.md`.
 - Commit only when asked.
+- NEVER use em-dash(—) when writing. Use commas or semicolons to join sentences. Or just simply break them with fullstops.  
 
 ## Docs layout
 
