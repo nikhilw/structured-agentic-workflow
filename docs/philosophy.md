@@ -135,7 +135,7 @@ This workflow is an **orchestration layer** — it defines *when* and *why* to d
 composes with execution-level skill libraries (like
 [obra/superpowers](https://github.com/obra/superpowers)) that define *how* to do specific
 things well, and with codebase-comprehension tools (like
-[graphify](https://github.com/safishamsi/graphify)) that answer *what is already there*.
+[graphify](https://github.com/Graphify-Labs/graphify)) that answer *what is already there*.
 
 Install domain-specific skills for TDD, debugging, and verification. Then let this workflow
 orchestrate when to invoke them.

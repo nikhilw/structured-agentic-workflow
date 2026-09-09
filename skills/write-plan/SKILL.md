@@ -39,7 +39,7 @@ Before writing a single phase, you MUST investigate the existing codebase. Read 
 
 ### Search the Knowledge Graph First
 
-Query the [graphify](https://github.com/safishamsi/graphify) index before grepping. It is how
+Query the [graphify](https://github.com/Graphify-Labs/graphify) index before grepping. It is how
 you find the existing pattern you would otherwise reinvent, and the call sites you would
 otherwise miss.
 

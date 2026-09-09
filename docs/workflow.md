@@ -97,7 +97,7 @@ reconnection. Consider IndexedDB vs localStorage."
 
 The skill will:
 
-- Refresh the [graphify](https://github.com/safishamsi/graphify) knowledge-graph index once
+- Refresh the [graphify](https://github.com/Graphify-Labs/graphify) knowledge-graph index once
   at the start of the session, if graphify is installed, and query it instead of blind
   grepping — this is what stops the "we implemented a duplicate of something that already
   existed" failure

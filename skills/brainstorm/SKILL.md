@@ -23,7 +23,7 @@ Explore the problem space for: **$ARGUMENTS**
 
 ## Step 0 — Refresh the Knowledge Graph (once per session)
 
-Before exploring anything, refresh the [graphify](https://github.com/safishamsi/graphify)
+Before exploring anything, refresh the [graphify](https://github.com/Graphify-Labs/graphify)
 index so that "what already exists?" is answered from a graph of the whole repo instead of
 guessed from a handful of greps. **Do this exactly once, at the start of the session** — it
 is an incremental update, not a rebuild, and re-running it between approaches wastes time

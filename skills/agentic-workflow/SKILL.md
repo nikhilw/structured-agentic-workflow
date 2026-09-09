@@ -22,7 +22,7 @@ This workflow orchestrates *when* things happen; it composes with skills that de
 - **[superpowers](https://github.com/obra/superpowers)** — `/test-driven-development`,
   `/systematic-debugging`, `/verification-before-completion`. The build phase expects TDD and
   the workflow never skips verification, so these are effectively required.
-- **[graphify](https://github.com/safishamsi/graphify)** — a persistent knowledge graph of
+- **[graphify](https://github.com/Graphify-Labs/graphify)** — a persistent knowledge graph of
   the repo. `/brainstorm` refreshes the index once per session and `/write-plan` queries it
   to find existing patterns and enumerate consumers. Strongly recommended, but optional:
   when it is absent both skills fall back to Grep/Glob after saying so once. Never install it

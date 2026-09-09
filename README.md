@@ -18,6 +18,8 @@ Powers codebase search in `/brainstorm` and `/write-plan`. The workflow runs wit
 both skills fall back to grep after saying so once — but this is where a lot of the quality
 comes from.
 
+You should follow the setup instructions as per the [graphify repo](https://github.com/Graphify-Labs/graphify), but for a quick reference we are including them here:
+
 ```bash
 uv tool install graphifyy   # note the double-y; `graphify` on PyPI is an unrelated package
 graphify install            # registers the /graphify skill with your agent
@@ -167,7 +169,7 @@ command-plus-expected-output test criteria. Every name in the plan must be verif
 or marked new.
 
 **5 · Index-first codebase search.**
-`/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/safishamsi/graphify)
+`/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/Graphify-Labs/graphify)
 knowledge graph of the repo before proposing anything. The most expensive mistake in a
 brainstorm is reimplementing something that already exists under a name nobody grepped for.
 
