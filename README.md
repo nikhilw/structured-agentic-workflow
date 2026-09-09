@@ -124,6 +124,7 @@ from [superpowers](https://github.com/obra/superpowers).
 | [configuration.md](docs/configuration.md) | `/workflow-config` — TDD/BDD, caveman brevity, GitHub issues |
 | [practices.md](docs/practices.md) | Task selection, refactoring monoliths, the "no surprises" rule |
 | [philosophy.md](docs/philosophy.md) | Why the workflow is shaped this way |
+| [extras/driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md) | Worked recipe: running Cursor's CLI agent headless as the build model |
 
 ---
 
@@ -139,6 +140,11 @@ with Sonnet — or hand the plan to Cursor, Gemini Flash, Copilot, or a local mo
 the tokens a coding agent burns are not reasoning at all — they are reading files, writing
 boilerplate, and re-running tests. This workflow is built so you stop paying frontier prices
 for typing. → [multi-model.md](docs/multi-model.md)
+
+> *Concretely: plan with Opus, then let Cursor's agent build the plan headless in the
+> background. The whole build comes back to your expensive model as a few hundred bytes —
+> a result line, not a transcript. [Here's the exact
+> recipe.](docs/extras/driving-cursor-as-build-model.md)*
 
 **2 · A review gate that takes ownership.**
 `/3p-review` switches persona to an independent Senior Architect who *owns the code on

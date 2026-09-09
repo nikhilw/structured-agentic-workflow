@@ -150,6 +150,13 @@ implementation velocity stop being the same number.
 The build model needs the workflow skills installed in *its* environment too — every skill
 here is a plain `SKILL.md`, which Claude Code, Cursor, Gemini CLI, and Copilot all read.
 
+> **A worked example:** [Driving cursor-agent as the build
+> model](extras/driving-cursor-as-build-model.md) is a full recipe for step 2 using Cursor's
+> CLI agent headless — the launch command, the prompt that holds up, how to batch a long plan
+> across runs, and the failure modes worth guarding against. Run that way, a completed build
+> returns a few hundred bytes to the planning model instead of a transcript, which is the
+> token saving made concrete.
+
 ### Expect halts, and read them correctly
 
 The build model is fenced in: it builds what the plan names and halts rather than inventing a
