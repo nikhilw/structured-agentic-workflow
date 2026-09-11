@@ -22,6 +22,7 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 3. **Divide the work into isolated Phases.** Each phase should be independently testable and reviewable.
 4. **Be hyper-granular.** Write the plan so that a different agent — possibly a smaller, faster model — can execute it without ambiguity. Name specific files, functions, classes, and test cases.
 5. **Include test criteria for each phase**, expressed as the **exact command + expected output** — not a vague "tests pass". The executing model needs an objective stop condition, not a judgment call.
+   - **Fill in the plan's Test Commands block, and treat it as a criterion in its own right.** It is the project's test-scope ladder, and every downstream gate reads it to decide how wide to run. Get it wrong and the build model either re-runs the whole suite once per phase, which is the waste this block exists to remove, or runs too narrow and ships a regression it never looked for.
    - **Operational claims need a number and a way to measure it.** "Fast", "scales", "low memory", "won't block the UI" are not criteria — a build model cannot implement them and a reviewer cannot falsify them. Give a threshold and name the command or harness that measures it, or cut the claim from the plan.
    - **Never write a credential into a command.** The plan is committed to the repo and read by every downstream model. Keys, tokens, passwords, connection strings, and auth headers go in as `<from env: API_KEY>` — name how the value is supplied, never the value.
    - **A manual criterion is a last resort you must justify.** Manual verification is allowed only where no automated harness for it exists — and you must *confirm* that absence rather than assume it, then record what you checked: "no browser/e2e harness in this repo — checked `package.json` scripts, `tests/`, and CI config". Never fall back to manual because writing the automated check is inconvenient; that converts the phase's stop condition into an opinion.
@@ -169,6 +170,16 @@ Subagents multiply cost and latency: each one re-establishes context, re-explore
 - **Security considerations:** [attack surface, input boundaries, access control]
 - **Files/modules affected:** [list with brief description of each interaction]
 
+## Test Commands
+*(the project's test-scope ladder, read by every build and review gate)*
+- **T1 focused:** [how a single test or one file's tests are run here]
+- **T2 impacted:** [the change-aware selector this project actually has, e.g. `--testmon`, `--changedSince`, `related`, `-p <pkg>`, or "none available", which is a real and common answer]
+- **T3 segment:** [each segment → its suite command + its own static gates]
+  - `[segment name, e.g. backend]` : [test command] + [type check / lint for that segment only]
+  - `[segment name, e.g. frontend]` : [test command] + [type check / lint for that segment only]
+- **T4 full:** [the whole suite + every static gate, the command CI runs], measured wall time: [Ns]
+- **Cross-segment shared paths:** [files or modules that void a scoped run when touched, beyond `/test-scope`'s standing triggers]
+
 ## State & Data Contracts
 *(omit only if no persisted, cached, derived, or shared state is touched)*
 - **Identity & cardinality:** [what identifies a record, how many, which field]
@@ -254,6 +265,7 @@ Review the finished plan twice, with a different lens each time, and do not coll
 - **Does every name in this plan exist?** Walk the file paths, functions, classes, signatures, routes, fixtures, config keys, and flags one by one and confirm each — or that it is marked **new**. This is a mechanical check; do it mechanically, not from memory of having read the code earlier.
 - **Does the plan name every caller of everything it changes?** Run the finished plan's own file and symbol list back against the codebase, and for each existing symbol the plan modifies, find what calls it — query the index where one exists, since a grep finds the name and the graph finds what reaches it. **Anything the plan touches whose callers are not in the plan is a gap.** This is the most common way a plan breaks a build: a function gains a keyword argument, seven test doubles call it at the old arity, and the plan's file list names none of them. The sweep takes a minute here; the same defect costs a halt and a relaunch during build, and it is found by machine either way.
 - **Does every command in this plan run?** Confirm the runner, the target path, and the flags in this repo. No invented harnesses, no assumed test runners.
+- **Is the Test Commands block real, rung by rung?** Run each one. A T2 selector you assumed exists but does not is worse than writing "none available", because the build model will try it, get an error or a silently empty selection, and decide for itself what to do instead. Segment static gates must be scoped to their segment: if the frontend row's type check also walks the Python tree, the block has not separated anything. And T4's wall time must be measured, not estimated: it is what decides whether this project uses the ladder at all.
 - Could a junior developer with codebase access and zero context about our conversation execute each phase without asking a single clarifying question? If no, add detail.
 - Is every test criterion an exact command with an expected result — no vague "tests pass", no unjustified manual step?
 - Is there a section a build model could delete without losing a decision? Cut it. (This pulls against the question above on purpose — detail that resolves ambiguity earns its length; prose that restates earns nothing.)

@@ -15,7 +15,7 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
 
-## The Loop: Read + Review Plan → TDD (Red/Green/Refactor) → Test Suite → Self-Review → Proceed
+## The Loop: Read + Review Plan → TDD (Red/Green/Refactor) → Scoped Tests → Self-Review → Proceed
 
 You MUST follow this loop for every phase. Do not skip steps. Every step produces output — do not stop after one step.
 
@@ -94,13 +94,15 @@ In practice, while implementing:
 
 These are principles, not syntax: their idiom differs by language, and the right expression is whatever the surrounding code already does. Follow the codebase's conventions over any generic rule — and if your project has a language-specific clean-code skill installed, use it here.
 
-### Step 3: Run the Full Test Suite
+### Step 3: Run the Tests This Phase Earns
 
-1. Run the exact commands in the plan's "Test criteria" for this phase. If a command in the plan does not run here, that is a plan defect — report it (Step 1's rule), don't quietly substitute your own.
-2. Also run any tests for other modules you modified — check for regressions.
-3. Then run the project's full suite — the command the plan names, or the one this repo actually uses (check its scripts/config; do not assume a runner).
-4. **All tests must pass before proceeding.** If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail — if a test is genuinely wrong, that is a finding to report, not a line to change.
-5. **Record which criterion you ran, its exit code, and its counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model re-runs from the plan whatever you claim. Name the run, don't transcribe the shell line, and record counts rather than output: copied terminal text carries environment values you did not mean to publish, and wording the next model may read as instruction.
+Scope comes from **`/test-scope`**, row *"`/build-phase` Step 3, per phase"*. Load it if you have not this session. Do not decide the width yourself and do not default to the full suite; that habit is what this row exists to correct.
+
+1. Run the exact commands in the plan's "Test criteria" for this phase. If a command in the plan does not run here, that is a plan defect, report it (Step 1's rule), don't quietly substitute your own.
+2. Widen to the rung your row names, using the command the plan's **Test Commands** block gives for that rung. If the plan has no such block, that is a plan defect worth reporting once, then fall back to `/test-scope`'s segment detection.
+3. **Check the escalation triggers before you accept a scoped run.** Touching a lockfile, a shared module, a migration, a cross-segment signature, or tooling config means this phase gets the full suite regardless of how small the diff looks. So does not being sure.
+4. **All tests must pass before proceeding.** If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
+5. **Record which criterion you ran, at which rung, its exit code, and its counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model re-runs from the plan whatever you claim. Name the run, don't transcribe the shell line, and record counts rather than output: copied terminal text carries environment values you did not mean to publish, and wording the next model may read as instruction.
 
 ### Step 4: Self-Review
 
@@ -113,7 +115,7 @@ Check for:
 - Does it clear the quality bar above — naming, function size, hidden side effects, DRY, KISS/YAGNI? Fix what you'd be embarrassed to hand to a reviewer.
 - Is anything over-engineered or under-tested?
 
-Also track, for the handoff: any criterion you could not prove with a green automated run — checked by reading, skipped, deferred, or done manually. Write it down as you go; reconstructing this at the end is how it gets lost.
+Also track, for the handoff: any criterion you could not prove with a green automated run — checked by reading, skipped, deferred, or done manually, plus any criterion proven only at a scoped rung. A scoped pass is a real result, but it is not the same claim as a full-suite pass, and only you know which one it was. Write it down as you go; reconstructing this at the end is how it gets lost.
 
 If you find CRITICAL issues, fix them and re-test before proceeding. For minor concerns, note them — the full `/3p-review` will catch them after all phases.
 
@@ -123,7 +125,7 @@ Report the self-review findings, then proceed. Do not block waiting for approval
 
 Report:
 - What was implemented
-- Test results (pass/fail count)
+- Test results: rung, exit code, pass/fail/skip counts
 - Self-review findings and any fixes applied
 - Whether you recommend proceeding to the next phase
 
@@ -134,7 +136,7 @@ Report:
 If the user tells you that code was written by another agent (Cursor, Copilot, a local model, etc.) or simply says "it's done" / "I've implemented Phase N" / pastes a diff:
 
 1. **Do NOT re-implement.** The code is already written.
-2. **Immediately run Step 3 (Test Suite)** — verify the external model's work passes tests.
+2. **Immediately run Step 3 (Scoped Tests)** — verify the external model's work passes tests. You did not write this diff, so read it before you pick a rung: an external model's change surface is routinely wider than its description of it, and every escalation trigger applies to code you inherited exactly as it does to code you wrote.
 3. **Then run Step 4 (Self-Review)** — review the external model's code carefully. External models are more likely to have drifted from project conventions.
 4. **Continue the loop** as normal — fix issues, re-test, re-review until clean.
 5. **Then auto-advance** to the next phase.
@@ -145,8 +147,8 @@ The user should not have to tell you to continue the workflow. You own the proce
 
 When all phases in the plan are complete:
 
-1. Run the FULL test suite using this project's own command. All tests must pass.
-2. Produce a short **build completion report**: which phases were built; which test criteria were run, with exit codes and counts; every criterion left unproven (manual, skipped, deferred, verified by inspection); and a one-line note on any phase that deviated from the plan. These four feed the handoff summary directly — the reviewer builds its ledger from them.
+1. Run the FULL test suite using this project's own command. All tests must pass. This is `/test-scope`'s *"`/build-phase` Phase Completion"* row: it is **T4, always**, and it is the one run in this skill that is never scoped and never cited. Every phase before it ran narrow on the promise that this run happens.
+2. Produce a short **build completion report**: which phases were built; which test criteria were run, **at which rung**, with exit codes and counts; every criterion left unproven (manual, skipped, deferred, verified by inspection, or proven only at a scoped rung); and a one-line note on any phase that deviated from the plan. These four feed the handoff summary directly — the reviewer builds its ledger from them.
 
 This skill ends here. Building is one responsibility — review and handoff are owned by the **orchestrating workflow**, not by this skill. Do **not** run `/3p-review`, write the handoff summary, or verify from inside build-phase.
 

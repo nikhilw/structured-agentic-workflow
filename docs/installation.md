@@ -105,6 +105,7 @@ It does two things:
 | `build-model` | this project | Dedicated build-model workflow — build-phase → 3p-review → handoff-summary → stop |
 | `3p-review` | this project | Independent third-person review; returns a Rework Brief when there is too much to fix in place |
 | `handoff-summary` | this project | Emit the fixed-format Build Handoff Summary after review passes |
+| `test-scope` | this project | Shared reference: how wide each test run must be, and when a recorded run can be cited. Not invoked directly |
 | `triage` | this project | Recommend the next task, minimizing context thrash |
 | `github-backlog` | this project | Maintain features and bugs on GitHub |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |

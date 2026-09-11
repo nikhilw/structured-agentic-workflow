@@ -59,11 +59,12 @@ globally and define the development lifecycle:
 - `agentic-workflow` — orchestrates the full lifecycle; suggests phase transitions automatically
 - `/brainstorm` — explore the problem space before planning (no code, no plans)
 - `/write-plan` — write phased plans to `docs/plans/new/` (agent-decoupled)
-- `/build-phase` — execute one plan phase: test-first → implement → test suite → self-review
+- `/build-phase` — execute one plan phase: test-first → implement → scoped tests → self-review
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
 - `/verification-before-completion` — evidence before any "done" claim
+- `test-scope` : how wide each test run must be, and when a run can be cited instead of re-run
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
@@ -102,10 +103,11 @@ Tier guidance is in [multi-model.md](docs/multi-model.md).
 | `agentic-workflow` | Orchestrates the lifecycle and drives phase transitions |
 | `/brainstorm` | Explores approaches, challenges the design, writes a decision document |
 | `/write-plan` | Writes a phased, fully-decided plan to `docs/plans/new/` |
-| `/build-phase` | Executes one phase: test-first → implement → suite → self-review |
+| `/build-phase` | Executes one phase: test-first → implement → scoped tests → self-review |
 | `/build-model` | Entry point for a dedicated build model: build → review → handoff → stop |
 | `/3p-review` | Independent review that owns the code; loops until clean |
 | `/handoff-summary` | Emits the fixed-format Build Handoff Summary |
+| `test-scope` | The shared test-run ladder and the citable-run rule the other skills defer to |
 | `/triage` | Recommends the next task, minimizing context thrash |
 | `/github-backlog` | Maintains features and bugs as GitHub issues |
 | `/workflow-config` | Sets TDD/BDD, output brevity, and backlog source |

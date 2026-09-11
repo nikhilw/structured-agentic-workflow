@@ -19,7 +19,7 @@ Build the plan at **$ARGUMENTS** to completion, review it, and hand it off — t
 
 Run these steps **in order**. Each step has a clear owner; do not collapse them or skip ahead. Finishing one step is the trigger to start the next — not a reason to stop.
 
-1. **Build — `/build-phase`.** Start at Phase 1 and advance through every phase. `/build-phase` owns the per-phase loop (Read + Review Plan → TDD → Test Suite → Self-Review) and auto-advances between phases. Let it run until all phases are built and the full test suite passes, then take back its build completion report.
+1. **Build — `/build-phase`.** Start at Phase 1 and advance through every phase. `/build-phase` owns the per-phase loop (Read + Review Plan → TDD → Scoped Tests → Self-Review) and auto-advances between phases. Individual phases run scoped per `/test-scope`; the full suite lands once, at Phase Completion. Let it run until all phases are built and that full-suite run is green, then take back its build completion report.
 
    Its first step at Phase 1 is a **plan review** — fresh eyes on the plan, the mirror of the `/3p-review` you will run in step 2. You did not write this plan, which makes you the only reader of it without the author's assumptions. Take that seriously: a defect found there costs a paragraph, and the same defect found in step 2 costs a full rework loop. Surface and halt; do not redesign.
 
@@ -37,7 +37,7 @@ The reviewing model returns rework here when the findings are too many or too sy
 2. **Failing test first, every time.** Reproduce the defect, then fix it. An item fixed with no test that was red first is not done.
 3. **Fix the Systemic section as one change**, at every site listed — not site-by-site with three different shapes of fix.
 4. **Respect "Do not touch."** Files outside the brief's scope stay untouched, including anything already dirty in the worktree.
-5. **Run the "Do not regress" commands** at the end, plus the full suite.
+5. **Run the "Do not regress" commands** at the end, plus the full suite. Rework is not a phase and gets no scoped shortcut: you are changing code the reviewer already read, across sites it chose, so the tree it signs off on has to be proven whole.
 6. **Re-emit `/handoff-summary`** with the rework reflected, then STOP. The reviewing model restarts its review from scratch — your report is a claim it will re-verify, not evidence it will accept.
 
 If an item is wrong or impossible as written, say so explicitly with the reason and stop on that item. Do not silently substitute a different fix.
@@ -54,5 +54,6 @@ If an item is wrong or impossible as written, say so explicitly with the reason 
 - **Stage by path when you share a working tree.** If another agent or session has uncommitted work in the same tree, `git add -A` and `git commit -a` sweep it into your commit. Add the specific paths your build touched. (This is a shared-tree hazard: when the build runs in its own git worktree, isolation handles it — but never assume you have one without checking.)
 - **Surface plan problems, don't paper over them.** `/build-phase` halts on a plan that is ambiguous, contradictory, *or wrong* — and you are expected to use judgment, not just follow instructions. When you hit a technical, architectural, or practical defect in the plan, stop, state it, propose the fix, and let the user decide. Do not invent design decisions the plan should have made, and do not silently build your own better idea. Anything unresolved goes in the handoff's Concerns.
 - **The review loop is a loop.** One clean pass is required; any fix triggers a fresh review.
+- **You pay for both mandatory full-suite runs, and you cannot net them out.** In this session you are the builder *and* the reviewer, so both of `/test-scope`'s "always" rows land on you: the one at Phase Completion and the one where `/3p-review` re-derives the builder's claims. They will often run minutes apart against an identical tree and that is not waste. The second exists precisely because the first was reported by the model being checked, which in this session is you. Scope the runs in between; never fold these two into one.
 - **Never skip the handoff.** Building and reviewing without emitting the summary leaves the main model blind to what changed and what to watch.
 - **Stop means stop.** After the handoff, your job is done. Do not continue into verification or the next plan.

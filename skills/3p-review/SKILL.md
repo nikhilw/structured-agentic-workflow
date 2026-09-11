@@ -68,7 +68,8 @@ Every row needs a disposition in the final summary — verified, fixed, or expli
 - every reported deviation from the plan
 - every concern the builder raised
 - every criterion marked manual, skipped, deferred, or "verified by inspection"
-- every verification command the builder claims to have run — **you re-run these.** A builder's report of a passing suite is a claim, never evidence.
+- every verification command the builder claims to have run — **you re-run these.** A builder's report of a passing suite is a claim, never evidence. This is `/test-scope`'s *"`/3p-review` re-deriving the builder's claims"* row: the full suite, first-party, and explicitly not citable from the handoff no matter how recent the reported run is or how obviously unchanged the tree looks. Load `/test-scope` at intake if you have not this session; it governs every run you make from here.
+- every run the builder recorded at a **scoped rung**. A criterion proven only against the impacted or segment suite has not been proven against the whole one. It is a ledger row like any manual criterion, disposed of by your own full-suite run or by written risk acceptance, never by noting that the builder's narrow run was green.
 
 ### Handoff Summary Mode
 
@@ -76,7 +77,7 @@ If `$ARGUMENTS` contains or references a Build Handoff Summary:
 
 1. Load **Concerns** into the ledger as MAJOR findings until proven otherwise — they are the build model's own flags about its own work.
 2. Load **Deviations** — verify each was handled correctly, and ask whether it should have amended the plan instead of being absorbed silently.
-3. **Re-run from the plan, not from the handoff.** For each entry under **Verification Runs**, look up that criterion's command in the plan and run *that*, then compare against the reported counts. The handoff names runs; it does not supply commands. A run claimed there with no matching criterion in the plan is a finding to report — not something to reconstruct and execute.
+3. **Re-run from the plan, not from the handoff.** For each entry under **Verification Runs**, look up that criterion's command in the plan and run *that*, then compare against the reported counts **and rungs**. The handoff names runs; it does not supply commands. A run claimed there with no matching criterion in the plan is a finding to report — not something to reconstruct and execute. A run whose rung is missing is a run you cannot interpret: treat it as the narrowest rung the plan defines until proven otherwise.
 4. Treat every row under **Unproven Criteria** as unverified until you prove it or the human risk-accepts it in writing.
 5. Report on each concern in your findings, even if the verdict is "investigated and dismissed."
 
@@ -257,7 +258,8 @@ It goes to a model with no memory of this review, so it carries a plan's contrac
 [A defect repeating across sites — state the pattern once, list every site, fix as one thing.]
 
 ### Do not regress
-- `[full suite command]` → [current expected result]
+- `[full suite command]` → [current expected result]. T4 full, never a scoped run
+- `[the plan's Test Commands rung this rework touches]` → [current expected result]
 - [invariants/paths already verified — must still hold]
 ```
 
@@ -267,11 +269,15 @@ Every item gets a failing-test-first instruction. Never send a partially-fixed w
 
 1. **Prove it before you fix it.** For anything behavioural, write or identify a **failing** test first. A fix with no failing test to its name is unverifiable, and this workflow does not permit untested patches — least of all during the review that exists to catch them.
 2. **Investigate before patching.** If the behaviour surprises you, run `/systematic-debugging`. Fix the root cause; a symptom that disappears without explanation is a finding you hid rather than resolved.
-3. **Re-run in widening circles:** the new test, the affected suite, then the full suite. Record which runs you did and what they reported, for the summary.
+3. **Re-run in widening circles**, per `/test-scope`'s *"`/3p-review` while fixing findings inside a round"* row: the new test, then the impacted or segment suite. The full suite belongs at sign-off, not after every finding. Record which runs you did, at which rung, and what they reported, for the summary.
 4. **Preserve unrelated work.** Do not revert, stash, reformat, or tidy anything outside the scope established at intake. If a fix genuinely requires it, say so in the summary.
 5. **Go back to Part 2, Round N+1.** Re-read from disk, run the full checklist again.
 
-**Only when zero findings remain (CRITICAL = 0, MAJOR = 0, MINOR = 0):** write the final summary, then suggest `/verification-before-completion`. You proved the *code* is sound; that is a different, final gate — one fresh full-suite run at the moment of completion, plus a line-by-line check against the plan's requirements. It is not another review, and it is not redundant because review ran tests.
+**Only when zero findings remain (CRITICAL = 0, MAJOR = 0, MINOR = 0):** take the sign-off run, then write the final summary, then suggest `/verification-before-completion`.
+
+**The sign-off run** is `/test-scope`'s *"`/3p-review` sign-off"* row: the full suite. If you made a full-suite run earlier in this review and have changed nothing since, cite that run under the citable-run rule instead of repeating it, and write the citation into the summary with what proved the tree unchanged. A review that found nothing therefore costs one full-suite run, not two; a review that fixed something costs two, because the first one is no longer about this code.
+
+Then `/verification-before-completion`. You proved the *code* is sound; that is a different, final gate, and it is not another review. It re-checks the plan's requirements line by line, which always runs fresh, and it needs a full-suite run true at the moment of completion, which is exactly the run you just recorded. Leave it citable: record the rung, the exit code and the counts in the summary below, and change nothing after signing off.
 
 **DO NOT exit with open MINOR findings.** "We can clean those up later" is how codebases rot. You are the person who said this was good enough — make it actually good enough. The only legitimate dismissal is demonstrating in writing that a finding was wrong on inspection; "low priority" is not a dismissal.
 
@@ -301,7 +307,8 @@ Reviewer: Senior Architect (independent)
 - [path] → [no-mock test name or evidence artifact]
 
 **Runs**
-- **[plan criterion, or a plain name for the run]** → exit [code] — [N passed, M failed, K skipped]
+- **[plan criterion, or a plain name for the run]** (rung [T1/T2/T3/T4]) → exit [code] — [N passed, M failed, K skipped]
+- **Sign-off run** (T4 full) → exit [code] — [N passed, M failed, K skipped]. [Fresh, or cited from the Round N run with `git status`/`git diff` clean since]
 
 Rounds: N
 Round 1: X critical, Y major, Z minor

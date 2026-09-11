@@ -17,6 +17,7 @@ The workflow is **Brainstorm → Plan → Build → 3p-Review → Verify**, with
 - `build-phase` — **model-agnostic**: builds phases via TDD → test → self-review, emits a build completion report. Owns no review/handoff.
 - `handoff-summary` — emits the fixed-format **Build Handoff Summary** (loaded at generation time for format reliability).
 - `3p-review`, `brainstorm`, `write-plan`, `triage`, `workflow-config` — the rest of the lifecycle.
+- `test-scope` : a **reference, not a step**. Holds the test-run ladder (focused → impacted → segment → full), the triggers that void a scoped run, and the citable-run rule. `user-invocable: false`; the skills that run tests read their rung out of it.
 - `vendor/superpowers/` holds upstream skills (`test-driven-development`, `systematic-debugging`, `verification-before-completion`, `brainstorming`) pulled by `pull-superpowers.sh`; their kebab names are kept verbatim. Don't hand-edit vendored skills.
 
 ### External dependencies
@@ -27,6 +28,19 @@ The workflow is **Brainstorm → Plan → Build → 3p-Review → Verify**, with
 ### Invariant when changing build/review/handoff skills
 
 A skill must not restate another skill's branch. The "stops after build" bug came from `build-phase` carrying an `if dedicated build model … else …` conditional repeated across sections, which drifted into a contradiction (one section said run `/3p-review`, another said don't). Keep each skill single-purpose; let the entry point decide.
+
+### Invariant: rung assignments live in one table
+
+`test-scope` exists because every gate used to demand the full suite independently, and a
+three-phase plan then paid for six or seven full-suite runs. Its "Rung by gate" table is the
+**only** place a rung is assigned. A skill that runs tests names its row and states no rung of
+its own; if it did, the two would drift and the narrower one would silently win. The same goes
+for the citable-run rule: state the conditions once, there, and reference them everywhere else.
+
+Two rows are marked **always** and are immune to citation: the builder's run at Phase
+Completion, and `/3p-review`'s when it re-derives the builder's claims. Never "optimize" those
+into one, including in a `/build-model` session where the same model owns both. That collapse
+is the whole point of the independence the review is paid for.
 
 ## Conventions
 

@@ -41,39 +41,40 @@ flowchart TD
     subgraph Build ["3 · Build — /build-phase · per phase, model-agnostic"]
         direction TB
         I["TDD: write failing test"] --> Impl["Implement to green"]
-        Impl --> T["Run tests"]
+        Impl --> T["Run tests<br/>scoped per /test-scope"]
         T -- "fail" --> Impl
         T -- "pass" --> SR["Self-review<br/>agent + human"]
         SR -- "issues found" --> Impl
         SR -- "clean" --> Next{"More phases?"}
         Next -- "yes" --> I
+        Next -- "no" --> BC["Phase Completion<br/>FULL suite - T4"]
     end
 
     subgraph BuildModel ["Build-model session — /build-model"]
         direction TB
-        X1["/build-phase across ALL phases<br/>cheaper model, or another tool"] --> X2["/3p-review<br/>loop until clean"]
+        X1["/build-phase across ALL phases<br/>cheaper model, or another tool<br/>ends on FULL suite - T4"] --> X2["/3p-review<br/>loop until clean"]
         X2 --> X3["/handoff-summary"]
         X3 --> X4([" STOP — does not verify "])
     end
 
     X4 --> ReturnSummary["User carries the handoff summary<br/>back to the main model"]
     ReturnSummary --> R1
-    Next -- "no" --> R1
+    BC --> R1
 
     subgraph FullReview ["4 · Holistic Review — /3p-review · main model, fresh eyes"]
-        R1["Senior Architect persona<br/>fresh eyes on ALL changes"] --> R2{"Findings?"}
+        R1["Senior Architect persona<br/>fresh eyes on ALL changes<br/>re-derive claims: FULL suite - T4"] --> R2{"Findings?"}
         R2 -- "fixable in place" --> R3["Fix issues"]
-        R3 --> R4["Re-test"]
+        R3 --> R4["Re-test<br/>scoped per /test-scope"]
         R4 --> R1
         R2 -- "too many / systemic" --> RB["Rework Brief<br/>back to the build model,<br/>then re-review from Round 1"]
-        R2 -- "none" --> R5["Review passed"]
+        R2 -- "none" --> R5["Sign-off run<br/>FULL suite - T4,<br/>or cite this review's own"]
     end
 
     R5 --> HS["Emit build record<br/>/handoff-summary"]
     HS --> V1
 
     subgraph Verify ["5 · Verify — /verification-before-completion"]
-        V1["Fresh full-suite run"] --> V2["Line-by-line check<br/>against plan requirements"]
+        V1["Full suite - T4,<br/>or cite the sign-off run<br/>if nothing changed since"] --> V2["Line-by-line check<br/>against plan requirements<br/>always fresh"]
     end
 
     V2 --> Archive["Move plan<br/>plans/ → done/"]
@@ -160,7 +161,7 @@ With AI-assisted development "later" means minutes or hours, so accumulating pla
 ## Step 3 — Build
 
 Execute the plan strictly **one phase at a time**:
-`Read plan → TDD (red/green/refactor) → full test suite → self-review → proceed`.
+`Read plan → TDD (red/green/refactor) → scoped tests → self-review → proceed`.
 
 There are two entry points, and **which one you launch decides who drives review and
 handoff** — there is no "am I the build model?" guesswork inside the skills:
@@ -191,7 +192,9 @@ Within a phase:
    behaviour — that is what the plan's gate phase is for.
 2. **TDD, mandatory.** Failing test first (red), minimum code to pass (green), then refactor.
    Writing the test is the *beginning* of the phase, not the end.
-3. **Full test suite** for the affected modules, to catch regressions.
+3. **Tests, scoped to what the phase earned.** A phase runs its own criteria and then widens
+   one rung, per [`/test-scope`](#test-scope-how-wide-a-run-has-to-be). The full suite runs once
+   at the end of the build, not once per phase.
 4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs?
    Lightweight per-phase check — not the full third-person review.
 5. **Proceed** to the next phase.
@@ -227,10 +230,13 @@ After `/3p-review` passes, run `/verification-before-completion` immediately. Th
 a second review**. `/3p-review` proved the *code* is sound; verification proves the *claim of
 "done" is true right now*. It adds two things review does not guarantee:
 
-- a **fresh** full-suite run at the actual moment of completion (review may have passed
-  several edits ago), and
+- a full-suite result that is **true at the actual moment of completion** (review may have
+  passed several edits ago), and
 - a **line-by-line check against the plan's requirements** (review judges completeness only
   qualitatively).
+
+Only the first can be satisfied without running anything, by citing `/3p-review`'s sign-off
+run under the citable-run rule below. The requirements checklist always runs fresh.
 
 It also covers the bug / quick-fix path, which skips full review. "Review already ran the
 tests" is never grounds to skip the gate.
@@ -239,3 +245,53 @@ Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv`.
 
 **Final validation:** all project tests pass. Nothing is "done" until the suite is green and
 the plan is archived.
+
+---
+
+## test-scope: how wide a run has to be
+
+Every gate above needs test evidence, and until `test-scope` existed each one asked for the
+full suite, because no gate can see any other gate's runs. A three-phase plan paid for six or
+seven full-suite runs, most of them re-proving code untouched since the last one. On a Python
+repo that also meant `mypy` on every phase of a change that never left the frontend.
+
+`test-scope` is a reference, not a step. Nothing invokes it as a phase; the skills that run
+tests read their rung out of it. It holds three things.
+
+**The ladder.** Four rungs, widening: **T1 focused** (the tests for the change in front of
+you), **T2 impacted** (whatever a change-aware selector reaches: `--testmon`, `--changedSince`,
+`vitest related`, `cargo test -p`), **T3 segment** (one segment's suite plus *that segment's*
+static gates), **T4 full** (everything CI runs). T2 beats T3 where it exists, because it
+selects by real dependency rather than by directory. The commands themselves live in the
+plan's **Test Commands** block, filled in by `/write-plan`, which has already confirmed each
+one runs here.
+
+A segment owns its own static gates. A type checker runs because *its* language changed, never
+because a sibling segment changed.
+
+**When the ladder does not apply.** If the full suite costs under a minute there is no ladder,
+just run it. Above that, a scoped run is the default until something voids it: a lockfile,
+tooling config, a shared or cross-segment module, a migration, a stale selector cache, or
+simply not being sure which segment the change is in. Uncertainty widens the run; it never
+narrows it.
+
+**The citable-run rule.** A run already made satisfies a run now required when four things
+hold: you made it yourself this session, it was the same command at the same rung, `git
+status`/`git diff` prove the tree has not changed since, and you write the citation down.
+This is what lets `/verification-before-completion` accept `/3p-review`'s sign-off run instead
+of repeating it. It is a *stricter* claim than re-running, not a looser one: re-running proves
+the suite passes, while a citation also proves nothing has changed since it did.
+
+**What is never traded away.** Two full-suite runs per feature, both marked *always* in
+test-scope's table and immune to citation: the builder's at Phase Completion, and the
+reviewer's when `/3p-review` re-derives the builder's claims. The second is not redundant with
+the first, because the first was reported by the model being checked. That holds even in a
+`/build-model` session where builder and reviewer are the same model minutes apart; if
+independence can be netted out by noticing that the tree is clean, it was never independence.
+
+**The price.** Every run is recorded with its rung, and the rung travels with it into the
+build report, the handoff's Verification Runs, and the review ledger. A criterion proven only
+at T1 or T2 is a ledger row, disposed of like a manual criterion: proven wider, or
+risk-accepted in writing. Reporting a scoped run as a full one is the failure mode that makes
+the whole mechanism unsafe, because every gate downstream inherits the claim. When in doubt
+about which rung a run was, it was the narrower one.
