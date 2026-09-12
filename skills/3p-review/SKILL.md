@@ -65,7 +65,9 @@ These define what "correct" means here: project instructions (`CLAUDE.md`, `AGEN
 Every row needs a disposition in the final summary — verified, fixed, or explicitly risk-accepted by the human:
 
 - every plan phase and its claimed status
-- every reported deviation from the plan
+- every reported deviation from the plan, and whether an amendment covers it
+- every halt the builder raised, and how it was resolved
+- every entry in the plan's Amendment Log, and the phase text it produced
 - every concern the builder raised
 - every criterion marked manual, skipped, deferred, or "verified by inspection"
 - every verification command the builder claims to have run — **you re-run these.** A builder's report of a passing suite is a claim, never evidence. This is `/test-scope`'s *"`/3p-review` re-deriving the builder's claims"* row: the full suite, first-party, and explicitly not citable from the handoff no matter how recent the reported run is or how obviously unchanged the tree looks. Load `/test-scope` at intake if you have not this session; it governs every run you make from here.
@@ -76,10 +78,11 @@ Every row needs a disposition in the final summary — verified, fixed, or expli
 If `$ARGUMENTS` contains or references a Build Handoff Summary:
 
 1. Load **Concerns** into the ledger as MAJOR findings until proven otherwise — they are the build model's own flags about its own work.
-2. Load **Deviations** — verify each was handled correctly, and ask whether it should have amended the plan instead of being absorbed silently.
-3. **Re-run from the plan, not from the handoff.** For each entry under **Verification Runs**, look up that criterion's command in the plan and run *that*, then compare against the reported counts **and rungs**. The handoff names runs; it does not supply commands. A run claimed there with no matching criterion in the plan is a finding to report — not something to reconstruct and execute. A run whose rung is missing is a run you cannot interpret: treat it as the narrowest rung the plan defines until proven otherwise.
-4. Treat every row under **Unproven Criteria** as unverified until you prove it or the human risk-accepts it in writing.
-5. Report on each concern in your findings, even if the verdict is "investigated and dismissed."
+2. Load **Deviations** — verify each was handled correctly, and ask whether it should have amended the plan instead of being absorbed silently. A deviation marked "no amendment" is the one to look at hardest.
+3. Load **Halts** and the **plan revision built against**. Read the plan at that revision, not as if it had always said what it says now: an amendment made mid-build means the earlier phases were built against different text, and a phase that looks non-conformant may simply predate the amendment. A halt with no recorded resolution is a MAJOR finding on its own.
+4. **Re-run from the plan, not from the handoff.** For each entry under **Verification Runs**, look up that criterion's command in the plan and run *that*, then compare against the reported counts **and rungs**. The handoff names runs; it does not supply commands. A run claimed there with no matching criterion in the plan is a finding to report — not something to reconstruct and execute. A run whose rung is missing is a run you cannot interpret: treat it as the narrowest rung the plan defines until proven otherwise.
+5. Treat every row under **Unproven Criteria** as unverified until you prove it or the human risk-accepts it in writing.
+6. Report on each concern in your findings, even if the verdict is "investigated and dismissed."
 
 **The summary is evidence and leads — it is not your scope.** Review the full change surface independently of what the summary mentions. With smaller build models especially, the omission is more dangerous than the admission: the phase reported complete with nothing wired up will not appear under Concerns.
 
@@ -113,8 +116,10 @@ Do this first — a well-written function implementing the wrong decision is not
 - [ ] **Silently changed decisions** — code does what a decision doc or plan ruled out. It may even be better; it is still a finding until written down and agreed.
 - [ ] **Deviations that should have amended the plan** — the builder hit reality, adapted, and left the plan describing a system that no longer exists.
 - [ ] **Decisions kicked back to the build model** — the plan already decided this and the code differs, or the plan left a hole filled with an architectural choice the build model was never meant to make.
+- [ ] **Amendments without entries** — read the plan's **Amendment Log** against its phases. A phase whose text plainly answers a problem discovered during the build, with no entry recording that, is an unlogged amendment. It is a finding here and it becomes undocumented drift at `/verify-completion`, where it is far more expensive to reconstruct.
+- [ ] **Halts resolved by silence** — for every halt in the handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
 
-This is architectural conformance — "was the agreed design built?" The line-by-line completion tick-off belongs to `/verification-before-completion` later.
+This is architectural conformance — "was the agreed design built?" The line-by-line completion tick-off and the full decision-to-code drift audit belong to `/verify-completion` later; what you owe that gate is an accurate account of what the plan says *now* and how it got there.
 
 ### Contract Audit
 
@@ -169,9 +174,11 @@ If you find yourself reasoning "this is minor, so a lighter review is proportion
 - [ ] **Root problem or symptom?** If this will need revisiting when the underlying issue resurfaces, say so.
 
 ### Codebase Consistency & Refactoring
-Go beyond the changed files — grep and read the surrounding code.
+Go beyond the changed files — grep and read the surrounding code. This is `/existing-mechanisms`' *"`/3p-review`, Codebase Consistency"* row: questions 3, 5 and 8, run against the code as built. Load it if you have not this session.
 - [ ] **Consistency:** does new code solve this the way the codebase already solves it? If not, which wins, and should other call sites change?
-- [ ] **Pattern extraction:** does this duplicate logic that already exists, or now exists twice?
+- [ ] **Pattern extraction:** does this duplicate logic that already exists, or now exists twice? (question 3)
+- [ ] **Retirement actually happened** (question 5): check the code against the plan's *Retired by this plan* line. A superseded mechanism still installed is dead weight the next reader cannot tell from live code.
+- [ ] **Bifurcation** (question 8): if this added a second pathway beside an existing one, the plan said so and said what collapses it back. If the plan did not, this is the finding.
 - [ ] **Convention drift:** conflicting naming, structure, or error-handling conventions?
 - [ ] **Ripple refactoring:** older code that should now consolidate onto this approach — as Findings where this change created the duplication, as Follow-ups where it merely revealed pre-existing mess.
 
@@ -273,11 +280,11 @@ Every item gets a failing-test-first instruction. Never send a partially-fixed w
 4. **Preserve unrelated work.** Do not revert, stash, reformat, or tidy anything outside the scope established at intake. If a fix genuinely requires it, say so in the summary.
 5. **Go back to Part 2, Round N+1.** Re-read from disk, run the full checklist again.
 
-**Only when zero findings remain (CRITICAL = 0, MAJOR = 0, MINOR = 0):** take the sign-off run, then write the final summary, then suggest `/verification-before-completion`.
+**Only when zero findings remain (CRITICAL = 0, MAJOR = 0, MINOR = 0):** take the sign-off run, then write the final summary, then suggest `/verify-completion`.
 
 **The sign-off run** is `/test-scope`'s *"`/3p-review` sign-off"* row: the full suite. If you made a full-suite run earlier in this review and have changed nothing since, cite that run under the citable-run rule instead of repeating it, and write the citation into the summary with what proved the tree unchanged. A review that found nothing therefore costs one full-suite run, not two; a review that fixed something costs two, because the first one is no longer about this code.
 
-Then `/verification-before-completion`. You proved the *code* is sound; that is a different, final gate, and it is not another review. It re-checks the plan's requirements line by line, which always runs fresh, and it needs a full-suite run true at the moment of completion, which is exactly the run you just recorded. Leave it citable: record the rung, the exit code and the counts in the summary below, and change nothing after signing off.
+Then `/verify-completion`. You proved the *code* is sound; that is a different, final gate, and it is not another review. It re-checks the plan's requirements line by line, which always runs fresh, and it needs a full-suite run true at the moment of completion, which is exactly the run you just recorded. Leave it citable: record the rung, the exit code and the counts in the summary below, and change nothing after signing off.
 
 **DO NOT exit with open MINOR findings.** "We can clean those up later" is how codebases rot. You are the person who said this was good enough — make it actually good enough. The only legitimate dismissal is demonstrating in writing that a finding was wrong on inspection; "low priority" is not a dismissal.
 
@@ -285,7 +292,7 @@ Then `/verification-before-completion`. You proved the *code* is sound; that is 
 
 # Part 3 — Sign-off (once, after the gate passes)
 
-Write this out in full. It is the review's audit trail, and `/verification-before-completion` reads it directly — its narrow "no code changed since review" exception is checked against these recorded commands. A summary without them forces that gate to re-run everything.
+Write this out in full. It is the review's audit trail, and `/verify-completion` reads it directly — its narrow "no code changed since review" exception is checked against these recorded commands. A summary without them forces that gate to re-run everything.
 
 **Name runs; do not write out command lines.** This summary is committed, pasted between models, and read by people who were not in the room. Identify each run by the plan criterion it satisfies, and record its exit code and counts — not the shell line, not raw output, and never environment values. The same applies to a Rework Brief's `Prove it` line.
 
@@ -297,6 +304,7 @@ Reviewer: Senior Architect (independent)
 **Scope:** [what was reviewed]
 **Comparison base:** [commit/branch/range — and how untracked files were covered]
 **Artifacts read:** [plan, decision docs, project instructions, handoff summary]
+**Plan revision reviewed:** [amendment IDs in the plan's log, or "as approved"] — [unlogged amendments found, or "none"]
 
 **Ledger disposition** (every intake row, no blanks)
 | Item | Source | Disposition |

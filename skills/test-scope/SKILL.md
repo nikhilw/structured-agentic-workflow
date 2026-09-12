@@ -73,7 +73,7 @@ This table is the only place rung assignments are written down. A skill that run
 | `/3p-review` re-deriving the builder's claims | **T4, always** | The builder's reported run is a claim, never a citable run. Holds even when you built this yourself minutes ago and the tree is provably clean: re-deriving is the whole reason the review is worth running |
 | `/3p-review` while fixing findings inside a round | T1, then T2 or T3 | The "widening circles" |
 | `/3p-review` sign-off | T4, or cite this review's own T4 when nothing changed since | |
-| `/verification-before-completion` | T4, or cite `/3p-review`'s sign-off run | The plan-requirements checklist is not a test run and is never cited. It always runs fresh |
+| `/verify-completion` | T4, or cite `/3p-review`'s sign-off run | The plan-requirements checklist is not a test run and is never cited. It always runs fresh |
 | Bug or quick-fix path, no plan | T2 or T3 by segment detection, then T4 at the completion claim | |
 
 Two full-suite runs per feature are mandatory and cannot be traded away: the builder's at Phase Completion, and the reviewer's first-party one. Everything else is either scoped or cited.

@@ -137,7 +137,7 @@ If `workflow-config:github-project-id` is configured:
    - **Triage (Todo):** Set the Project status column to **Todo** (or equivalent) when the issue is logged.
    - **Plan/Build (In Progress):** Move the card to **In Progress** when starting a `/write-plan` or `/build-phase`.
    - **Review (In Review):** Move the card to **In Review** during `/3p-review`.
-   - **Verify (Done):** Move the card to **Done** after `/verification-before-completion` passes.
+   - **Verify (Done):** Move the card to **Done** after `/verify-completion` passes.
 
 ---
 

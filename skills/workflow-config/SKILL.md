@@ -30,7 +30,7 @@ Only one can be active at a time. Setting one disables the other.
 - **caveman full** — Terse. Bullet points over paragraphs. Minimal preamble. All technical accuracy preserved.
 - **caveman ultra** — Maximum compression. Sentence fragments. Only essential information.
 
-When caveman is enabled, ALL workflow skills (brainstorm, write-plan, build-phase, 3p-review, triage, systematic-debugging, verification-before-completion) adapt their output to the requested brevity level. Technical accuracy is never sacrificed — only prose style changes.
+When caveman is enabled, ALL workflow skills (brainstorm, write-plan, build-phase, 3p-review, triage, systematic-debugging, verify-completion) adapt their output to the requested brevity level. Technical accuracy is never sacrificed — only prose style changes.
 
 **Important:** This workflow does NOT bundle or vendor the Caveman skills package. If the user wants caveman to also govern the agent's base system prompt (outside of workflow skills), they should install the caveman package separately (e.g., via `npx @anthropics/skills`). The workflow's caveman compatibility works independently — it adapts workflow skill output regardless of whether the caveman package is installed.
 
@@ -53,10 +53,11 @@ Save each preference as a memory entry in your agent's persistent memory system.
 ## What You Cannot Configure
 
 The following are NOT configurable — they are core workflow guarantees:
-- **Verification (`/verification-before-completion`)** — Always mandatory. Cannot be disabled.
+- **Verification (`/verify-completion`)** — Always mandatory, including its drift audit. Cannot be disabled.
 - **Phase order** — Brainstorm → Plan → Build → 3p-Review → Verify. Cannot be reordered or skipped.
 - **Plan lifecycle** — Plans move through `new/` → `plans/` → `done/`. Cannot be bypassed.
 - **3p-review loop** — Review loops until clean. Cannot be short-circuited.
+- **Halt and amend** — The build model surfaces plan problems and stops; the planning model amends the plan and logs the amendment. The builder never edits the plan. Neither half is optional.
 
 ## Output
 
