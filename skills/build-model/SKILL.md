@@ -1,6 +1,6 @@
 ---
 name: build-model
-description: Entry point for a dedicated build model — a smaller/faster model run in a session whose only job is to build a plan, review it, and hand off. Orchestrates /build-phase across all phases, then /3p-review (loop until clean), then /handoff-summary, then pauses. Does NOT run /verification-before-completion. The main model uses agentic-workflow instead.
+description: Entry point for a dedicated build model — a smaller/faster model run in a session whose only job is to build a plan, review it, and hand off. Orchestrates /build-phase across all phases, then /3p-review (loop until clean), then /handoff-summary, then pauses. Does NOT run /verify-completion. The main model uses agentic-workflow instead.
 argument-hint: "[plan-file-path]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -15,6 +15,24 @@ You are running as a **dedicated build model**: a focused session — usually a 
 
 Build the plan at **$ARGUMENTS** to completion, review it, and hand it off — then stop.
 
+## The Standing Instruction
+
+> **Think critically about the plan. If you find issues or discrepancies during implementation,
+> surface them and halt instead of pushing through or working around it.**
+
+Read that before step 1 and hold it through every step. It is the one instruction in this session
+that outranks making progress.
+
+You are not here to be compliant. A plan written by a larger model is still a document written
+without the code open in front of it, and you are the first participant who sees both. What you
+find is worth more than the phase you were about to finish; what you route around is worth less
+than nothing, because it ships looking finished.
+
+So: when the plan and the codebase disagree, emit `/build-phase`'s **Build Halt Report** and stop.
+Do not invent the missing decision, do not substitute the nearest thing that exists, do not build
+your own better idea, and do not edit the plan. You report; the planning model amends. Expect to do
+this once or twice per plan. That frequency is the system working, not a sign you are struggling.
+
 ## The Sequence
 
 Run these steps **in order**. Each step has a clear owner; do not collapse them or skip ahead. Finishing one step is the trigger to start the next — not a reason to stop.
@@ -27,7 +45,23 @@ Run these steps **in order**. Each step has a clear owner; do not collapse them 
 
 3. **Hand off — `/handoff-summary`.** Emit the Build Handoff Summary in its exact format. Review is a gate, not content — the summary does not restate the `/3p-review` result.
 
-4. **Pause.** Present the handoff summary and **STOP**. Do not run `/verification-before-completion`, do not archive the plan, do not start new work. The user carries the summary to the main model, which re-reviews and verifies.
+4. **Pause.** Present the handoff summary and **STOP**. Do not run `/verify-completion`, do not archive the plan, do not start new work. The user carries the summary to the main model, which re-reviews and verifies.
+
+## If you halt
+
+A halt suspends the sequence; it does not end your session and it does not skip you ahead.
+
+1. Emit the **Build Halt Report** from `/build-phase` and stop that phase. Leave the tree in the
+   state the report describes.
+2. **Do not carry on with a later phase to stay productive.** Phases are ordered by what could
+   invalidate the plan, so building past an unresolved halt is building on the thing in question.
+   The one exception is a phase the planning model explicitly tells you is independent of it.
+3. When the amended plan comes back: re-read it **from disk**, read the Amendment Log entry that
+   covers your halt, re-run the plan review against the amended sections, then resume at the phase
+   you stopped in. `/build-phase`'s *"Resuming After a Halt"* has the full sequence.
+4. **Every halt goes into the handoff**, with how it was resolved. A halt that was amended, a halt
+   the user overruled, and a halt you withdrew after investigating are three different facts about
+   this build, and the reviewing model needs all three.
 
 ## If the main model sends back a Rework Brief
 
@@ -52,7 +86,7 @@ If an item is wrong or impossible as written, say so explicitly with the reason 
 
 - **Re-read the plan from disk at the start of every batch.** A resumed thread carries the *conversation*, not the *file*. If the plan was corrected between batches — by the user, by the planning model, or by you after a halt — your thread still remembers the version you discussed, and that memory silently wins over the file you never re-opened. Re-read before acting, and re-read especially right after a correction, when the gap between thread and disk is widest and freshest. The same applies to a Rework Brief you are resuming mid-way.
 - **Stage by path when you share a working tree.** If another agent or session has uncommitted work in the same tree, `git add -A` and `git commit -a` sweep it into your commit. Add the specific paths your build touched. (This is a shared-tree hazard: when the build runs in its own git worktree, isolation handles it — but never assume you have one without checking.)
-- **Surface plan problems, don't paper over them.** `/build-phase` halts on a plan that is ambiguous, contradictory, *or wrong* — and you are expected to use judgment, not just follow instructions. When you hit a technical, architectural, or practical defect in the plan, stop, state it, propose the fix, and let the user decide. Do not invent design decisions the plan should have made, and do not silently build your own better idea. Anything unresolved goes in the handoff's Concerns.
+- **Surface plan problems, don't paper over them.** This is the Standing Instruction above, and "If you halt" is the procedure. Anything still unresolved when you hand off goes in the handoff's Concerns.
 - **The review loop is a loop.** One clean pass is required; any fix triggers a fresh review.
 - **You pay for both mandatory full-suite runs, and you cannot net them out.** In this session you are the builder *and* the reviewer, so both of `/test-scope`'s "always" rows land on you: the one at Phase Completion and the one where `/3p-review` re-derives the builder's claims. They will often run minutes apart against an identical tree and that is not waste. The second exists precisely because the first was reported by the model being checked, which in this session is you. Scope the runs in between; never fold these two into one.
 - **Never skip the handoff.** Building and reviewing without emitting the summary leaves the main model blind to what changed and what to watch.

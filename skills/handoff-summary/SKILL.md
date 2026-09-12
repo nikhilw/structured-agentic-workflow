@@ -17,15 +17,20 @@ This skill is invoked **after** the build is complete and **after** `/3p-review`
 
 ## Your only job
 
-Follow the template below: same headings, same order, same casing. Fill each section from the build record. Do **not** rename sections, add sections, drop sections, or replace the template with your own prose. This is a fixed artifact format so the consuming model can parse it reliably.
+Follow the template below: same headings, same order, same casing. Fill each section from the build record. Do **not** rename sections, add sections, drop sections, or replace the template with your own prose. This is a fixed artifact format so the consuming model can parse it reliably. A section with nothing in it is filled with "None.", never removed.
 
 ```markdown
 ## Build Handoff Summary
 
 **Plan:** [plan file path]
+**Plan revision built against:** [amendment IDs applied during this build, e.g. "A1, A2", or "as approved"]
+
+### Halts
+- **Phase N** — [what was halted on, one line] → [resolved by amendment A1 / overruled by the user / withdrawn after investigation]
+- (Every halt raised during this build. If none, write "None.")
 
 ### Deviations
-- **Phase N: [Name]** — [what changed and why, one line]
+- **Phase N: [Name]** — [what changed and why, one line] — [amendment ID if a plan amendment covers it, or "no amendment"]
 - (Only list phases that deviated from the plan. If nothing deviated, write "None.")
 
 ### Verification Runs
@@ -44,7 +49,8 @@ Follow the template below: same headings, same order, same casing. Fill each sec
 ## Rules
 
 - **Be honest and specific.** Deviations and concerns are the whole point — an empty summary that hides real drift defeats the purpose. If a phase departed from the plan, say so and why.
-- **Keep it to the four sections.** This is not a feature description or a changelog. Do not restate what the plan already says.
+- **Keep it to the five sections.** This is not a feature description or a changelog. Do not restate what the plan already says.
+- **Halts and the plan revision are how the next model reads everything else.** A reviewer comparing the code against a plan that was amended twice mid-build will read the amendments as unexplained divergence unless this summary says which revision the build was made against. A deviation with no amendment behind it is a different and more serious fact than one with an amendment, and only you can tell them apart.
 - **Name each run; never write out its command line.** Identify a run by the plan criterion it satisfies, or by a plain description ("full suite, project runner"). The command text lives in the plan — this artifact carries only which run happened and what it reported. Environment values, arguments and headers have no business in a document that is committed and passed between models.
 - **Report counts, never output.** Exit codes and pass/fail/skip numbers are what the reviewer needs; "all tests pass" is not a report, and the reviewer re-runs from the plan and compares. Copied terminal text carries values you did not intend to publish, and wording the next model may read as instruction.
 - **Unproven Criteria is the section you will be tempted to leave empty.** Anything you checked by reading rather than running, skipped as "obviously fine", or intended to come back to, goes here. A criterion omitted here reads as green to the next model, and that is how an unbuilt path ships.
@@ -54,4 +60,4 @@ Follow the template below: same headings, same order, same casing. Fill each sec
 ## What happens next
 
 - **Dedicated build model** (launched via `/build-model`): present the summary, then **STOP**. The user carries it to the main model.
-- **Main model**: present the summary as the build record, then continue the workflow → `/verification-before-completion` → archive the plan.
+- **Main model**: present the summary as the build record, then continue the workflow → `/verify-completion` → archive the plan.

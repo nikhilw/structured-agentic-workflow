@@ -15,6 +15,27 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
 
+## The Standing Instruction
+
+> **Think critically about the plan. If you find issues or discrepancies during implementation,
+> surface them and halt instead of pushing through or working around it.**
+
+This is not advice for the start of the phase. It is in force at every step below, from reading the
+plan to the last test run, and it outranks finishing the phase. Three things follow from it:
+
+- **A workaround is the failure mode, not the save.** Routing around a gap inside the files the
+  plan did name produces something that passes every gate while doing the wrong thing, and nothing
+  downstream will catch it, because from the outside it looks finished.
+- **You never edit the plan while building.** You report; the planning model assesses and amends.
+  That split is what keeps the plan a contract and what makes drift measurable at the end.
+  **In a single-model session it still holds**, because the split that matters is between *acts*,
+  not models: stop building, go back to the plan as its author, verify what you found, amend the
+  document and append the Amendment Log entry, then resume. Editing the plan mid-build without
+  stopping and without logging is the same silent drift whether one model does it or two.
+- **Halting is not failing.** A halt with an accurate diagnosis is the cheapest possible outcome
+  for a plan defect, and the planning model expects one or two. The expensive outcome is the
+  silent fix.
+
 ## The Loop: Read + Review Plan → TDD (Red/Green/Refactor) → Scoped Tests → Self-Review → Proceed
 
 You MUST follow this loop for every phase. Do not skip steps. Every step produces output — do not stop after one step.
@@ -23,7 +44,7 @@ You MUST follow this loop for every phase. Do not skip steps. Every step produce
 
 1. Read the plan file and locate the specified phase.
 2. Understand what the phase requires: files to modify/create, expected behavior, test criteria.
-3. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, STOP and flag it to the user. Do not guess or make design decisions that the plan should have made. The user may need to take the issue back to the planning model.
+3. **Surface discrepancies — do not silently work around them.** If the plan is ambiguous, contradictory, or assumes something that doesn't match the codebase, stop and emit the **Build Halt Report** below. Do not guess or make design decisions that the plan should have made. The resolution is the planning model's: it verifies what you found, amends the plan, and logs the amendment.
 4. **Run the plan review below before writing a single line of code.**
 
 #### Plan Review — Fresh Eyes on the Plan
@@ -34,10 +55,11 @@ You MUST follow this loop for every phase. Do not skip steps. Every step produce
 
 **What this is not.** You are not re-brainstorming, not exploring alternatives, and not redesigning. Do not propose a different architecture because you would have picked one — the plan resolved its trade-offs with the user, and re-litigating them burns the cost advantage this session exists for. You read for things that are **wrong, missing, or unbuildable as written**, and you *surface* them; you do not fix them.
 
-**The mechanical half — does the plan match the codebase?** Look things up; do not answer from having skimmed the plan.
+**The mechanical half — does the plan match the codebase?** Look things up; do not answer from having skimmed the plan. This half is `/existing-mechanisms`' *"`/build-phase`, Plan Review"* row: questions 1, 3, 5 and 8, run against this phase's named files and symbols. Load that file if you have not this session.
 
 - **Does everything the plan names actually exist?** Walk this phase's file paths, functions, classes, signatures, routes, fixtures, config keys, and flags. Anything marked **new** is expected to be absent — everything else must be found. Building "the closest thing" to a name that does not exist is how an invented method that no other code expects gets written.
-- **Does the plan name every caller of what it changes?** For each existing symbol this phase modifies — especially a changed signature or return type — find its call sites and check the plan accounts for them. Where an index exists (`graphify query`, `graphify path`), use it; a grep finds the name, the graph finds what reaches it. **A caller the plan does not name is the single most common plan defect**: a function gains a keyword argument, six test doubles call it at the old arity, and none are in the plan's file list.
+- **Does the plan name every caller of what it changes?** (question 1) For each existing symbol this phase modifies — especially a changed signature or return type — find its call sites and check the plan accounts for them. Where an index exists (`graphify query`, `graphify path`), use it; a grep finds the name, the graph finds what reaches it. **A caller the plan does not name is the single most common plan defect**: a function gains a keyword argument, six test doubles call it at the old arity, and none are in the plan's file list.
+- **Then `/existing-mechanisms` questions 3, 5 and 8**, asked of the plan rather than of the codebase: is it specifying something that already exists, does it retire what it replaces, does it bifurcate a pathway. Read them there; each names what a real answer looks like and what the silence costs. Anything you cannot answer from the plan is a silence, and a silence is a halt.
 
 **The judgment half — is the plan buildable exactly as written?**
 
@@ -55,7 +77,7 @@ You MUST follow this loop for every phase. Do not skip steps. Every step produce
 
 ### Standing Rule: You Are Not a Typist — Push Back on a Bad Plan
 
-This applies at **every step**, not just when reading the plan. You are closer to the code than the planning model ever was, and implementation surfaces things planning cannot see.
+This is the Standing Instruction in operational form, and it applies at **every step**, not just when reading the plan. You are closer to the code than the planning model ever was, and implementation surfaces things planning cannot see.
 
 The moment you spot a technical, architectural, or practical problem with the plan — an approach that won't work here, a design that fights the codebase, a step that is far more expensive than the plan assumes, a simpler route the plan missed, a requirement that contradicts how the system actually behaves — **stop and raise it**:
 
@@ -63,7 +85,43 @@ The moment you spot a technical, architectural, or practical problem with the pl
 2. **Propose a fix** — the concrete alternative you'd recommend, and what it costs. Don't just report a blocker.
 3. **Halt that phase.** Do not build the thing you believe is wrong while waiting, and do not quietly build your alternative instead — the plan is a contract, and unilaterally amending it is exactly the drift the workflow exists to prevent.
 
-The user decides: amend the plan, overrule you, or take it back to the planning model. "The plan said so" is not a defence for shipping something you knew was wrong — you are expected to have judgment and to use it. Raising a real design problem mid-build is a success of the process, not an interruption of it.
+The user decides: send it to the planning model to amend, or overrule you and have it built as planned. "The plan said so" is not a defence for shipping something you knew was wrong — you are expected to have judgment and to use it. Raising a real design problem mid-build is a success of the process, not an interruption of it. Either way the outcome is recorded: an amendment ID, or an overrule you note in the phase report so it reaches the handoff.
+
+#### The Build Halt Report
+
+Emit this, then stop. It goes to a model that has to decide the resolution without your session, so
+it carries the same burden a plan does: specific enough to be checked, with no step left to
+inference.
+
+```markdown
+## Build Halt — Phase N
+
+**Plan:** [path]   **Phase:** [N — name]   **Where:** [file:line, or plan section]
+
+**Plan says:** [what the plan instructs, quoted or tightly paraphrased]
+**Found:** [what the codebase, the test, or the runtime actually shows]
+**Evidence:** [the command you ran and what it reported, or the file and line you read]
+**Why it blocks:** [what you would have to invent, guess, or decide to continue]
+
+**Options:**
+1. [concrete route] — [cost, and what it gives up]
+2. [concrete route] — [cost, and what it gives up]
+
+**Recommendation:** [the one you would pick, and why]
+
+**State of the tree:** [what is built and green so far; what this phase left untouched; whether
+anything is half-done and needs reverting before the fix lands]
+```
+
+Two lines people leave out, and both matter more than the diagnosis. **Evidence** is what lets the
+planning model verify your claim in one command instead of re-deriving your whole investigation.
+**State of the tree** is what stops the amended plan from being written against a tree it does not
+match.
+
+**Report a suspected decision-level problem as such.** If what you found undermines the *approach*
+rather than this phase of it, say so explicitly in "Why it blocks". That sentence is what sends it
+back to brainstorming instead of into a phase amendment, and it is the distinction the accumulated
+drift at the end of a project is usually made of.
 
 ### Step 2: TDD — Write Tests, Then Implement
 
@@ -76,6 +134,20 @@ Use `/test-driven-development`. This is mandatory for every phase.
 **You must complete all three steps.** Do not stop after writing tests. The tests exist to drive the implementation — writing them is the beginning of the phase, not the end.
 
 **Build the seam test the plan names.** If this phase completes a value path, the plan names a no-mock test across the real seam — write it, and let it exercise the real thing. Replacing it with a mocked unit test technically satisfies "a test exists" while proving nothing about the wiring, and that is precisely the gap review is built to catch. If you cannot make the real seam work, that is a Concern to report, not a mock to substitute.
+
+**The Standing Instruction is live in the middle of this step.** Implementation is where the plan's
+silences become visible, and where they are cheapest to mistake for permission. The moment you find
+yourself reaching for any of these, you have found a plan defect and the answer is a halt, not a
+keystroke:
+
+- adding a parameter, field, flag or config key the plan never named, to make the phase work;
+- calling something adjacent because the thing the plan named does not exist;
+- mocking a seam the plan said to exercise for real;
+- widening a signature, loosening a type, or catching an exception the plan did not account for;
+- "I'll build it this way for now and mention it at the end."
+
+Each of these is a decision the plan owed you. Fill one silently and it never surfaces again: the
+tests you wrote will encode your guess, and every gate downstream reads green.
 
 ### The Quality Bar You Are Building To
 
@@ -110,6 +182,7 @@ Review your own changes with a critical eye. This is NOT the full `/3p-review` �
 
 Check for:
 - Does the implementation match what the plan specified?
+- **Did I decide anything the plan should have decided?** Walk the diff for names, parameters, error paths, defaults and config keys that are not in the plan. Each one is either something the plan named, or a silence you filled. A silence you filled is a halt you did not take, and now is the last moment it costs only a paragraph.
 - Are there any obvious bugs, edge cases, or regressions?
 - Does the code follow existing project conventions and patterns?
 - Does it clear the quality bar above — naming, function size, hidden side effects, DRY, KISS/YAGNI? Fix what you'd be embarrassed to hand to a reviewer.
@@ -131,6 +204,28 @@ Report:
 
 **Then auto-advance:** if the phase is clean and more phases remain, immediately suggest and begin the next phase. Do not wait for the user to say "proceed" unless the plan requires a human decision gate.
 
+## Resuming After a Halt
+
+When the plan comes back amended:
+
+1. **Re-read the plan from disk.** Not from your thread, which remembers the version you discussed
+   and will silently win over the file you never re-opened. This is widest and freshest right after
+   a correction, which is exactly when it is skipped.
+2. **Read the Amendment Log entry, not just the amended phase.** It says what changed and why, and
+   whether the change touched phases you have already built. An amendment with decision impact may
+   invalidate work behind you.
+3. **Re-run the plan review** (Step 1) against the amended sections. Amended text is new plan text,
+   and no one has reviewed it with your eyes.
+4. **Restore the tree to what your halt report described**, if anything was left half-done, before
+   building on top of it.
+5. If the amendment does not actually resolve what you halted on, say so and halt again. A second
+   halt on the same point is information, not insubordination; silently accepting a non-fix is how
+   the original defect ships with a paper trail that says it was handled.
+
+If the user overrules the halt and tells you to build it as planned, build it as planned, and record
+the overrule in the phase report so it reaches the handoff. That is the user's call to make. It is
+not yours to make by staying quiet.
+
 ## Resuming After External Model Execution
 
 If the user tells you that code was written by another agent (Cursor, Copilot, a local model, etc.) or simply says "it's done" / "I've implemented Phase N" / pastes a diff:
@@ -148,11 +243,11 @@ The user should not have to tell you to continue the workflow. You own the proce
 When all phases in the plan are complete:
 
 1. Run the FULL test suite using this project's own command. All tests must pass. This is `/test-scope`'s *"`/build-phase` Phase Completion"* row: it is **T4, always**, and it is the one run in this skill that is never scoped and never cited. Every phase before it ran narrow on the promise that this run happens.
-2. Produce a short **build completion report**: which phases were built; which test criteria were run, **at which rung**, with exit codes and counts; every criterion left unproven (manual, skipped, deferred, verified by inspection, or proven only at a scoped rung); and a one-line note on any phase that deviated from the plan. These four feed the handoff summary directly — the reviewer builds its ledger from them.
+2. Produce a short **build completion report**: which phases were built; which test criteria were run, **at which rung**, with exit codes and counts; every criterion left unproven (manual, skipped, deferred, verified by inspection, or proven only at a scoped rung); a one-line note on any phase that deviated from the plan; and **every halt you raised, with how it was resolved** (amendment ID, overruled by the user, or withdrawn on investigation) plus the plan revision you built against. These five feed the handoff summary directly — the reviewer builds its ledger from them.
 
 This skill ends here. Building is one responsibility — review and handoff are owned by the **orchestrating workflow**, not by this skill. Do **not** run `/3p-review`, write the handoff summary, or verify from inside build-phase.
 
-- `agentic-workflow` (main model) drives `/3p-review` → `/handoff-summary` → `/verification-before-completion`.
+- `agentic-workflow` (main model) drives `/3p-review` → `/handoff-summary` → `/verify-completion`.
 - `build-model` (dedicated build model) drives `/3p-review` → `/handoff-summary` → STOP.
 
 Whichever launched you takes over once you report completion. You do not need to decide which — just report and hand back.
