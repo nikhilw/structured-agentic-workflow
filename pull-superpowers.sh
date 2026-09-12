@@ -24,6 +24,15 @@ SKILLS=(
     brainstorming
     test-driven-development
     systematic-debugging
+)
+
+# Skills we used to pull and no longer do. Stale copies from an earlier install
+# are removed so the agent is never offered two skills for one job.
+#
+# verification-before-completion: superseded by this repo's own verify-completion,
+# which keeps its Iron Law and adds the plan-requirements tick-off and the drift
+# audit. Installing both would leave two gates claiming the same role.
+RETIRED_SKILLS=(
     verification-before-completion
 )
 
@@ -81,12 +90,23 @@ fetch() {
         echo "  copied   ${skill}/ -> skills/${skill}/"
     done
 
+    # Drop stale copies of skills we no longer pull, in vendor/ and in skills/.
+    for skill in "${RETIRED_SKILLS[@]}"; do
+        for stale in "${VENDOR_DIR}/${skill}" "${skills_dir}/${skill}"; do
+            if [ -d "$stale" ]; then
+                rm -rf "$stale"
+                echo "  removed  ${stale#$SCRIPT_DIR/} (retired)"
+            fi
+        done
+    done
+
     # Strip the `superpowers:` namespace prefix on cross-references so the skills
-    # resolve in agents that don't understand plugin-style namespacing.
+    # resolve in agents that don't understand plugin-style namespacing, and point
+    # the verification reference at our own gate, which replaces the upstream one.
     local debug_skill="${skills_dir}/systematic-debugging/SKILL.md"
     if [ -f "$debug_skill" ]; then
         sed -i 's|superpowers:test-driven-development|/test-driven-development|g' "$debug_skill"
-        sed -i 's|superpowers:verification-before-completion|/verification-before-completion|g' "$debug_skill"
+        sed -i 's|superpowers:verification-before-completion|/verify-completion|g' "$debug_skill"
     fi
 
     echo ""

@@ -17,7 +17,6 @@ vendor/
 skills/brainstorming/
 skills/test-driven-development/
 skills/systematic-debugging/
-skills/verification-before-completion/
 
 # Internal working notes (kept locally, not tracked)
 docs/superpowers-comparison.md

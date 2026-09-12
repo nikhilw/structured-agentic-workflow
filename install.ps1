@@ -39,8 +39,42 @@ $AgentPaths = @{
 
 $AllAgents = @("claude", "cursor", "gemini", "copilot")
 
+# Skills this project used to install and no longer does. A link left behind by an
+# earlier install is removed, but only when it is ours: a broken link, or one that
+# resolves back into this repo. A real skill the user installed some other way is
+# never touched.
+#
+# verification-before-completion: superseded by our own verify-completion.
+$RetiredSkills = @(
+    "verification-before-completion"
+)
+
 function Get-Skills {
     Get-ChildItem -Path $SkillsSrc -Directory | Select-Object -ExpandProperty Name
+}
+
+function Remove-RetiredLinks([string]$SkillsDst) {
+    foreach ($skill in $RetiredSkills) {
+        $target = Join-Path $SkillsDst $skill
+        if (-not (Test-Path $target -ErrorAction SilentlyContinue)) {
+            # A broken link fails Test-Path, so check for the entry itself too.
+            $item = Get-Item $target -Force -ErrorAction SilentlyContinue
+            if ($null -eq $item) { continue }
+        } else {
+            $item = Get-Item $target -Force
+        }
+
+        if (-not ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint)) { continue }
+
+        $resolved = $item.Target
+        if ([string]::IsNullOrEmpty($resolved) -or -not (Test-Path $resolved)) {
+            Remove-Item $target -Force
+            Write-Host "    removed  $skill (retired - link was broken)"
+        } elseif ((Resolve-Path $resolved).Path.StartsWith((Resolve-Path $SkillsSrc).Path)) {
+            Remove-Item $target -Force
+            Write-Host "    removed  $skill (retired - superseded by verify-completion)"
+        }
+    }
 }
 
 function Remove-SkillLinks([string]$AgentName, [string]$SkillsDst) {
@@ -58,6 +92,8 @@ function Remove-SkillLinks([string]$AgentName, [string]$SkillsDst) {
             }
         }
     }
+
+    Remove-RetiredLinks $SkillsDst
 }
 
 function Install-SkillLinks([string]$AgentName, [string]$SkillsDst) {
@@ -89,6 +125,8 @@ function Install-SkillLinks([string]$AgentName, [string]$SkillsDst) {
         New-Item -ItemType SymbolicLink -Path $target -Target $src | Out-Null
         Write-Host "    linked   $skill"
     }
+
+    Remove-RetiredLinks $SkillsDst
 }
 
 function Show-Agents {

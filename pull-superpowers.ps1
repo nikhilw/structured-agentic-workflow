@@ -28,6 +28,15 @@ $Skills = @(
     "brainstorming"
     "test-driven-development"
     "systematic-debugging"
+)
+
+# Skills we used to pull and no longer do. Stale copies from an earlier install
+# are removed so the agent is never offered two skills for one job.
+#
+# verification-before-completion: superseded by this repo's own verify-completion,
+# which keeps its Iron Law and adds the plan-requirements tick-off and the drift
+# audit. Installing both would leave two gates claiming the same role.
+$RetiredSkills = @(
     "verification-before-completion"
 )
 
@@ -93,13 +102,25 @@ function Fetch-SuperpowersSkills {
             Write-Host "  copied   $skill/ -> skills/$skill/"
         }
 
+        # Drop stale copies of skills we no longer pull, in vendor/ and in skills/.
+        foreach ($skill in $RetiredSkills) {
+            foreach ($stale in @((Join-Path $VendorDir $skill), (Join-Path $skillsDir $skill))) {
+                if (Test-Path $stale) {
+                    Remove-Item $stale -Recurse -Force
+                    Write-Host "  removed  $skill/ (retired)"
+                }
+            }
+        }
+
         # Strip the `superpowers:` namespace prefix on cross-references so the
-        # skills resolve in agents that don't understand plugin-style namespacing.
+        # skills resolve in agents that don't understand plugin-style namespacing,
+        # and point the verification reference at our own gate, which replaces the
+        # upstream one.
         $debugSkill = Join-Path $skillsDir "systematic-debugging" "SKILL.md"
         if (Test-Path $debugSkill) {
             (Get-Content $debugSkill) `
                 -replace "superpowers:test-driven-development", "/test-driven-development" `
-                -replace "superpowers:verification-before-completion", "/verification-before-completion" |
+                -replace "superpowers:verification-before-completion", "/verify-completion" |
                 Set-Content $debugSkill
         }
 

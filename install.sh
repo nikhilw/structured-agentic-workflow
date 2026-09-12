@@ -28,12 +28,46 @@ declare -A AGENT_PATHS=(
 
 ALL_AGENTS=(claude cursor gemini copilot)
 
-# Discover all skills dynamically from the skills/ directory
+# Skills this project used to install and no longer does. A link left behind by an
+# earlier install is removed, but only when it is ours: a broken link, or one that
+# resolves back into this repo. A real skill the user installed some other way is
+# never touched.
+#
+# verification-before-completion: superseded by our own verify-completion.
+RETIRED_SKILLS=(
+    verification-before-completion
+)
+
+remove_retired_links() {
+    local skills_dst="$1"
+    local skill target resolved
+    for skill in "${RETIRED_SKILLS[@]}"; do
+        target="${skills_dst}/${skill}"
+        [ -L "$target" ] || continue
+        resolved="$(cd "$(dirname "$target")" && readlink -f "$skill" 2>/dev/null || true)"
+        if [ -z "$resolved" ] || [ ! -e "$resolved" ]; then
+            rm "$target"
+            echo "    removed  ${skill} (retired — link was broken)"
+        elif [ "${resolved#${SKILLS_SRC}/}" != "$resolved" ]; then
+            rm "$target"
+            echo "    removed  ${skill} (retired — superseded by verify-completion)"
+        fi
+    done
+}
+
+# Discover all skills dynamically from the skills/ directory, minus anything
+# retired. A retired skill can still be sitting in skills/ from an older pull;
+# linking it and then unlinking it would clobber a copy the user installed
+# themselves, so it is never a candidate in the first place.
 discover_skills() {
-    local skills=()
+    local skills=() name retired
     for dir in "${SKILLS_SRC}"/*/; do
         [ -d "$dir" ] || continue
-        skills+=("$(basename "$dir")")
+        name="$(basename "$dir")"
+        for retired in "${RETIRED_SKILLS[@]}"; do
+            [ "$name" = "$retired" ] && continue 2
+        done
+        skills+=("$name")
     done
     echo "${skills[@]}"
 }
@@ -54,6 +88,8 @@ remove_links() {
             echo "    skipped  ${skill} (not a symlink — remove manually if intended)"
         fi
     done
+
+    remove_retired_links "$skills_dst"
 }
 
 install_links() {
@@ -84,6 +120,8 @@ install_links() {
         ln -s "$src" "$target"
         echo "    linked   ${skill}"
     done
+
+    remove_retired_links "$skills_dst"
 }
 
 list_agents() {
