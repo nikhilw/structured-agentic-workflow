@@ -41,16 +41,24 @@ npx skills add nikhilw/structured-agentic-workflow
 npx skills add nikhilw/structured-agentic-workflow -a claude-code
 
 # superpowers skills live in a separate repo — install them separately
-npx skills add obra/superpowers -s test-driven-development -s systematic-debugging -s verification-before-completion
+npx skills add obra/superpowers -s test-driven-development -s systematic-debugging
 ```
 
 The CLI discovers all skills in the repo, lets you pick which to install, and symlinks them
 into your agent's skills directory.
 
 > We keep the upstream superpowers names verbatim (`systematic-debugging`,
-> `verification-before-completion`) rather than shortening them to `debug`/`verify`. The
+> `test-driven-development`) rather than shortening them to `debug`/`tdd`. The
 > `npx skills` CLI has no rename flag, so keeping the upstream names means installs via
 > `npx skills` and installs via `install.sh` produce identically-named skills.
+
+> **Do not install superpowers' `verification-before-completion`.** This workflow replaces it with
+> `verify-completion`: the same Iron Law, gate function and key patterns, plus the plan-requirements
+> tick-off and the drift audit. Installing both leaves two skills claiming one gate, and the agent
+> takes whichever it reads first. The name differs deliberately, since the install script copies
+> vendored skills into `skills/` and a same-named skill of ours would be clobbered on every pull.
+> If you already have the upstream one from an earlier install, `./install.sh` removes the link it
+> created; a copy you installed by another route stays, and `/verify-completion` is still the gate.
 
 ## Option B — the install script
 
@@ -64,12 +72,16 @@ cd structured-agentic-workflow
 .\install.ps1         # Windows PowerShell — requires Developer Mode or admin
 ```
 
-It does two things:
+It does three things:
 
 1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers)
    (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/`
    under their upstream names.
 2. **Symlinks all skills** into the global skills directory for each supported agent.
+3. **Cleans up retired skills** — `verification-before-completion` is no longer part of this
+   workflow, so a stale copy under `skills/` and the symlink an earlier install created are
+   removed. Only a link that is broken or points back into this repo is touched; a copy you
+   installed some other way is left alone.
 
 ### Targeting one agent
 
@@ -105,12 +117,13 @@ It does two things:
 | `build-model` | this project | Dedicated build-model workflow — build-phase → 3p-review → handoff-summary → stop |
 | `3p-review` | this project | Independent third-person review; returns a Rework Brief when there is too much to fix in place |
 | `handoff-summary` | this project | Emit the fixed-format Build Handoff Summary after review passes |
+| `verify-completion` | this project | The final gate: fresh suite, plan-requirements tick-off, decision-to-code drift audit. Replaces the upstream `verification-before-completion` |
 | `test-scope` | this project | Shared reference: how wide each test run must be, and when a recorded run can be cited. Not invoked directly |
+| `existing-mechanisms` | this project | Shared reference: the eight questions about what the codebase already does. Not invoked directly |
 | `triage` | this project | Recommend the next task, minimizing context thrash |
 | `github-backlog` | this project | Maintain features and bugs on GitHub |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
 | `systematic-debugging` | [superpowers](https://github.com/obra/superpowers) | Systematic 4-phase root cause investigation |
-| `verification-before-completion` | [superpowers](https://github.com/obra/superpowers) | Evidence before completion claims |
 
 ### Optional vendor skills
 
@@ -119,6 +132,12 @@ Installed, but not part of the workflow.
 | Skill | Source | Description |
 |---|---|---|
 | `brainstorming` | [superpowers](https://github.com/obra/superpowers) | Interactive brainstorming with visual companion and spec review loop. Available if you prefer it over `/brainstorm`. |
+
+### Retired
+
+| Skill | Why it is gone |
+|---|---|
+| `verification-before-completion` | Replaced by `verify-completion`, which does everything it did and adds the requirements tick-off and the drift audit. No longer pulled or linked; `./install.sh` removes a stale copy and the symlink it created. The one upstream reference to it, in `systematic-debugging`'s related-skills list, is rewritten to `/verify-completion` at pull time. |
 
 ---
 
@@ -137,14 +156,19 @@ mkdir -p vendor/superpowers
 cp -r /tmp/superpowers/skills/brainstorming vendor/superpowers/
 cp -r /tmp/superpowers/skills/test-driven-development vendor/superpowers/
 cp -r /tmp/superpowers/skills/systematic-debugging vendor/superpowers/
-cp -r /tmp/superpowers/skills/verification-before-completion vendor/superpowers/
 cp /tmp/superpowers/LICENSE vendor/superpowers/
 
 # Copy into skills/ under their upstream names
 cp -r /tmp/superpowers/skills/brainstorming skills/brainstorming
 cp -r /tmp/superpowers/skills/test-driven-development skills/test-driven-development
 cp -r /tmp/superpowers/skills/systematic-debugging skills/systematic-debugging
-cp -r /tmp/superpowers/skills/verification-before-completion skills/verification-before-completion
+
+# Point systematic-debugging's cross-references at skills that exist here
+sed -i 's|superpowers:test-driven-development|/test-driven-development|g' skills/systematic-debugging/SKILL.md
+sed -i 's|superpowers:verification-before-completion|/verify-completion|g' skills/systematic-debugging/SKILL.md
+
+# Retired: remove it if an earlier install left it behind
+rm -rf vendor/superpowers/verification-before-completion skills/verification-before-completion
 
 rm -rf /tmp/superpowers
 ```

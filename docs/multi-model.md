@@ -29,7 +29,7 @@ Three roles. Two of them are mandatory; they are allowed to be the same model.
 |---|---|---|---|
 | **Planning model** | `/brainstorm`, `/write-plan` — explores the problem, challenges the design, resolves every decision, writes the plan file | Deep reasoning, long context, architectural judgment | Your best available model — Opus 5, or whatever you reserve for hard thinking |
 | **Build model** | `/build-model` → `/build-phase` per phase → `/3p-review` → `/handoff-summary` | Accurate code generation, tool use, patience | **Sonnet 5 is the default choice** — it executes a well-specified plan without needing to design. Also: Cursor, Copilot, Gemini Flash, or a local model |
-| **Review model** *(optional)* | `/3p-review` on the returning change set, then `/verification-before-completion` | Fresh eyes, no authorship bias | Usually the planning model. Occasionally a *third*, deliberately different model — a reviewer that shares no blind spots with either author |
+| **Review model** *(optional)* | `/3p-review` on the returning change set, then `/verify-completion` | Fresh eyes, no authorship bias | Usually the planning model. Occasionally a *third*, deliberately different model — a reviewer that shares no blind spots with either author |
 
 By default the planning model also reviews and verifies. Splitting the reviewer out is an
 upgrade, not a requirement.
@@ -92,7 +92,7 @@ flowchart LR
 
     subgraph R ["3 · Review model — fresh eyes (planning model by default)"]
         direction TB
-        R1["/3p-review<br/>independent re-review"] --> R2["/verification-before-completion"]
+        R1["/3p-review<br/>independent re-review"] --> R2["/verify-completion<br/>suite · requirements · drift"]
     end
 
     R --> Done([Feature complete])
@@ -111,9 +111,17 @@ left ambiguous is a decision the build model will make silently, at the worst po
 moment. The plan is where the expensive model's foresight gets *stored*.
 
 **Return contract — the Build Handoff Summary.** `/handoff-summary` emits a fixed-format
-record of what was built, what the build model's own `/3p-review` found, every deviation
-from the plan, and every open concern. The user carries it back. The main model then runs
-`/3p-review` **again**, with the summary as input, and only then verifies.
+record of the plan revision built against, every halt and how it was resolved, every deviation
+from the plan, the verification runs with their rungs, the criteria left unproven, and every open
+concern. The user carries it back. The main model then runs `/3p-review` **again**, with the summary
+as input, and only then verifies.
+
+**The plan is amended on the forward path, not the return path.** A halt travels back as a report,
+the planning model amends the plan and logs the amendment, and the amended plan travels forward
+again. The build model never edits the plan. That is what keeps the forward contract a contract
+instead of a shared scratchpad, and it is what makes the final drift audit possible at all: with two
+models editing one document and no log, nothing can later tell what the plan promised when each
+phase was built.
 
 That second review is the whole point of the handoff. The build model reviewed its own work;
 the returning review is the one performed by an agent that did not write the code.
@@ -145,7 +153,7 @@ implementation velocity stop being the same number.
    summary, and **stops** — it does not verify.
 3. **Return.** Back in the planning model, paste the handoff summary. It runs `/3p-review`
    with the summary as argument, loops until clean, then
-   `/verification-before-completion`, then archives the plan to `docs/plans/done/`.
+   `/verify-completion`, then archives the plan to `docs/plans/done/`.
 
 The build model needs the workflow skills installed in *its* environment too — every skill
 here is a plain `SKILL.md`, which Claude Code, Cursor, Gemini CLI, and Copilot all read.
@@ -176,6 +184,17 @@ re-brainstorm — that would burn the cost advantage this session exists for.
 
 It cannot catch how a third-party library behaves at runtime, which is what the plan's gate
 phase is for.
+
+**When a halt arrives, resolve it in the plan.** Verify the report first-party (build models are
+often right about the symptom and wrong about the cause), classify it, amend the plan, and append
+an Amendment Log entry before handing it back. The classification that matters most is whether the
+finding is phase-level or **decision-level**: something that undermines the approach itself goes
+back to `/brainstorm`, because absorbing it as a phase amendment is how a feature ends up somewhere
+nobody chose. The full loop is in `/write-plan`'s *"When a build halt comes back"*.
+
+Answering a halt in chat and letting the build continue is the tempting shortcut, and it is the one
+that costs days later: the plan then describes a system that no longer matches the code, and the
+drift audit at the end has nothing to compare against.
 
 ### If the build comes back badly
 

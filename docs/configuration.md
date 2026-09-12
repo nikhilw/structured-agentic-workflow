@@ -75,7 +75,9 @@ common case needs no further configuration. Two optional overrides:
 
 These are core guarantees, not preferences:
 
-- **Verification** — `/verification-before-completion` is always mandatory
+- **Verification** — `/verify-completion` is always mandatory, including its drift audit
 - **Phase order** — Brainstorm → Plan → Build → 3p-Review → Verify
 - **Plan lifecycle** — `new/` → `plans/` → `done/`
 - **The review loop** — `/3p-review` loops until clean
+- **Halt and amend** — the build model surfaces plan problems and stops; the planning model amends
+  the plan and logs it. Neither half is optional, and the builder never edits the plan

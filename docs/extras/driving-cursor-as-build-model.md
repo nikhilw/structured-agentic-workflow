@@ -67,6 +67,14 @@ Add your project's own code-style skill to the load list if you have one.
 
 Each of those instructions is load-bearing, and the section below is why.
 
+**Keep the halt lines even though the skills now carry them.** `/build-model` opens with the same
+standing instruction and `/build-phase` repeats it at every step, including a list of the specific
+moves that mean "you have found a plan defect" (a parameter the plan never named, a nearby function
+called because the named one is missing, a mocked seam where the plan asked for a real one). The
+prompt line is still worth its space: it is the first thing in the session's context, it survives a
+skill that loads late or not at all, and in `-p` mode it is the only instruction you can be certain
+arrived. Belt and braces, cheaply.
+
 ## Safety before you launch
 
 You are handing an autonomous agent a repo and walking away. Two things make that reasonable:

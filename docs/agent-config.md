@@ -42,8 +42,9 @@ globally and define the development lifecycle:
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
-- `/verification-before-completion` — evidence before any "done" claim
+- `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
 - `test-scope` : how wide each test run must be, and when a run can be cited instead of re-run
+- `existing-mechanisms` : the eight questions about what the codebase already does
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
@@ -65,6 +66,12 @@ Our recurring failure modes are: missed edge cases; code we never searched for o
 and building a duplicate, less capable alternative to something that already exists. Search
 everything needed and resolve every doubt before a brainstorm or plan is considered solid.
 ```
+
+> The three named there are common enough that `existing-mechanisms` now asks about them at every
+> gate by default: duplicates, unenumerated callers, and what a change leaves dead behind it. Keep
+> your own paragraph for the failure modes that are specific to *your* project, and drop the ones
+> the skills already enforce; a line that repeats a skill costs context on every conversation and
+> buys nothing.
 
 ### 3. The project worldview
 
@@ -129,8 +136,9 @@ globally and define the development lifecycle:
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
-- `/verification-before-completion` — evidence before any "done" claim
+- `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
 - `test-scope` : how wide each test run must be, and when a run can be cited instead of re-run
+- `existing-mechanisms` : the eight questions about what the codebase already does
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.

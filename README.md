@@ -36,13 +36,18 @@ Add `graphify-out/` to your project's `.gitignore`; it is a build artifact.
 # Works with Claude Code, Cursor, Gemini CLI, Copilot, and 40+ other agents
 npx skills add nikhilw/structured-agentic-workflow
 
-# superpowers supplies TDD, debugging, and verification — strongly recommended
-npx skills add obra/superpowers -s test-driven-development -s systematic-debugging -s verification-before-completion
+# superpowers supplies TDD and systematic debugging — strongly recommended
+npx skills add obra/superpowers -s test-driven-development -s systematic-debugging
 ```
 
 Prefer one command that pulls everything? Clone the repo and run `./install.sh`
 (`.\install.ps1` on Windows). Per-agent targets, manual steps, and the full skill inventory
 are in [installation.md](docs/installation.md).
+
+> **Upgrading from an earlier install?** Re-run it. Two skills are new (`verify-completion`,
+> `existing-mechanisms`), and superpowers' `verification-before-completion` is no longer part of
+> this workflow: `/verify-completion` replaces it. `./install.sh` removes the link the old install
+> created, leaving any copy you installed another way alone.
 
 ### 3. Point your project's agent config at the workflow
 
@@ -63,8 +68,9 @@ globally and define the development lifecycle:
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
-- `/verification-before-completion` — evidence before any "done" claim
+- `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
 - `test-scope` : how wide each test run must be, and when a run can be cited instead of re-run
+- `existing-mechanisms` : the eight questions about what the codebase already does
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
@@ -83,7 +89,7 @@ A fuller template — standing quality bar, architecture facts, hard rules, and 
                                                     # you review it, then: mv to docs/plans/
 /build-phase docs/plans/offline-sync.md Phase 1     # TDD → test → self-review, per phase
 /3p-review                                          # holistic review, loops until clean
-/verification-before-completion                     # fresh evidence, then archive the plan
+/verify-completion                                  # fresh evidence + drift audit, then archive
 ```
 
 `agentic-workflow` drives these transitions for you — you rarely type the middle three. Ask
@@ -107,13 +113,17 @@ Tier guidance is in [multi-model.md](docs/multi-model.md).
 | `/build-model` | Entry point for a dedicated build model: build → review → handoff → stop |
 | `/3p-review` | Independent review that owns the code; loops until clean |
 | `/handoff-summary` | Emits the fixed-format Build Handoff Summary |
+| `/verify-completion` | The final gate: fresh suite, requirements tick-off, decision-to-code drift audit |
 | `test-scope` | The shared test-run ladder and the citable-run rule the other skills defer to |
+| `existing-mechanisms` | The eight questions about what already exists, shared by brainstorm, plan, build and review |
 | `/triage` | Recommends the next task, minimizing context thrash |
 | `/github-backlog` | Maintains features and bugs as GitHub issues |
 | `/workflow-config` | Sets TDD/BDD, output brevity, and backlog source |
 
-Plus `test-driven-development`, `systematic-debugging`, and `verification-before-completion`
-from [superpowers](https://github.com/obra/superpowers).
+Plus `test-driven-development` and `systematic-debugging` from
+[superpowers](https://github.com/obra/superpowers). `/verify-completion` replaces superpowers'
+`verification-before-completion`, which this workflow no longer installs: it keeps that skill's Iron
+Law and adds the requirements tick-off and the drift audit.
 
 ---
 
@@ -135,7 +145,7 @@ from [superpowers](https://github.com/obra/superpowers).
 ## What makes this different
 
 There are other agent-skill libraries — [obra/superpowers](https://github.com/obra/superpowers)
-is the best known, and this workflow composes with it rather than competing. Five things set
+is the best known, and this workflow composes with it rather than competing. Six things set
 this one apart:
 
 **1 · The build model doesn't have to be the planning model.**
@@ -170,10 +180,21 @@ their owners, concurrency and aliasing, named seam tests per value path, and exa
 command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
 or marked new.
 
-**5 · Index-first codebase search.**
+**5 · Index-first codebase search, with the questions that go with it.**
 `/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/Graphify-Labs/graphify)
 knowledge graph of the repo before proposing anything. The most expensive mistake in a
-brainstorm is reimplementing something that already exists under a name nobody grepped for.
+brainstorm is reimplementing something that already exists under a name nobody grepped for, so
+`existing-mechanisms` makes the search into eight required answers: every caller, every related
+flow, what already does this job, whether you are extending or replacing it, what becomes dead code
+if you do, and whether you are quietly adding a second pathway beside the first.
+
+**6 · Drift is measured, not hoped for.**
+Plans change during a build, and a feature that ends up somewhere other than where it was aimed is
+usually the sum of a dozen reasonable corrections. So corrections are made in one place and written
+down: the build model halts and reports rather than working around a gap, the planning model amends
+the plan and appends to its **Amendment Log**, and `/verify-completion` reads the decision document
+against the plan and the plan against the code before anything is called done. Undocumented drift
+blocks the completion claim.
 
 ```mermaid
 flowchart LR
@@ -197,7 +218,7 @@ flowchart LR
 
     subgraph R ["3 · Review model — fresh eyes, planning model by default"]
         direction TB
-        R1["/3p-review"] --> R2["/verification-before-completion"]
+        R1["/3p-review"] --> R2["/verify-completion<br/>suite · requirements · drift"]
     end
 
     R --> Done([Feature complete])

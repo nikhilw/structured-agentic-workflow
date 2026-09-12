@@ -15,7 +15,8 @@ flowchart TD
     Start([New feature / bug / task]) --> B1
 
     subgraph Brainstorm ["1 · Brainstorm — /brainstorm · planning model"]
-        B1["Refresh graphify index once,<br/>then explore the problem space"] --> B2["Propose approaches<br/>minimal ↔ structural"]
+        B1["Refresh graphify index once,<br/>then explore the problem space"] --> B1a["existing-mechanisms<br/>all 8 questions answered"]
+        B1a --> B2["Propose approaches<br/>minimal ↔ structural<br/>+ E: ideal, then adjusted"]
         B2 --> B3["Challenge the obvious solution"]
         B3 --> B4{"Human satisfied?"}
         B4 -- "refine / pivot" --> B1
@@ -35,20 +36,26 @@ flowchart TD
     Approve -- "approved" --> MovePlan["Move plan<br/>new/ → plans/"]
     MovePlan --> ModelChoice{"Who builds?"}
 
-    ModelChoice -- "same session" --> I
+    ModelChoice -- "same session" --> PR
     ModelChoice -- "hand off the plan file" --> X1
 
     subgraph Build ["3 · Build — /build-phase · per phase, model-agnostic"]
         direction TB
-        I["TDD: write failing test"] --> Impl["Implement to green"]
+        PR["Plan review<br/>fresh eyes on the plan"] --> I["TDD: write failing test"]
+        I --> Impl["Implement to green"]
         Impl --> T["Run tests<br/>scoped per /test-scope"]
         T -- "fail" --> Impl
         T -- "pass" --> SR["Self-review<br/>agent + human"]
         SR -- "issues found" --> Impl
         SR -- "clean" --> Next{"More phases?"}
-        Next -- "yes" --> I
+        Next -- "yes" --> PR
         Next -- "no" --> BC["Phase Completion<br/>FULL suite - T4"]
     end
+
+    PR -. "plan defect" .-> HALT
+    Impl -. "discrepancy found" .-> HALT["Build Halt Report<br/>stop, do not work around"]
+    HALT --> AM["Planning model:<br/>verify · classify · amend<br/>+ Amendment Log entry"]
+    AM -. "re-read plan from disk" .-> PR
 
     subgraph BuildModel ["Build-model session — /build-model"]
         direction TB
@@ -73,11 +80,15 @@ flowchart TD
     R5 --> HS["Emit build record<br/>/handoff-summary"]
     HS --> V1
 
-    subgraph Verify ["5 · Verify — /verification-before-completion"]
+    subgraph Verify ["5 · Verify — /verify-completion"]
         V1["Full suite - T4,<br/>or cite the sign-off run<br/>if nothing changed since"] --> V2["Line-by-line check<br/>against plan requirements<br/>always fresh"]
+        V2 --> V3["Drift audit<br/>decision doc → plan → code<br/>always fresh"]
     end
 
-    V2 --> Archive["Move plan<br/>plans/ → done/"]
+    V3 --> DriftQ{"Undocumented<br/>drift?"}
+    DriftQ -- "yes" --> DriftFix["Close the record:<br/>amend decision doc + plan log"]
+    DriftFix --> V3
+    DriftQ -- "no" --> Archive["Move plan<br/>plans/ → done/"]
     Archive --> Done([Feature complete])
 ```
 
@@ -102,20 +113,34 @@ The skill will:
   at the start of the session, if graphify is installed, and query it instead of blind
   grepping — this is what stops the "we implemented a duplicate of something that already
   existed" failure
+- Answer all eight **`existing-mechanisms`** questions before proposing anything: every caller and
+  every call, the related methods and flows, what already does this job, whether you are extending
+  or replacing it (never "competing" with it), what becomes dead code, how to build on what is
+  there, which patterns the codebase already uses, and whether the change unifies pathways or
+  bifurcates them. These are the questions that used to have to be asked by hand, and they found
+  something almost every time
 - Surface **contracts and constraints** (authority, identity, currentness, lifecycle,
   consumers, environment) *before* proposing approaches, because a contract discovered later
   invalidates the comparison rather than one option
 - Propose 2–4 approaches spanning **minimal to structural**, with impact and blast radius
-- **Challenge the obvious solution** — would we design it this way from zero?
+- Derive one more, always last and always required: **the ideal, then adjusted**. Start from the
+  design this problem deserves in this project if nothing were yet committed, then walk it into the
+  codebase that exists, recording each collision as a named adjustment with its cost. It is how you
+  get a solution instead of a patch, and the adjustment table is what makes visible which existing
+  decisions are actually costing you
+- **Challenge the obvious solution** — how far is the recommendation from that ideal, and what does
+  the distance buy?
 - Run a **decision audit** against its own recommendation before writing anything down
 
 **Your active role:** while the AI analyses, you research in parallel. Often you will find a
 library or approach it missed — say so and pivot. That is the phase working.
 
 **Decision documents.** When a direction is chosen, `/brainstorm` offers to save
-`docs/discussions/YYYY-MM-DD-<topic>.md` — what was considered, what won, what was rejected,
-and what would reverse the decision. Invaluable when someone asks "why did we do it this
-way?" six months later.
+`docs/discussions/YYYY-MM-DD-<topic>.md` — the mechanism ledger, what was considered, what won,
+what was rejected, and what would reverse the decision. Invaluable when someone asks "why did we do
+it this way?" six months later, and load-bearing well before that: it is the **baseline** the drift
+audit in step 5 measures the finished feature against. Without it, drift has nothing to be measured
+against except the plan, which is the thing that drifted.
 
 ## Step 2 — Plan
 
@@ -139,6 +164,9 @@ explicit."
 - Decisive gates ordered **before** the work that depends on them
 - A **two-pass review** before saving: *is this the right plan?* then *can a different agent
   run this exactly as written?*
+- A **Decision Source** section mapping every decision in the decision document to the phase that
+  carries it, with every departure named. Pass 1 walks that mapping line by line
+- An **Amendment Log**, empty at first, which is where every later change to the plan is recorded
 
 **On approval:** move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` — not
 `git mv`, since the plan file may not be tracked yet.
@@ -167,7 +195,7 @@ There are two entry points, and **which one you launch decides who drives review
 handoff** — there is no "am I the build model?" guesswork inside the skills:
 
 - **Same model:** the `agentic-workflow` orchestrator drives `/build-phase` through each
-  phase, then `/3p-review`, `/handoff-summary`, and `/verification-before-completion`.
+  phase, then `/3p-review`, `/handoff-summary`, and `/verify-completion`.
 - **Dedicated build model:** launch the session with `/build-model`. It is a self-contained
   mini-workflow — `/build-phase` across all phases, then `/3p-review` looping until clean,
   then `/handoff-summary`, then **stop**. It does not verify. You carry the summary back to
@@ -195,14 +223,51 @@ Within a phase:
 3. **Tests, scoped to what the phase earned.** A phase runs its own criteria and then widens
    one rung, per [`/test-scope`](#test-scope-how-wide-a-run-has-to-be). The full suite runs once
    at the end of the build, not once per phase.
-4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs?
+4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs? And the
+   question that catches silent drift: *did I decide anything the plan should have decided?*
    Lightweight per-phase check — not the full third-person review.
 5. **Proceed** to the next phase.
 
+### Halts: the standing instruction, and what happens to one
+
+Every build session opens with one instruction that outranks making progress:
+
+> **Think critically about the plan. If you find issues or discrepancies during implementation,
+> surface them and halt instead of pushing through or working around it.**
+
+It is in force at every step, not just while reading the plan, because implementation is where the
+plan's silences become visible and cheapest to mistake for permission. A parameter the plan never
+named, a nearby function called because the named one does not exist, a mocked seam where the plan
+asked for a real one: each is a decision the plan owed the builder, and filling one silently is the
+failure this workflow is built to prevent. The workaround ships looking finished, which is why
+nothing downstream catches it.
+
+So the builder emits a **Build Halt Report** and stops: what the plan says, what it found, the
+evidence, why it blocks, the options with costs, its recommendation, and the state of the tree. It
+does not edit the plan.
+
+Then the loop closes on the planning side:
+
+1. **Verify the report first-party.** It is a set of claims, not a verdict. Build models are often
+   right about the symptom and wrong about the cause.
+2. **Classify it.** A plan defect or a reality defect is amended. A **decision-level** problem, one
+   that undermines the approach rather than this phase of it, goes back to `/brainstorm`; absorbing
+   one as a phase amendment is the single largest source of drift in this workflow. A builder error
+   gets a clarification, and an explicit note that the plan's substance is unchanged.
+3. **Amend the plan and log it** in the plan's Amendment Log: trigger, what was reported, what
+   changed, decision impact, scope impact.
+4. **Re-review the amendment** (it is new plan text that nobody has reviewed) and hand it back,
+   telling the builder to re-read from disk rather than from its thread.
+
+**Amend the plan even when the fix is one line.** Answering a halt in chat leaves the plan
+describing a system that no longer matches the code, and the drift audit at the end with nothing to
+compare against.
+
 ### The Build Handoff Summary
 
-When a build is complete **and reviewed**, `/handoff-summary` emits a fixed-format record of
-the `/3p-review` result, deviations from the plan, and open concerns. It lives in its own
+When a build is complete **and reviewed**, `/handoff-summary` emits a fixed-format record: the plan
+revision built against, every halt and how it was resolved, deviations from the plan, the
+verification runs with their rungs, unproven criteria, and open concerns. It lives in its own
 skill so the exact template is loaded into context at the moment it is written, which keeps
 the format stable across runs and across models.
 
@@ -226,20 +291,51 @@ After all build phases, `/3p-review` runs on the **entire change set**.
 
 ## Step 5 — Verify and archive
 
-After `/3p-review` passes, run `/verification-before-completion` immediately. This is **not
+After `/3p-review` passes, run `/verify-completion` immediately. This is **not
 a second review**. `/3p-review` proved the *code* is sound; verification proves the *claim of
-"done" is true right now*. It adds two things review does not guarantee:
+"done" is true right now*. It adds three things review does not guarantee:
 
 - a full-suite result that is **true at the actual moment of completion** (review may have
-  passed several edits ago), and
+  passed several edits ago),
 - a **line-by-line check against the plan's requirements** (review judges completeness only
-  qualitatively).
+  qualitatively), and
+- a **drift audit**, the same line-by-line treatment applied one document earlier: the decision
+  document against the plan, and the plan against the code.
 
 Only the first can be satisfied without running anything, by citing `/3p-review`'s sign-off
-run under the citable-run rule below. The requirements checklist always runs fresh.
+run under the citable-run rule below. The checklist and the drift audit are document comparisons,
+not test runs, and always happen fresh.
 
 It also covers the bug / quick-fix path, which skips full review. "Review already ran the
 tests" is never grounds to skip the gate.
+
+### The drift audit
+
+This is the only place the whole chain is read end to end, and it exists for a specific, expensive
+failure: you set out to build one thing, the plan absorbed a dozen small corrections that were each
+reasonable, and what shipped is a different thing. Nobody notices for days, because no single
+amendment looks like a change of direction.
+
+Three comparisons:
+
+- **D1, decision document → the plan as it now stands.** Every decision is disposed of as upheld,
+  deliberately narrowed, superseded with an Amendment Log entry naming it, or **dropped**, which is
+  the finding. Two lines get checked by name: the decision document's *"what would reverse this
+  decision"* condition, in case the build discovered exactly that and patched around it; and its
+  Open Questions, each of which is answered or still carried, never quietly abandoned.
+- **D2, the plan as approved → the plan as it now stands.** Every difference has a log entry. The
+  baseline is the plan file's git history where it is tracked, since that is the one record that
+  cannot be edited after the fact.
+- **D3, decision document → what actually shipped.** The round trip. Does the code solve the
+  problem that was decided, or a neighbouring one? Would the approach comparison still choose this
+  approach, knowing what the build found out? Did the amendments add up to a different approach
+  than the one chosen, without any single entry saying so?
+
+The verdict is NO DRIFT, DOCUMENTED DRIFT, or UNDOCUMENTED DRIFT. The last one blocks the
+completion claim. **The fix for drift is the written record, not a revert**: a superseded decision
+is usually the right call and the defect is that nothing says so, which is closed by appending an
+Amendments section to the decision document and the missing entry to the plan. Only a genuine gap
+in the *work* goes back to build.
 
 Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv`.
 
@@ -278,7 +374,7 @@ narrows it.
 **The citable-run rule.** A run already made satisfies a run now required when four things
 hold: you made it yourself this session, it was the same command at the same rung, `git
 status`/`git diff` prove the tree has not changed since, and you write the citation down.
-This is what lets `/verification-before-completion` accept `/3p-review`'s sign-off run instead
+This is what lets `/verify-completion` accept `/3p-review`'s sign-off run instead
 of repeating it. It is a *stricter* claim than re-running, not a looser one: re-running proves
 the suite passes, while a citation also proves nothing has changed since it did.
 
