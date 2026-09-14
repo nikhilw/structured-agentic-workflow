@@ -95,9 +95,16 @@ time: a mechanism that already does this under a name nobody searched for, a cal
 enumerated, a subsystem a proposal would leave unreachable, a second pathway added where the codebase
 already had one. Every one of those is cheap to find now and expensive to find during build.
 
-Two of the eight carry more weight than the rest at this stage, so do not let them collapse into a
-yes:
+Three of the eight carry more weight than the rest at this stage, so do not let them collapse into
+a yes:
 
+- **Question 1, both directions.** Trace backward and forward, and write them as two lists.
+  Backward is every caller, and then *their* callers out to a boundary this change cannot disturb,
+  including the inbound edges that never spell the name: fixtures, DI registrations, route tables,
+  subscriptions, config keys, anything dispatched by string. Forward is everything the target
+  calls and what those things depend on in turn. One direction answers who breaks when this
+  changes; the other answers what can break this, and what the design inherits whether or not you
+  looked. An approach costed against half the graph is costed wrong.
 - **Question 4, relationship to the incumbent.** "Compete" is not a design. If two mechanisms would
   end up doing one job, the work is not designed yet, whichever one is better.
 - **Question 6, build on what exists.** State the extend-the-incumbent version of this change even

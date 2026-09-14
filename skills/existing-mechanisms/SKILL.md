@@ -34,10 +34,31 @@ Answer every one. A question that genuinely does not apply is answered **"does n
 because ..."**; silence reads identically to "checked and clean" to every later reader, and that
 is how the gap ships.
 
-1. **Callers and calls.** Enumerate *every* caller of everything this would touch, and every call
-   those things make outward. Not the main ones. Not the ones you happened to open. Where an index
-   exists, query it (`graphify query`, `graphify path`); a grep finds the name, the graph finds
-   what reaches it. *Prevents: the signature change that breaks seven call sites nobody listed.*
+1. **Callers and calls, in both directions.** Trace the target backward *and* forward. They answer
+   different questions and missing either one is its own class of defect, so answer them as two
+   separate lists rather than one paragraph about "usages".
+
+   - **Backward, what reaches this.** Every direct caller, then *their* callers, outward until you
+     reach a boundary that this change cannot disturb (a stable public API, a process edge, a
+     surface with its own contract). Say where you stopped and why. Direct callers are the easy
+     half; the defect usually lives one hop further out, where a caller adapts to the change and
+     quietly passes something different to *its* caller. Include the inbound edges that carry no
+     literal reference to the name: test doubles and fixtures, dependency-injection registrations,
+     route and command tables, event or signal subscriptions, decorators, serialized or persisted
+     references, config keys, scheduled jobs, and anything dispatched by string. A grep finds the
+     name; none of these spell it.
+   - **Forward, what this reaches.** Everything the target calls out to, and what those things
+     depend on in turn: modules, shared helpers, database tables and columns, queues, caches,
+     files, environment variables, external services, and the assumptions each of those carries.
+
+   Backward tells you who breaks when this changes. Forward tells you what can break *this*, and
+   what the change inherits whether or not you looked. Where an index exists, walk it both ways:
+   `graphify query` to find the thing, its incoming edges for backward, its outgoing edges for
+   forward, and `graphify path "A" "B"` to confirm two things actually connect.
+
+   *Prevents, backward: the signature change that breaks seven call sites nobody listed, and the
+   caller two hops out that silently changes meaning. Forward: building on a dependency that
+   already has the constraint you are about to design around.*
 
 2. **Scope beyond the entry point.** Which related methods, sibling flows, and alternative paths
    reach the same data or the same decision? A change scoped to one function is only correct if
@@ -98,7 +119,11 @@ evidence. Collapse the ones that genuinely do not apply onto a single "does not 
 
 ```markdown
 ### Existing Mechanisms
-1. **Callers and calls:** [what calls it, what it calls] *(evidence: graph query / grep / read)*
+1. **Callers and calls:**
+   - *backward:* [direct callers → their callers, to the boundary named here; plus the inbound
+     edges that do not spell the name] *(evidence: graph incoming edges / grep / read)*
+   - *forward:* [what it calls, and what those depend on: modules, tables, queues, services, env]
+     *(evidence: graph outgoing edges / read)*
 2. **Scope beyond the entry point:** [related methods and flows that reach the same thing]
 3. **Already exists:** [the mechanism that already does this, or what was searched for and not found]
 4. **Relationship to the incumbent:** [extend / replace / abandon] + [why]
