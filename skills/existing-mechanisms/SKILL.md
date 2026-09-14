@@ -133,6 +133,31 @@ evidence. Collapse the ones that genuinely do not apply onto a single "does not 
 8. **Unify vs bifurcate:** [what is extracted; any second pathway introduced and what collapses it]
 ```
 
+## The second sweep
+
+**Expect the first pass to be incomplete.** It is run against the problem while the design is still
+in your head. The second is run against what you actually wrote, and that is where precision
+defects surface: the ones that are invisible in a summary and obvious in a file list.
+
+Three things make the second sweep find what the first missed. Drop any one and it degrades into
+confirming the first.
+
+- **Run it against the artifact, not your memory of it.** Take the finished document's own list of
+  names, files, symbols and commands, and walk it back against the codebase mechanically, both
+  directions per question 1. "I checked that earlier" is the answer that produces nothing.
+- **Hunt a named list.** Generic re-reading finds generic problems. These are the classes that
+  actually recur: a **dropped** step or requirement that quietly vanished between documents; a
+  **deletion or abandonment** that left callers, tests, config or data dangling; a **duplicate** of
+  something that already exists; a **missed caller**, especially one that does not spell the name;
+  a **bifurcated** pathway added beside an existing one; and **drift** from what was decided. Say
+  which you are looking for before you look.
+- **Give yourself permission to reverse.** A sweep that can only confirm is not a sweep. Finding
+  four defects in your own finished work is the mechanism paying for itself, not a failure.
+
+**"Anything else you would rethink?" is a trigger, not a question.** When a human asks it, or when
+you are about to hand work over as done, re-run the sweep for real. Answering it from memory is the
+single cheapest way to waste the most valuable question anyone will ask you.
+
 ## Where this is answered
 
 This table is the only place these assignments are written down. A skill that runs the audit names
@@ -142,6 +167,8 @@ its row here and does not restate the questions.
 |---|---|---|
 | `/brainstorm`, Current State Analysis | the problem space, before any approach is proposed | all eight, recorded in the decision document |
 | `/brainstorm`, Decision Audit | the approach you are about to recommend | re-check 3, 4, 5, 8 against the *chosen* design |
+| `/brainstorm`, after the decision document is written | the saved document's own claims and names | the second sweep, before handing over to `/write-plan` |
+| `/write-plan`, Pass 2 | the finished plan's own file and symbol list | the second sweep, before the plan is saved or activated |
 | `/write-plan`, Codebase Analysis | the concrete chosen design, not the problem space | all eight, recorded in the plan |
 | `/build-phase`, Plan Review | this phase's named files and symbols | 1, 3, 5, 8; a gap here is a halt, not a fix |
 | `/3p-review`, Codebase Consistency | the code as built | 3, 5, 8; a gap here is a finding |

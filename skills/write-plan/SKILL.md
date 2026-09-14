@@ -374,6 +374,8 @@ Review the finished plan twice, with a different lens each time, and do not coll
 
 ### Pass 2 — Executability: *can a different agent run this exactly as written?*
 
+This is `/existing-mechanisms`' **second sweep**, run against the plan you just wrote. Assume the first pass missed things; it was run against the problem, this one is run against the text. Hunt the named classes rather than re-reading generically: dropped requirements, retirements that left callers or config dangling, duplicates, missed callers, bifurcated pathways, drift from the decision document.
+
 - **Does every name in this plan exist?** Walk the file paths, functions, classes, signatures, routes, fixtures, config keys, and flags one by one and confirm each — or that it is marked **new**. This is a mechanical check; do it mechanically, not from memory of having read the code earlier.
 - **Does the plan name every caller of everything it changes?** Run the finished plan's own file and symbol list back against the codebase, and for each existing symbol the plan modifies, find what calls it — query the index where one exists, since a grep finds the name and the graph finds what reaches it. **Anything the plan touches whose callers are not in the plan is a gap.** This is the most common way a plan breaks a build: a function gains a keyword argument, seven test doubles call it at the old arity, and the plan's file list names none of them. The sweep takes a minute here; the same defect costs a halt and a relaunch during build, and it is found by machine either way.
 - **Does every command in this plan run?** Confirm the runner, the target path, and the flags in this repo. No invented harnesses, no assumed test runners.

@@ -230,6 +230,8 @@ Run this audit against your own recommendation before you write anything down. I
 - **Is the comparison still fair?** Re-check that no approach was charged for work it doesn't require, and that no approach was credited for a consumer that doesn't exist.
 - **What breaks that I have not named?** Earlier milestones, existing consumers, shared or aliased state, environment constraints, the thing the user will notice first.
 
+- **Then run `/existing-mechanisms`' second sweep against the written document**, once it exists. Not against the recommendation you are holding in your head: against the names, claims and mechanisms as they appear on the page, walked back to the codebase with the index. This pass is where precision defects surface, and it routinely finds several in work that felt finished. Do it before suggesting `/write-plan`, and do it again for real if anyone asks whether there is anything else you would rethink.
+
 If the audit changes your mind, say so out loud and revise the recommendation. A reversal here is the process working, not a mistake to hide. **Do not save the decision document, and do not transition to `/write-plan`, until this audit passes** — the plan inherits every unexamined assumption in the decision, and the build inherits them from the plan.
 
 ## After the Audit — Save the Decision Document
