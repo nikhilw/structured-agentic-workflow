@@ -332,10 +332,21 @@ Three comparisons:
   than the one chosen, without any single entry saying so?
 
 The verdict is NO DRIFT, DOCUMENTED DRIFT, or UNDOCUMENTED DRIFT. The last one blocks the
-completion claim. **The fix for drift is the written record, not a revert**: a superseded decision
-is usually the right call and the defect is that nothing says so, which is closed by appending an
-Amendments section to the decision document and the missing entry to the plan. Only a genuine gap
-in the *work* goes back to build.
+completion claim.
+
+**The one thing this gate must never do is edit the baseline.** Finding a difference and then
+changing the decision document so it matches the code does not resolve the drift; it destroys the
+only evidence that there was any, and it produces a clean verdict that every later reader believes.
+That is worse than not running the audit at all. So the gate is read-only until it has reported:
+it states the difference, and the human rules on it. If they accept the departure, the record is
+closed by **appending** a dated entry under the original text, marked as found at verification, so
+a reader can still see what was decided *and* what happened instead. If they reject it, the gap is
+in the work and it goes back to build. A verdict of UNDOCUMENTED DRIFT describes what the build
+did, and writing something down afterwards does not turn it into DOCUMENTED DRIFT.
+
+To make that checkable rather than merely promised, the audit starts at **D0**: read the decision
+document from version control, compare it against the working copy, and report any difference. An
+edit to the Decision or Consequences sections with no Amendments entry is itself a finding.
 
 Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv`.
 

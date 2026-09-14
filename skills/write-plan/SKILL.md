@@ -331,6 +331,13 @@ is how a wrong halt gets written into the contract.
    of entries is what `/verify-completion`'s drift audit reads; reconstructing it at the end, from a
    plan and a codebase that have both moved, is the days-long archaeology this whole loop exists to
    avoid.
+
+   **Append; never rewrite what a decision said.** The decision document records what was decided
+   at the time, and a superseded decision is still what was decided. Add an entry underneath
+   saying what replaced it and why; do not edit the original to match the new direction, and do not
+   quietly delete a consequence that stopped being true. The same goes for the plan's own Amendment
+   Log: entries are added, never revised. Both documents are only worth anything later if a reader
+   can see what changed *and* what it changed from.
 5. **Re-run the affected review passes.** An amendment is new plan text and has had no review. Run
    Pass 1 against it if it touched contracts, failure modes, or phase ordering; run Pass 2 against
    it always, because the amendment introduces new names and new commands.
