@@ -170,13 +170,18 @@ confirming the first.
 
 - **Run it against the artifact, not your memory of it.** Take the finished document's own list of
   names, files, symbols and commands, and walk it back against the codebase mechanically, both
-  directions per question 1. "I checked that earlier" is the answer that produces nothing.
+  directions per question 1. "I checked that earlier" is the answer that produces nothing. **Count
+  what you find rather than estimating it:** a document that says four call sites where there are
+  seven is executed at four, and the three nobody counted are found by a build failure or by
+  nobody.
 - **Hunt a named list.** Generic re-reading finds generic problems. These are the classes that
   actually recur: a **dropped** step or requirement that quietly vanished between documents; a
   **deletion or abandonment** that left callers, tests, config or data dangling; a **duplicate** of
   something that already exists; a **missed caller**, especially one that does not spell the name;
-  a **bifurcated** pathway added beside an existing one; and **drift** from what was decided. Say
-  which you are looking for before you look.
+  a **bifurcated** pathway added beside an existing one; an **inert** change, one that does nothing
+  unless a second change lands with it, most often two guards on consecutive lines where removing
+  one leaves the other holding the door shut; and **drift** from what was decided. Say which you
+  are looking for before you look.
 - **Give yourself permission to reverse.** A sweep that can only confirm is not a sweep. Finding
   four defects in your own finished work is the mechanism paying for itself, not a failure.
 
@@ -198,6 +203,7 @@ its row here and does not restate the questions.
 | `/write-plan`, Codebase Analysis | the concrete chosen design, not the problem space | all eight, recorded in the plan |
 | `/build-phase`, Plan Review | this phase's named files and symbols | 1, 3, 5, 8; a gap here is a halt, not a fix |
 | `/3p-review`, Codebase Consistency | the code as built | 3, 5, 8; a gap here is a finding |
+| `/3p-review`, before a Rework Brief is handed over | the brief's own names, files, lines and commands | the second sweep, against the brief — a brief is a plan |
 | Bug or quick-fix path, no plan | the fix you are about to make | 1, 2 and 8, before the fix. Question 2 is the one that matters here: a bug reached through four entry points is fixed at one of them and reported as fixed |
 
 **The two full runs are not redundant.** `/brainstorm` asks the questions about a problem, when the

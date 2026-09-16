@@ -252,7 +252,7 @@ Past that volume you stop reviewing and start rebuilding — and you cannot revi
 
 ### Sending back — the Rework Brief
 
-It goes to a model with no memory of this review, so it carries a plan's contract burden: self-contained findings, decided fixes, exact proof commands.
+It goes to a model with no memory of this review, so it carries a plan's contract burden: self-contained findings, decided fixes, exact proof commands. **A brief is a plan, and it gets a plan's review before it leaves your hands** — see *Before you hand it over*, below.
 
 ```
 ## Rework Brief — [feature]
@@ -285,6 +285,15 @@ above and to every later round, not only to the case that prompted them. "None."
 ```
 
 Every item gets a failing-test-first instruction. Never send a partially-fixed worktree — fix a finding fully or leave it untouched and list it. State which findings you already fixed so they are not re-litigated. When the build model returns, **restart at Round 1 with fresh intake**; its report is a claim, not evidence.
+
+#### Before you hand it over
+
+A brief is executed literally by a model that cannot see what you meant, so a wrong line number does not produce a question — it produces an invented implementation. Run a plan's Pass 2 against your own brief, in this order:
+
+- **Every name, file, line and command in it exists.** Check them one at a time against the codebase, not against your memory of reading it an hour ago. This is `/existing-mechanisms`' *"`/3p-review`, before a Rework Brief is handed over"* row — the second sweep, run against the artifact.
+- **Count the call sites; do not estimate them.** A brief that says four sites where there are seven is executed at four, and comes back green.
+- **Check whether any fix is inert without another.** Two guards on consecutive lines means removing one changes nothing. Name the pairing and require them built together, or the round costs a relaunch and moves nothing.
+- **Then read the brief back against the decision document.** It can satisfy every finding you raised and still ask for something the decision ruled out — the same drift pass you run on the code, run on your own instructions.
 
 ### Fixing them yourself
 

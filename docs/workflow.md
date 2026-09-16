@@ -288,6 +288,11 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   systemic defect, or a missing/unwired phase) it stops fixing and emits a **Rework Brief**
   for the build model instead. A reviewer who rewrites half the feature has become its
   author.
+- **A brief is a plan, and gets a plan's review before it is handed over**: every name, file, line
+  and command in it checked against the codebase, call sites counted rather than estimated, any
+  fix that is inert without a second one named as a pair, and the finished brief read back against
+  the decision document. A wrong line number does not produce a question from the build model — it
+  produces an invented implementation, and the round comes back green having moved nothing.
 - For a handed-off build, the main model runs `/3p-review` **again** on return — that second,
   independent review is the entire point of the handoff.
 - `/3p-review` can also be invoked standalone at any time, outside a build cycle.
