@@ -12,40 +12,18 @@ without evidence.
 
 ## Highlights
 
-**Frontier reasoning where it counts, cheap tokens everywhere else.** Plan with your most
-capable model, then hand the plan file to a cheaper one, or to a different tool entirely.
-Most of what a coding agent burns is not reasoning; it is reading files, writing boilerplate
-and re-running suites. On top of that, the test-scope ladder retires the redundant full-suite
-runs that a phased build otherwise pays for six or seven times. The workflow is built to stay
-usable when tokens are the binding constraint, not an afterthought for when they are.
+- **Plan with a frontier model, build with a cheap one.** The plan is a file, so the build lane can be any model, or another tool entirely.
+- **Redundant full-suite runs retired.** A four-rung test ladder, scoped per gate, instead of the same suite six or seven times per feature.
+- **Intent is a document, not a ticket.** `/brainstorm` records what you chose, why, and what would reverse it.
+- **Drift blocks the claim.** Decision doc against plan, plan against code, checked before anything is called done.
+- **A review that owns the code.** `/3p-review` loops to zero findings at every severity, minors included.
+- **No mock on the value path.** A path with no test across the real seam cannot pass review.
+- **The build model halts, never works around.** A plan gap comes back as a report, not an invented fix.
+- **Nothing finishes smaller than it started.** Every removal is audited with its replacement named.
+- **Evidence before claims.** No "done" without a run you made yourself this session.
+- **Works with any agent.** Claude Code, Cursor, Gemini CLI, Copilot, and 40+ others.
 
-**A spec is not your intent.** `/brainstorm` explores real alternatives, argues against its
-own favourite, and writes a decision document recording what you chose, why, what it costs,
-and what would reverse it. That document, not the ticket, is the baseline. Every later gate
-is measured against it.
-
-**Drift is measured, not hoped for.** Plans change during a build, and a feature that lands
-somewhere other than where it was aimed is usually the sum of a dozen individually reasonable
-corrections. So each correction is logged where it happens, and `/verify-completion` reads
-the decision document against the plan and the plan against the code before anything is
-called done. Undocumented drift blocks the completion claim outright.
-
-**A review gate that takes ownership.** `/3p-review` switches persona to an independent
-Senior Architect who owns the code from sign-off onward, loops until zero findings at every
-severity including minors, and cannot pass a value path that has no test crossing the real
-seam. Past a volume threshold it stops fixing and sends a Rework Brief back instead: a
-reviewer who rewrites half the feature has become its author.
-
-**The build model halts instead of guessing.** A plan gap produces a Build Halt Report, not a
-workaround. Routing around a gap inside the files the plan did name is the expensive failure,
-because it passes every gate while doing the wrong thing. Halts are expected, they are cheap,
-and resolving them is the planning model's job.
-
-**Nothing finishes smaller than it started.** Every removal is audited row by row with its
-replacement named, because a deleted capability is the one defect a green suite cannot see:
-the tests that covered it were usually deleted in the same commit.
-
-*The longer comparison with other skill libraries is [further down](#what-makes-this-different).*
+*Each of these is argued out in [what makes this different](#what-makes-this-different), further down.*
 
 ---
 
