@@ -106,7 +106,7 @@ Any handoff concern of the form "not integration-tested" / "manual E2E not execu
 
 Everything below re-runs each round, re-reading the code **from disk**. You are reviewing the code as it exists NOW, not checking whether your fixes were correct. Intake is not repeated.
 
-**A general criterion the owner states during this review joins the checklist from that round onward** (AW-24). It arrives while they are reading a result — one function, one prescription, one round of findings — and it is almost never about that case. Record it verbatim where you will re-read it: in the ledger, and in the Rework Brief if one goes back. Then check it against every finding in every later round, not only against the instance that produced it.
+**A general criterion the owner states during this review joins the checklist from that round onward** (AW-24). It arrives while they are reading a result (one function, one prescription, one round of findings), and it is almost never about that case. Record it verbatim where you will re-read it: in the ledger, and in the Rework Brief if one goes back. Then check it against every finding in every later round, not only against the instance that produced it.
 
 ## Round N: Review
 
@@ -114,7 +114,7 @@ Everything below re-runs each round, re-reading the code **from disk**. You are 
 
 Do this first — a well-written function implementing the wrong decision is not fixable by a code-quality pass.
 
-**Read the decision document first, then the plan, then the diff — in that order.** The plan is a derived artifact; the decision document is the baseline it was derived from, and a change can satisfy every word of the plan while contradicting the decision that produced it. The order is what makes that visible: read the plan first and you will find yourself checking the code against the plan, agreeing with both, and never opening the document that ruled out what the code does.
+**Read the decision document first, then the plan, then the diff, in that order.** The plan is a derived artifact; the decision document is the baseline it was derived from, and a change can satisfy every word of the plan while contradicting the decision that produced it. The order is what makes that visible: read the plan first and you will find yourself checking the code against the plan, agreeing with both, and never opening the document that ruled out what the code does.
 
 Map **decision → plan requirement → implementation → evidence**, and flag every break:
 
@@ -122,7 +122,7 @@ Map **decision → plan requirement → implementation → evidence**, and flag 
 - [ ] **Silently changed decisions** — code does what a decision doc or plan ruled out. It may even be better; it is still a finding until written down and agreed.
 - [ ] **Deviations that should have amended the plan** — the builder hit reality, adapted, and left the plan describing a system that no longer exists.
 - [ ] **Decisions kicked back to the build model** — the plan already decided this and the code differs, or the plan left a hole filled with an architectural choice the build model was never meant to make.
-- [ ] **Judgement calls you delegated, re-traced by you.** Where the plan or a Rework Brief said "this one is yours to judge, say which way you went", read what it chose and trace it yourself — callers and callees both ways, per `/existing-mechanisms` question 1. **Delegating the decision never delegated the tracing**, and what comes back is a claim like every other claim in the handoff. The build model chose with less of the system in view than you have: the guard it removed as redundant may also have been holding a second thing shut. A delegated call the handoff never mentions is worse than one you disagree with — check the diff for choices nobody reported.
+- [ ] **Judgement calls you delegated, re-traced by you.** Where the plan or a Rework Brief said "this one is yours to judge, say which way you went", read what it chose and trace it yourself, callers and callees both ways, per `/existing-mechanisms` question 1. **Delegating the decision never delegated the tracing**, and what comes back is a claim like every other claim in the handoff. The build model chose with less of the system in view than you have: the guard it removed as redundant may also have been holding a second thing shut. A delegated call the handoff never mentions is worse than one you disagree with, so check the diff for choices nobody reported.
 - [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make.
 - [ ] **Amendments without entries** — read the plan's **Amendment Log** against its phases. A phase whose text plainly answers a problem discovered during the build, with no entry recording that, is an unlogged amendment. It is a finding here and it becomes undocumented drift at `/verify-completion`, where it is far more expensive to reconstruct.
 - [ ] **Halts resolved by silence** — for every halt in the handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
@@ -185,7 +185,7 @@ If you find yourself reasoning "this is minor, so a lighter review is proportion
 Go beyond the changed files — grep and read the surrounding code. This is `/existing-mechanisms`' *"`/3p-review`, Codebase Consistency"* row: questions 3, 5 and 8, run against the code as built. Load it if you have not this session.
 - [ ] **Consistency:** does new code solve this the way the codebase already solves it? If not, which wins, and should other call sites change?
 - [ ] **Pattern extraction:** does this duplicate logic that already exists, or now exists twice? (question 3)
-- [ ] **Retirement actually happened** (question 5): walk the plan's *Retired by this plan* removal table row by row against the diff. A superseded mechanism still installed is dead weight the next reader cannot tell from live code. Two rows fail harder than that: one whose *Replaced by* never landed, which is a capability the feature took away — **CRITICAL**, and reported in those words, because no suite can see it once the tests went with it — and a deletion in the diff that the table never named, which is a removal nobody audited. And a test still covering a path this change made unreachable is a coverage hole, not a pass: green, and proving nothing.
+- [ ] **Retirement actually happened** (question 5): walk the plan's *Retired by this plan* removal table row by row against the diff. A superseded mechanism still installed is dead weight the next reader cannot tell from live code. Two rows fail harder than that: one whose *Replaced by* never landed, which is a capability the feature took away. That one is **CRITICAL**, and reported in those words, because no suite can see it once the tests went with it. The other is a deletion in the diff that the table never named, which is a removal nobody audited. And a test still covering a path this change made unreachable is a coverage hole, not a pass: green, and proving nothing.
 - [ ] **Bifurcation** (question 8): if this added a second pathway beside an existing one, the plan said so and said what collapses it back. If the plan did not, this is the finding.
 - [ ] **Convention drift:** conflicting naming, structure, or error-handling conventions?
 - [ ] **Ripple refactoring:** older code that should now consolidate onto this approach — as Findings where this change created the duplication, as Follow-ups where it merely revealed pre-existing mess.
@@ -252,7 +252,7 @@ Past that volume you stop reviewing and start rebuilding — and you cannot revi
 
 ### Sending back — the Rework Brief
 
-It goes to a model with no memory of this review, so it carries a plan's contract burden: self-contained findings, decided fixes, exact proof commands. **A brief is a plan, and it gets a plan's review before it leaves your hands** — see *Before you hand it over*, below.
+It goes to a model with no memory of this review, so it carries a plan's contract burden: self-contained findings, decided fixes, exact proof commands. **A brief is a plan, and it gets a plan's review before it leaves your hands.** See *Before you hand it over*, below.
 
 ```
 ## Rework Brief — [feature]
@@ -288,12 +288,12 @@ Every item gets a failing-test-first instruction. Never send a partially-fixed w
 
 #### Before you hand it over
 
-A brief is executed literally by a model that cannot see what you meant, so a wrong line number does not produce a question — it produces an invented implementation. Run a plan's Pass 2 against your own brief, in this order:
+A brief is executed literally by a model that cannot see what you meant, so a wrong line number does not produce a question; it produces an invented implementation. Run a plan's Pass 2 against your own brief, in this order:
 
-- **Every name, file, line and command in it exists.** Check them one at a time against the codebase, not against your memory of reading it an hour ago. This is `/existing-mechanisms`' *"`/3p-review`, before a Rework Brief is handed over"* row — the second sweep, run against the artifact.
+- **Every name, file, line and command in it exists.** Check them one at a time against the codebase, not against your memory of reading it an hour ago. This is `/existing-mechanisms`' *"`/3p-review`, before a Rework Brief is handed over"* row: the second sweep, run against the artifact.
 - **Count the call sites; do not estimate them.** A brief that says four sites where there are seven is executed at four, and comes back green.
 - **Check whether any fix is inert without another.** Two guards on consecutive lines means removing one changes nothing. Name the pairing and require them built together, or the round costs a relaunch and moves nothing.
-- **Then read the brief back against the decision document.** It can satisfy every finding you raised and still ask for something the decision ruled out — the same drift pass you run on the code, run on your own instructions.
+- **Then read the brief back against the decision document.** It can satisfy every finding you raised and still ask for something the decision ruled out. It is the same drift pass you run on the code, run on your own instructions.
 
 ### Fixing them yourself
 

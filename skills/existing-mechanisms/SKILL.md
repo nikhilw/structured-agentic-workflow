@@ -84,8 +84,8 @@ is how the gap ships.
    people later assume is live.*
 
    **The moment anything is removed, this answer stops being a line and becomes a table.** One row
-   per removal, with a replacement named for each. Summarising instead — "cleaned up the old prune
-   path" — is how the load-bearing half of a removal disappears without anyone deciding to drop it.
+   per removal, with a replacement named for each. Summarising instead, as in "cleaned up the old prune
+   path", is how the load-bearing half of a removal disappears without anyone deciding to drop it.
 
    | Removed | What it did | Replaced by | Anything lost? |
    |---|---|---|---|
@@ -103,7 +103,7 @@ is how the gap ships.
    - **Scalpel, not butcher knife.** Remove exactly the lines the table names, not the
      neighbourhood. Anything you want to remove that the table does not name gets a row first.
    - **You cannot finish with less than you started with.** A row whose *Replaced by* cell is empty
-     is a capability the work took away. That is a loud failure, not a simplification — say so in
+     is a capability the work took away. That is a loud failure, not a simplification. Say so in
      those words rather than letting the blank cell read as an answer. Reduced functionality is a
      decision the owner is allowed to make; it is not one any gate here makes quietly on their
      behalf.
@@ -203,7 +203,7 @@ its row here and does not restate the questions.
 | `/write-plan`, Codebase Analysis | the concrete chosen design, not the problem space | all eight, recorded in the plan |
 | `/build-phase`, Plan Review | this phase's named files and symbols | 1, 3, 5, 8; a gap here is a halt, not a fix |
 | `/3p-review`, Codebase Consistency | the code as built | 3, 5, 8; a gap here is a finding |
-| `/3p-review`, before a Rework Brief is handed over | the brief's own names, files, lines and commands | the second sweep, against the brief — a brief is a plan |
+| `/3p-review`, before a Rework Brief is handed over | the brief's own names, files, lines and commands | the second sweep, against the brief; a brief is a plan |
 | Bug or quick-fix path, no plan | the fix you are about to make | 1, 2 and 8, before the fix. Question 2 is the one that matters here: a bug reached through four entry points is fixed at one of them and reported as fixed |
 
 **The two full runs are not redundant.** `/brainstorm` asks the questions about a problem, when the

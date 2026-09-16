@@ -185,7 +185,7 @@ Check for:
 - Does the implementation match what the plan specified?
 - **Did I decide anything the plan should have decided?** Walk the diff for names, parameters, error paths, defaults and config keys that are not in the plan. Each one is either something the plan named, or a silence you filled. A silence you filled is a halt you did not take, and now is the last moment it costs only a paragraph.
 - Are there any obvious bugs, edge cases, or regressions?
-- **If this phase removed anything, does the diff match the plan's removal table row for row?** Every row's replacement actually landed, nothing was deleted that the table does not name, and no test was deleted because it went red — a changed rule needs a test stating the new rule, not one fewer test. A row whose replacement did not land is a capability this phase took away; halt and report it rather than noting it (AW-26).
+- **If this phase removed anything, does the diff match the plan's removal table row for row?** Every row's replacement actually landed, nothing was deleted that the table does not name, and no test was deleted because it went red. A changed rule needs a test stating the new rule, not one fewer test. A row whose replacement did not land is a capability this phase took away; halt and report it rather than noting it (AW-26).
 - Does the code follow existing project conventions and patterns?
 - Does it clear the quality bar above — naming, function size, hidden side effects, DRY, KISS/YAGNI? Fix what you'd be embarrassed to hand to a reviewer.
 - Is anything over-engineered or under-tested?
@@ -233,7 +233,7 @@ not yours to make by staying quiet.
 If the user tells you that code was written by another agent (Cursor, Copilot, a local model, etc.) or simply says "it's done" / "I've implemented Phase N" / pastes a diff:
 
 1. **Do NOT re-implement.** The code is already written.
-2. **Read the diff against the decision document, then the plan.** In that order: the plan is derived from the decision, so a change can satisfy every line of the plan and still contradict the decision that produced it — and reading the plan first is how you end up agreeing with both without ever opening the document. Anything the diff does that the decision ruled out is a halt, not a self-review note.
+2. **Read the diff against the decision document, then the plan.** In that order: the plan is derived from the decision, so a change can satisfy every line of the plan and still contradict the decision that produced it, and reading the plan first is how you end up agreeing with both without ever opening the document. Anything the diff does that the decision ruled out is a halt, not a self-review note.
 3. **Immediately run Step 3 (Scoped Tests)** — verify the external model's work passes tests. You did not write this diff, so read it before you pick a rung: an external model's change surface is routinely wider than its description of it, and every escalation trigger applies to code you inherited exactly as it does to code you wrote.
 4. **Then run Step 4 (Self-Review)** — review the external model's code carefully. External models are more likely to have drifted from project conventions.
 5. **Continue the loop** as normal — fix issues, re-test, re-review until clean.
