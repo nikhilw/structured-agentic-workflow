@@ -62,6 +62,34 @@ module per phase can be stopped, reviewed, and reverted at any point.
 
 ---
 
+## Work nests — keep the stack visible
+
+Real sessions do not stay at one level. A plan opens a gate, the gate finds a defect, the defect
+needs a rework brief, the brief raises a design question, and the question needs its own decision
+document and plan. **Every one of those descents is correct** — it is how a problem gets solved at
+the depth it actually lives at, rather than patched at the depth it was noticed.
+
+What goes wrong is not the descent. It is that the stack goes invisible, and the goal that started
+the session is quietly abandoned at depth four, because everyone involved agreed that the thing in
+front of them was finished.
+
+Four habits keep it visible:
+
+- **Restate the stack every time you surface.** The original goal, the level you are at, and what
+  is still owed at every level above it. If the owner has to ask "did we ever finish X?" about the
+  thing that started the session, the stack was not visible enough.
+- **A "done" at depth N is not a "done" at depth N−1.** Finishing a rework round does not finish
+  the review; finishing the review does not finish the plan that spawned it; and neither of them
+  archives anything.
+- **Close a nested piece out loud, in its parent's terms.** Say what remains at the parent level
+  before starting anything new.
+- **A gate goes stale the moment work lands under it.** A completion gate run before two rework
+  rounds landed proves nothing about the tree that exists now. Say it is stale and run it again —
+  citing it is the failure, and `test-scope`'s citable-run rule (same tree, or no citation) is the
+  mechanical form of the same fact.
+
+---
+
 ## The "no surprises" rule
 
 A standing constraint worth putting in your [agent config file](agent-config.md):
