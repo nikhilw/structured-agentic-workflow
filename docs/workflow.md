@@ -15,7 +15,7 @@ flowchart TD
     Start([New feature / bug / task]) --> B1
 
     subgraph Brainstorm ["1 · Brainstorm — /brainstorm · planning model"]
-        B1["Refresh graphify index once,<br/>then explore the problem space"] --> B1a["existing-mechanisms<br/>all 8 questions answered"]
+        B1["Refresh graphify index once, if installed,<br/>then explore the problem space"] --> B1a["existing-mechanisms<br/>all 8 questions answered"]
         B1a --> B2["Propose approaches<br/>minimal ↔ structural<br/>+ E: ideal, then adjusted"]
         B2 --> B3["Challenge the obvious solution"]
         B3 --> B4{"Human satisfied?"}
@@ -26,7 +26,7 @@ flowchart TD
     B5 --> P1
 
     subgraph Plan ["2 · Plan — /write-plan · planning model"]
-        P1["Codebase analysis<br/>patterns · security · state · failure modes"] --> P2["Write phased plan<br/>zero ambiguity for external models"]
+        P1["Codebase analysis<br/>pattern scan · security · state · failure modes<br/>+ removal table, if anything is removed"] --> P2["Write phased plan<br/>zero ambiguity for external models"]
         P2 --> P3["Two-pass plan review"]
         P3 --> P4["Save to docs/plans/new/"]
     end
@@ -56,6 +56,7 @@ flowchart TD
     Impl -. "discrepancy found" .-> HALT["Build Halt Report<br/>stop, do not work around"]
     HALT --> AM["Planning model:<br/>verify · classify · amend<br/>+ Amendment Log entry"]
     AM -. "re-read plan from disk" .-> PR
+    AM -. "decision-level, not a phase defect:<br/>descend to a nested cycle" .-> B1
 
     subgraph BuildModel ["Build-model session — /build-model"]
         direction TB
@@ -69,11 +70,11 @@ flowchart TD
     BC --> R1
 
     subgraph FullReview ["4 · Holistic Review — /3p-review · main model, fresh eyes"]
-        R1["Senior Architect persona<br/>fresh eyes on ALL changes<br/>re-derive claims: FULL suite - T4"] --> R2{"Findings?"}
+        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>re-derive claims: FULL suite - T4"] --> R2{"Findings?"}
         R2 -- "fixable in place" --> R3["Fix issues"]
         R3 --> R4["Re-test<br/>scoped per /test-scope"]
         R4 --> R1
-        R2 -- "too many / systemic" --> RB["Rework Brief<br/>back to the build model,<br/>then re-review from Round 1"]
+        R2 -- "too many / systemic" --> RB["Rework Brief<br/>a brief is a plan: Pass 2 it first<br/>back to the build model,<br/>then re-review from Round 1"]
         R2 -- "none" --> R5["Sign-off run<br/>FULL suite - T4,<br/>or cite this review's own"]
     end
 
@@ -86,15 +87,26 @@ flowchart TD
     end
 
     V3 --> DriftQ{"Undocumented<br/>drift?"}
-    DriftQ -- "yes" --> DriftFix["Close the record:<br/>amend decision doc + plan log"]
-    DriftFix --> V3
-    DriftQ -- "no" --> Archive["Move plan<br/>plans/ → done/"]
+    DriftQ -- "yes" --> DriftReport["Report it and STOP<br/>never edit the baseline<br/>status: NOT COMPLETE"]
+    DriftReport --> HumanRules{"Human rules on it"}
+    HumanRules -- "accepts the departure" --> DriftLog["Append a dated amendment<br/>under the original text<br/>decision doc + plan log"]
+    DriftLog --> Archive["Move plan<br/>plans/ → done/"]
+    HumanRules -- "rejects it" --> PR
+    DriftQ -- "no" --> Archive
     Archive --> Done([Feature complete])
 ```
 
 The two build lanes are the [multi-model split](multi-model.md): the same model can carry
-the whole cycle, or the plan file can be handed to a cheaper/faster model — or a different
-tool entirely — that builds, self-reviews, and hands back a summary.
+the whole cycle, or the plan file can be handed to a cheaper/faster model, or a different
+tool entirely, that builds, self-reviews, and hands back a summary.
+
+**The cycle nests, and the diagram can only show one level of it.** Two arrows leave a level
+and start a fresh one: a halt classified as decision-level goes back to `/brainstorm`, and a
+rework brief that turns out to raise a design question does the same. Each descent is
+correct; what the picture cannot draw is that the level above is still owed. A completion
+gate run before the nested work landed is stale, and a "done" at the inner level is not a
+"done" at the outer one. That accounting is `agentic-workflow` AW-25, and it is the part of
+this diagram you have to hold in your head.
 
 ---
 
