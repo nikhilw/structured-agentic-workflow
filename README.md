@@ -10,6 +10,45 @@ without evidence.
 
 ---
 
+## Highlights
+
+**Frontier reasoning where it counts, cheap tokens everywhere else.** Plan with your most
+capable model, then hand the plan file to a cheaper one, or to a different tool entirely.
+Most of what a coding agent burns is not reasoning; it is reading files, writing boilerplate
+and re-running suites. On top of that, the test-scope ladder retires the redundant full-suite
+runs that a phased build otherwise pays for six or seven times. The workflow is built to stay
+usable when tokens are the binding constraint, not an afterthought for when they are.
+
+**A spec is not your intent.** `/brainstorm` explores real alternatives, argues against its
+own favourite, and writes a decision document recording what you chose, why, what it costs,
+and what would reverse it. That document, not the ticket, is the baseline. Every later gate
+is measured against it.
+
+**Drift is measured, not hoped for.** Plans change during a build, and a feature that lands
+somewhere other than where it was aimed is usually the sum of a dozen individually reasonable
+corrections. So each correction is logged where it happens, and `/verify-completion` reads
+the decision document against the plan and the plan against the code before anything is
+called done. Undocumented drift blocks the completion claim outright.
+
+**A review gate that takes ownership.** `/3p-review` switches persona to an independent
+Senior Architect who owns the code from sign-off onward, loops until zero findings at every
+severity including minors, and cannot pass a value path that has no test crossing the real
+seam. Past a volume threshold it stops fixing and sends a Rework Brief back instead: a
+reviewer who rewrites half the feature has become its author.
+
+**The build model halts instead of guessing.** A plan gap produces a Build Halt Report, not a
+workaround. Routing around a gap inside the files the plan did name is the expensive failure,
+because it passes every gate while doing the wrong thing. Halts are expected, they are cheap,
+and resolving them is the planning model's job.
+
+**Nothing finishes smaller than it started.** Every removal is audited row by row with its
+replacement named, because a deleted capability is the one defect a green suite cannot see:
+the tests that covered it were usually deleted in the same commit.
+
+*The longer comparison with other skill libraries is [further down](#what-makes-this-different).*
+
+---
+
 ## Setup
 
 ### 1. Install graphify (recommended)
@@ -226,6 +265,31 @@ flowchart LR
 
 Both build lanes are optional: the same model can carry the whole cycle. The split is there
 when you want it.
+
+---
+
+## Worth pairing with
+
+None of these are part of the workflow and none are required. They solve problems this
+workflow runs into once the tasks get long or the agents get plural.
+
+**A shared memory between agents.** Agents in separate sessions cannot see each other's
+context, so the same file gets re-read and the same decision gets re-made in parallel. A
+shared memory store, `agentic-tools` or anything equivalent, gives them one place to write
+findings and read someone else's. The plan file already does this for the build lane; a
+memory store extends it to work that is not phase-shaped.
+
+**Another tool as the build model.** Anything that can read a plan file and edit a repo can
+take the build lane, which is the point of making the plan a file rather than a conversation.
+Driving Cursor's agent headless in the background is written up end to end, including the
+launch prompt, the failure modes and the lines that prevent them, in
+[driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md).
+
+**Long-lived subagents for long-running work.** A one-off subagent starts cold every time: it
+re-establishes context, re-explores, reports, and throws all of it away. Across a long task
+you pay that setup on every call. A subagent that holds its conversation instead answers the
+second question knowing what it learned on the first, which is the difference between
+delegating a question and delegating a job.
 
 ---
 
