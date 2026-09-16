@@ -196,7 +196,7 @@ Subagents multiply cost and latency: each one re-establishes context, re-explore
 - **Existing mechanisms:** [the `/existing-mechanisms` ledger, all eight lines, answered against this design]
 - **Existing patterns used:** [patterns/utilities this plan reuses]
 - **New patterns introduced:** [if any — justify why existing patterns don't fit]
-- **Retired by this plan:** [what the plan removes, and the phase that removes it; "nothing" if nothing is replaced]
+- **Retired by this plan:** [`/existing-mechanisms` question 5's removal table — one row per removal, each naming what it did, what replaces it, and what is lost — plus the phase that performs it. "Nothing" if nothing is removed. An empty *Replaced by* cell is a capability this plan gives up, and it is the owner's call, not a detail]
 - **Security considerations:** [attack surface, input boundaries, access control]
 - **Files/modules affected:** [list with brief description of each interaction]
 
@@ -364,7 +364,10 @@ Review the finished plan twice, with a different lens each time, and do not coll
   the plan. If no decision document exists, say so here rather than leaving the check unmentioned.
 - **Is the `/existing-mechanisms` ledger answered against this design, not just the problem?** In
   particular: does any phase duplicate a mechanism that already exists, and does every retirement
-  in question 5 have a phase that performs it?
+  in question 5 have a phase that performs it? **If this plan removes anything, is question 5
+  answered as the removal table, with every *Replaced by* cell filled and every *Anything lost?*
+  cell answered?** A blank replacement cell is a functionality regression about to be planned in,
+  and it costs one line to see here and a rework loop to see in the diff.
 - Does every State & Data Contract line have an actual answer — identity, currentness, authority and rebuild path, visibility during change, enforcement layer, migration behavior? An `unknown` left here is a decision the build model will make for you, at the worst possible moment.
 - For every long-lived thing, TTL, and boundary: is what happens at expiry/failure written down, with a named owner for **each** error code? A failure mode that lives only in my head will not be built.
 - Does every value path have a named no-mock seam test? An anticipated interaction with no test is not handled — the build model will skip it.

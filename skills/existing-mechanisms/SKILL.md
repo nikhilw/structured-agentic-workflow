@@ -83,6 +83,31 @@ is how the gap ships.
    the next reader cannot tell it is dead. *Prevents: the abandoned-in-place subsystem that three
    people later assume is live.*
 
+   **The moment anything is removed, this answer stops being a line and becomes a table.** One row
+   per removal, with a replacement named for each. Summarising instead — "cleaned up the old prune
+   path" — is how the load-bearing half of a removal disappears without anyone deciding to drop it.
+
+   | Removed | What it did | Replaced by | Anything lost? |
+   |---|---|---|---|
+
+   - **Nothing is deleted because it "looks unused".** Prove the callers both ways, per question 1,
+     including the inbound edges that never spell the name: tests, fixtures, DI registrations,
+     route and command tables, config keys, scheduled jobs, anything dispatched by string.
+   - **Ask what the code was load-bearing *for*, not only who calls it.** The dangerous removals
+     are the ones that read as housekeeping. A checkpoint prune that looks like tidy-up can be the
+     only thing bounding a database that is already at 100 MB, and no caller says so.
+   - **A test left covering a path nobody takes any more is a coverage hole, not a pass.** It stays
+     green and proves nothing. Name it in the row, and say which assertion replaces it.
+   - **Deleting a test because it went red is not updating it.** A changed rule needs a test that
+     states the new rule.
+   - **Scalpel, not butcher knife.** Remove exactly the lines the table names, not the
+     neighbourhood. Anything you want to remove that the table does not name gets a row first.
+   - **You cannot finish with less than you started with.** A row whose *Replaced by* cell is empty
+     is a capability the work took away. That is a loud failure, not a simplification — say so in
+     those words rather than letting the blank cell read as an answer. Reduced functionality is a
+     decision the owner is allowed to make; it is not one any gate here makes quietly on their
+     behalf.
+
 6. **Build on what exists.** State the version of this change that extends the existing mechanism
    rather than adding a parallel one, even if you will not recommend it. If you cannot state it,
    you have not understood the existing mechanism well enough to replace it. *Prevents: greenfield
@@ -127,7 +152,8 @@ evidence. Collapse the ones that genuinely do not apply onto a single "does not 
 2. **Scope beyond the entry point:** [related methods and flows that reach the same thing]
 3. **Already exists:** [the mechanism that already does this, or what was searched for and not found]
 4. **Relationship to the incumbent:** [extend / replace / abandon] + [why]
-5. **Retirement:** [what becomes dead and where it is removed, or "nothing is retired"]
+5. **Retirement:** [what becomes dead and where it is removed, or "nothing is retired". If anything
+   is removed, this line is the removal table above, one row per removal]
 6. **Build on what exists:** [the extend-the-incumbent version of this change]
 7. **House pattern:** [the shape this codebase already uses for this problem]
 8. **Unify vs bifurcate:** [what is extracted; any second pathway introduced and what collapses it]

@@ -116,6 +116,12 @@ review. Build a checklist and walk it.
   never written is a missing requirement, not a missing nicety.
 - **Anything in Out of Scope that got built anyway is a finding.** Scope grows silently and this is
   the only line that catches it.
+- **Anything removed comes with its replacement named.** Walk the plan's removal table
+  (`/existing-mechanisms` question 5) against the diff. A row whose replacement never landed, and a
+  deletion the table never named, are each a capability the feature took away — report them in
+  those words. The suite cannot see this — the tests that covered the removed path were usually
+  deleted with it, so the same commit destroys the evidence of the loss (`agentic-workflow`
+  Rule 26).
 
 A gap here does not fail the gate by itself. An *unreported* gap does. The output is a truthful
 ledger; the human decides whether an unproven row is acceptable.
@@ -287,6 +293,8 @@ it was ever a different one.
 
 **Unproven or missing:** [each row that is not "built and proven", or "none"]
 **Built but not in the plan:** [scope that grew, or "none"]
+**Removed without a replacement:** [each removal whose replacement did not land, and each deletion
+no removal table named, or "none"]
 
 ### Drift (decision → plan → code)
 - **D0 baseline:** [decision doc read from git at <ref> / untracked, working tree only] — [working
@@ -322,6 +330,7 @@ COMPLETE** until the record is closed or the human accepts the gap in writing.
 | Agent completed | The VCS diff, read | The agent reporting success |
 | Requirements met | The line-by-line checklist | Tests passing |
 | Built what we decided | The drift audit, all three comparisons | The plan being followed |
+| Nothing was lost | The removal table walked against the diff, each replacement found | The suite passing after the deletion |
 | No drift | Both documents read as they stand, differences named | The documents agreeing after you edited one |
 
 ## Red flags, stop
@@ -355,6 +364,7 @@ COMPLETE** until the record is closed or the human accepts the gap in writing.
 | "I'll update the decision doc so it matches what we built" | That is the failure this gate exists to catch, committed by the gate itself. Report the difference; append only after the human accepts |
 | "The decision was clearly superseded, so the old text is just wrong now" | Superseded text is the evidence. It stays, and the amendment goes below it |
 | "It's only a wording fix to the old decision" | There are no wording fixes to a baseline during an audit |
+| "Nothing went red when we removed it" | The tests for it were removed too. Name the capability, not the suite |
 
 ## Key patterns
 

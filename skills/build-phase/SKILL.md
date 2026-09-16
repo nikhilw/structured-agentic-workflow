@@ -144,6 +144,7 @@ keystroke:
 - calling something adjacent because the thing the plan named does not exist;
 - mocking a seam the plan said to exercise for real;
 - widening a signature, loosening a type, or catching an exception the plan did not account for;
+- deleting a line, a test, a config key or a file that the plan's removal table does not name;
 - "I'll build it this way for now and mention it at the end."
 
 Each of these is a decision the plan owed you. Fill one silently and it never surfaces again: the
@@ -184,6 +185,7 @@ Check for:
 - Does the implementation match what the plan specified?
 - **Did I decide anything the plan should have decided?** Walk the diff for names, parameters, error paths, defaults and config keys that are not in the plan. Each one is either something the plan named, or a silence you filled. A silence you filled is a halt you did not take, and now is the last moment it costs only a paragraph.
 - Are there any obvious bugs, edge cases, or regressions?
+- **If this phase removed anything, does the diff match the plan's removal table row for row?** Every row's replacement actually landed, nothing was deleted that the table does not name, and no test was deleted because it went red — a changed rule needs a test stating the new rule, not one fewer test. A row whose replacement did not land is a capability this phase took away; halt and report it rather than noting it (`agentic-workflow` Rule 26).
 - Does the code follow existing project conventions and patterns?
 - Does it clear the quality bar above — naming, function size, hidden side effects, DRY, KISS/YAGNI? Fix what you'd be embarrassed to hand to a reviewer.
 - Is anything over-engineered or under-tested?

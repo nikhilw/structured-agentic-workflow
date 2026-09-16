@@ -166,6 +166,9 @@ explicit."
   run this exactly as written?*
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it, with every departure named. Pass 1 walks that mapping line by line
+- A **removal table** whenever the plan takes anything out — one row per removal, naming what it
+  did, what replaces it, and what is lost. A blank replacement cell is a capability the plan is
+  giving up, and that is the owner's call to make, not a detail to discover in the diff
 - An **Amendment Log**, empty at first, which is where every later change to the plan is recorded
 
 **On approval:** move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` — not
@@ -308,6 +311,13 @@ not test runs, and always happen fresh.
 
 It also covers the bug / quick-fix path, which skips full review. "Review already ran the
 tests" is never grounds to skip the gate.
+
+And it reports what the work **removed**. A capability that was reachable before the change and is
+not reachable after it, with nothing named as its replacement, is a regression however tidy the
+deletion looks — and it is the one kind of defect the suite structurally cannot catch, because the
+tests that covered it were usually deleted in the same commit. Finishing with less than you started
+with is a decision the owner is allowed to make; it is not one the gates make quietly on their
+behalf.
 
 ### The drift audit
 

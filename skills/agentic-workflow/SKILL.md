@@ -105,6 +105,8 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
     - **When a nested piece closes, return to its parent out loud** and say what remains there before starting anything new.
     - **Gates run at the level that owns them, and a gate goes stale the moment work lands under it.** A completion gate run before two rework rounds landed says nothing about the tree that exists now. Say that it is stale and re-run it rather than citing it — `/test-scope`'s citable-run rule is the mechanical form of the same fact, and the rest of the gate (the requirements tick-off, the drift audit) is never citable at all.
 
+26. **Finish with no less than you started with.** A change that removes something has to say what replaces it, and a capability that was reachable before and is not reachable after is a regression however tidy the deletion looks. The suite will not tell you: the tests that covered it were usually deleted with it, so the evidence of the loss is destroyed by the same commit. `/existing-mechanisms` question 5 holds the removal table that makes this checkable, `/write-plan` requires it whenever a plan removes anything, `/build-phase` builds only the rows it names, `/3p-review` walks it against the diff, and `/verify-completion` reports what is missing. **Shipping reduced functionality is a decision the owner is allowed to make; it is not one any gate here makes quietly on their behalf.** When you find one, say so loudly, in those words, and let them rule.
+
 ## Plan Directory Lifecycle
 
 - **`docs/plans/new/`** — Brainstormed and written, not yet started. Staging area.
