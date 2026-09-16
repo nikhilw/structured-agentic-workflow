@@ -95,6 +95,8 @@ Fail any condition and there is no citation, only a run you still owe.
 
 **Every run is recorded with its rung.** "T2 impacted, exit 0, 34 passed, 0 failed, 2 skipped", never "tests pass".
 
+**Take the exit code from the run itself, never from a pipeline.** `<runner> | tee out.txt` reports `tee`'s status, not the suite's, so a failing run reads as exit 0 to every gate downstream while the counts scroll past unread. Run the command on its own and read its status, or use your shell's pipeline-status mechanism. This is the one recording error that cannot be caught by reading the report, because the report is honest and the exit code is not.
+
 The rung travels with the run through every artifact that carries it: the build completion report, the handoff summary's Verification Runs, the review ledger, the sign-off. A reader who cannot see the rung cannot tell the difference between a criterion proven against the whole suite and one proven against four files, and will assume the first.
 
 **A criterion proven only at T1 or T2 is a ledger row, not a green check.** It is disposed of the same way a manual criterion is: proven at a wider rung, or risk-accepted in writing by the human.

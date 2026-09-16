@@ -95,6 +95,8 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 
 23. **Scope every test run through `/test-scope`.** It holds the ladder (focused → impacted → segment → full), the triggers that void a scoped run, and the citable-run rule. It is the only place rung assignments are written down, so no skill here restates them and none of them may contradict it. Two full-suite runs per feature are mandatory and not tradeable: the builder's at Phase Completion, and `/3p-review`'s first-party re-derivation. Everything else is scoped or cited. **The saving is bought with bookkeeping, not with trust:** a scoped run that is not recorded as scoped is worse than the full run it replaced, because it reads as proof it never was.
 
+24. **A criterion the owner states about one case is a standing check for the rest of the work.** These arrive while they are reading a result — one prescription, one function, one round of findings — and they almost never mean only that instance; the instance is what made the rule visible. Fixing the case in hand and moving on is the failure, because the other instances are already written and nothing will look at them again. Record the criterion **verbatim** where the work will re-read it — the review ledger, the Rework Brief's Standing criteria section, the plan's Amendment Log when it changes the contract — and test every later round against it. Where it is genuinely unclear whether they meant this case or the class, ask: one sentence decides how much of the work the rule touches, and guessing narrow is the expensive half of that bet.
+
 ## Plan Directory Lifecycle
 
 - **`docs/plans/new/`** — Brainstormed and written, not yet started. Staging area.

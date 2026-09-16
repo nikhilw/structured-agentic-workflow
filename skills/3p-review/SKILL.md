@@ -106,16 +106,23 @@ Any handoff concern of the form "not integration-tested" / "manual E2E not execu
 
 Everything below re-runs each round, re-reading the code **from disk**. You are reviewing the code as it exists NOW, not checking whether your fixes were correct. Intake is not repeated.
 
+**A general criterion the owner states during this review joins the checklist from that round onward** (`agentic-workflow` Rule 24). It arrives while they are reading a result — one function, one prescription, one round of findings — and it is almost never about that case. Record it verbatim where you will re-read it: in the ledger, and in the Rework Brief if one goes back. Then check it against every finding in every later round, not only against the instance that produced it.
+
 ## Round N: Review
 
 ### Plan & Decision Conformance
 
-Do this first — a well-written function implementing the wrong decision is not fixable by a code-quality pass. Map **decision → plan requirement → implementation → evidence**, and flag every break:
+Do this first — a well-written function implementing the wrong decision is not fixable by a code-quality pass.
+
+**Read the decision document first, then the plan, then the diff — in that order.** The plan is a derived artifact; the decision document is the baseline it was derived from, and a change can satisfy every word of the plan while contradicting the decision that produced it. The order is what makes that visible: read the plan first and you will find yourself checking the code against the plan, agreeing with both, and never opening the document that ruled out what the code does.
+
+Map **decision → plan requirement → implementation → evidence**, and flag every break:
 
 - [ ] **Skipped requirements** — a requirement with no implementation, or a phase reported complete with files missing or nothing wired to them.
 - [ ] **Silently changed decisions** — code does what a decision doc or plan ruled out. It may even be better; it is still a finding until written down and agreed.
 - [ ] **Deviations that should have amended the plan** — the builder hit reality, adapted, and left the plan describing a system that no longer exists.
 - [ ] **Decisions kicked back to the build model** — the plan already decided this and the code differs, or the plan left a hole filled with an architectural choice the build model was never meant to make.
+- [ ] **Judgement calls you delegated, re-traced by you.** Where the plan or a Rework Brief said "this one is yours to judge, say which way you went", read what it chose and trace it yourself — callers and callees both ways, per `/existing-mechanisms` question 1. **Delegating the decision never delegated the tracing**, and what comes back is a claim like every other claim in the handoff. The build model chose with less of the system in view than you have: the guard it removed as redundant may also have been holding a second thing shut. A delegated call the handoff never mentions is worse than one you disagree with — check the diff for choices nobody reported.
 - [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make.
 - [ ] **Amendments without entries** — read the plan's **Amendment Log** against its phases. A phase whose text plainly answers a problem discovered during the build, with no entry recording that, is an unlogged amendment. It is a finding here and it becomes undocumented drift at `/verify-completion`, where it is far more expensive to reconstruct.
 - [ ] **Halts resolved by silence** — for every halt in the handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
@@ -258,12 +265,18 @@ It goes to a model with no memory of this review, so it carries a plan's contrac
 **Now:** [what the code currently does]
 **Wrong because:** [defect, contract, or plan requirement violated — cite plan §/decision doc]
 **Required:** [the specific change — decided, not "consider"]
+**Yours to judge:** [omit unless the brief genuinely cannot decide this. Where it appears, say what
+must be reported back: which way you went, and what you traced to check it]
 **Prove it:** [the run that must go green — plan criterion or test id] → [assertion that must pass]
 
 ### R2 — ...
 
 ### Systemic
 [A defect repeating across sites — state the pattern once, list every site, fix as one thing.]
+
+### Standing criteria
+[Every general criterion the owner stated during this review, verbatim. They apply to every item
+above and to every later round, not only to the case that prompted them. "None." if there are none.]
 
 ### Do not regress
 - `[full suite command]` → [current expected result]. T4 full, never a scoped run
