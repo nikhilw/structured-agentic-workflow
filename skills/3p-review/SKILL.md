@@ -106,7 +106,7 @@ Any handoff concern of the form "not integration-tested" / "manual E2E not execu
 
 Everything below re-runs each round, re-reading the code **from disk**. You are reviewing the code as it exists NOW, not checking whether your fixes were correct. Intake is not repeated.
 
-**A general criterion the owner states during this review joins the checklist from that round onward** (`agentic-workflow` Rule 24). It arrives while they are reading a result — one function, one prescription, one round of findings — and it is almost never about that case. Record it verbatim where you will re-read it: in the ledger, and in the Rework Brief if one goes back. Then check it against every finding in every later round, not only against the instance that produced it.
+**A general criterion the owner states during this review joins the checklist from that round onward** (AW-24). It arrives while they are reading a result — one function, one prescription, one round of findings — and it is almost never about that case. Record it verbatim where you will re-read it: in the ledger, and in the Rework Brief if one goes back. Then check it against every finding in every later round, not only against the instance that produced it.
 
 ## Round N: Review
 

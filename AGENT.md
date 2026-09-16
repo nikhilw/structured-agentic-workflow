@@ -91,6 +91,7 @@ is the whole point of the independence the review is paid for.
 
 - Plans live in `docs/plans/`: `new/` (staged) → `plans/` (active) → `done/` (archived). Move with plain `mv`, not `git mv` — plan files may be untracked.
 - Brainstorm decision docs go to `docs/discussions/YYYY-MM-DD-<topic>.md`.
+- **Rules carry a prefixed, stable id.** `agentic-workflow` uses `AW-N`, `write-plan` uses `WP-N`, `brainstorm` uses `BS-N`. Cite a rule by that tag from anywhere, including from another skill; an unprefixed "Rule 8" is ambiguous, because three skills have one. The tag is a name, not a position, so a rule is never renumbered: insert new rules at the end, and retire one by marking it retired in place. A skill that gains its own rules section takes a new two-letter prefix and says so here.
 - Commit only when asked.
 - NEVER use em-dash(—) when writing. Use commas or semicolons to join sentences. Or just simply break them with fullstops.  
 

@@ -120,8 +120,7 @@ review. Build a checklist and walk it.
   (`/existing-mechanisms` question 5) against the diff. A row whose replacement never landed, and a
   deletion the table never named, are each a capability the feature took away — report them in
   those words. The suite cannot see this — the tests that covered the removed path were usually
-  deleted with it, so the same commit destroys the evidence of the loss (`agentic-workflow`
-  Rule 26).
+  deleted with it, so the same commit destroys the evidence of the loss (AW-26).
 
 A gap here does not fail the gate by itself. An *unreported* gap does. The output is a truthful
 ledger; the human decides whether an unproven row is acceptable.
