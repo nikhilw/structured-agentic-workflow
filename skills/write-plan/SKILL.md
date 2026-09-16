@@ -109,13 +109,19 @@ Two of the eight decide what the plan must contain:
 
 Choosing a pattern is an architectural decision, so **the plan makes it and names it** — the build model should never have to decide "what shape should this be?". Name the pattern *and* the problem it solves; a pattern named without its problem is decoration the reviewer will strip out.
 
-Three rules, in priority order:
+**Run the scan yourself; nobody is going to raise this for you.** The user describes a problem, not a shape, and the build model builds whatever the plan spells out. So walk the table below against this design once, before the phases are written — read the **left column first**, as a list of problems you might have, not as a lookup for a name you already picked. A design that matches a row and never says so ships the hand-rolled version of a solved problem, and the plan reads as though the question was considered.
+
+Both outcomes get written down in the plan's Codebase Analysis: the pattern you are specifying, or **"scanned; no pattern applies"**. Silence there is indistinguishable from never having looked.
+
+**Say what you found to the user, not only to the plan.** A pattern changes the shape of the work, so it is theirs to accept or refuse, and they will mostly not have raised one — that is not a signal they want none. Surface it when you present the plan: the problem you matched, the pattern, the form it takes here, and what it costs. Two cases need saying out loud rather than settling quietly in a phase: a pattern that would restructure work the user has already described in concrete terms, and a pattern the user *did* name that does not fit what you found in the code — say that, and say what fits instead.
+
+Then three rules filter what the scan turns up, in priority order:
 
 1. **The problem comes first.** If you cannot state the concrete problem in one sentence — "three export formats chosen at runtime", "an external API whose interface we don't control" — do not name a pattern. A pattern applied to a problem you don't have is over-engineering, and `/3p-review` treats it as a finding.
 2. **The codebase's existing vocabulary wins.** If this project already solves this shape of problem a particular way, specify that, even when a textbook pattern would be tidier. Consistency beats correctness-in-isolation.
 3. **The language may already be the pattern.** Half of GoF dissolves into language features — most visibly in Python, where the class-heavy form is *worse* than the idiom, not more rigorous.
 
-| Problem | Pattern | Usual Python form |
+| Problem | Pattern | Usual lightweight form (Python shown) |
 |---|---|---|
 | Interchangeable algorithms picked at runtime | Strategy | a callable passed in, or a dict of callables |
 | Build one of several related objects from a key or config | Factory | a dict registry, or a `classmethod` |
@@ -127,6 +133,8 @@ Three rules, in priority order:
 | Encapsulate a request to queue, log, or undo it | Command | a closure or `functools.partial` |
 | Traverse without exposing internals | Iterator | a generator (`yield`) |
 | Swap an implementation for tests or per-environment | Dependency Injection | pass the collaborator in as a parameter |
+
+**Write the form in this project's language, not the one in the table.** The third column is the shape the pattern usually collapses to, illustrated in Python because that is where the collapse is most visible; a TypeScript, Go, or Rust codebase has its own lightweight form, and suggesting Python's is a wrong suggestion delivered confidently. Read rule 2 first — what this codebase already does beats both.
 
 Specify which form the plan wants. "Use a Strategy" is ambiguous; "pass a `Callable[[Row], str]` formatter into `export()`; the three formatters live in `exporters.py`" is a decision.
 
@@ -196,7 +204,7 @@ Subagents multiply cost and latency: each one re-establishes context, re-explore
 ## Codebase Analysis
 - **Existing mechanisms:** [the `/existing-mechanisms` ledger, all eight lines, answered against this design]
 - **Existing patterns used:** [patterns/utilities this plan reuses]
-- **New patterns introduced:** [if any — justify why existing patterns don't fit]
+- **New patterns introduced:** [the pattern scan's result: each pattern this plan specifies, with the problem it solves and the form it takes here — or "scanned; no pattern applies". If a pattern is introduced, justify why existing patterns don't fit]
 - **Retired by this plan:** [`/existing-mechanisms` question 5's removal table — one row per removal, each naming what it did, what replaces it, and what is lost — plus the phase that performs it. "Nothing" if nothing is removed. An empty *Replaced by* cell is a capability this plan gives up, and it is the owner's call, not a detail]
 - **Security considerations:** [attack surface, input boundaries, access control]
 - **Files/modules affected:** [list with brief description of each interaction]
@@ -375,6 +383,7 @@ Review the finished plan twice, with a different lens each time, and do not coll
 - Is every invariant enforced at the layer that can actually violate it, not just at the layer that happens to be convenient?
 - Do the phases run in the right order — is every decisive gate ahead of the work that depends on it? Does each phase deliver something observable?
 - Does this fit the codebase's existing patterns, boundaries, and naming — or does it introduce a new pattern that I justified explicitly in the plan?
+- **Did the pattern scan actually run?** The Codebase Analysis says either which pattern this plan specifies and why, or "scanned; no pattern applies". A blank line there is the scan not having happened, and the cost lands as a hand-rolled version of a solved problem that `/3p-review` has to argue about after it is built.
 
 ### Pass 2 — Executability: *can a different agent run this exactly as written?*
 
