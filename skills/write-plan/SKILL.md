@@ -39,6 +39,7 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 - **WP-13 · Every change to an approved plan gets an Amendment Log entry, written before the plan goes back.** An unlogged edit is indistinguishable from the plan having always said that, which is exactly the state that costs days to untangle at the end. The log is append-only: correcting an amendment means adding an entry, never editing one.
 - **WP-14 · Carry the decision document into the plan, and name every departure.** Fill in the Decision Source section from `docs/discussions/`. If the plan does something the decision ruled out, that is a departure and it is written down here, now, while it is one line. `/verify-completion` reads the decision doc against the plan line by line at the end; every departure you did not record surfaces there as undocumented drift, and blocks the completion claim. Until the plan leaves `docs/plans/new/` the decision document is still live: if a departure is really a sign the decision was wrong, take it back to the user and let them correct the document itself, rather than recording a permanent departure from something they no longer intend. After approval that door closes and AW-27 governs.
 - **WP-15 · Length comes from resolved decisions, not prose.** "Hyper-granular" is an instruction about *decision density*, not word count. Every file path, signature, error code, and test assertion earns its space — that specificity is the whole contract. Padding does not: restated context, redundant summaries, motivational framing, the same decision explained in three places, or a template section left in with nothing under it. A plan is long because the work has many decisions, never because the writing is loose. If a paragraph carries no decision the build model needs, cut it.
+- **WP-16 · Impact is a pass of its own, and it does not start from the plan.** Confirming that every name the plan writes down exists (WP-8) and tracing what *else* reaches the things the plan changes are two different questions, and the second is not answered by doing the first more carefully. They start from opposite sets: name verification walks the document outward into the code, an impact trace walks the code inward and returns things the document never mentioned. The caller that breaks the build is, by definition, not in the plan; that is what makes it the caller that breaks the build. Pass 3 below is where that trace happens, and it runs `/existing-mechanisms`' impact trace in full: **structural** (callers, callees, call sites both ways, dependencies and dependants), **functional** (the flows this changes and the flows it depends on, plus the logical couplings no graph has an edge for), and **consolidation** (what is left unused, what gets abandoned without anyone deciding to, whether this unifies or bifurcates, and what should be extracted and reused). No plan is saved or activated without all three. The structural axis alone feels like an answer, which is exactly why it is the only one that ever gets run.
 
 ## Before Writing the Plan — Codebase Analysis
 
@@ -51,7 +52,7 @@ reinvent, and the call sites you would otherwise miss.
 
 ```bash
 if command -v graphify >/dev/null 2>&1; then
-    [ -d graphify-out ] || graphify . --update    # /brainstorm normally did this already
+    graphify . --update    # incremental; /brainstorm was often a different session
     graphify query "how is <X> handled today?"
 else
     echo "graphify not installed - falling back to Grep/Glob"
@@ -69,7 +70,7 @@ fi
   vendored dependencies.
 - **What to ask it here:** how this is solved elsewhere, how two components connect, and the
   incoming edges that enumerate **every consumer** of anything this plan changes. A grep
-  finds the name; the graph finds what reaches it, which is the half Pass 2's caller sweep
+  finds the name; the graph finds what reaches it, which is what Pass 3's impact trace
   is made of.
 - **A library's runtime behaviour is not in the graph.** A plan resting on what a third-party
   package actually does needs a **gate phase that runs the thing** (WP-10), or a read-only
@@ -88,8 +89,8 @@ into files the plan names instead of halts the build model hits.
 
 Two of the eight decide what the plan must contain:
 
-- **Question 1, callers and calls.** This is where WP-8's name verification and Pass 2's caller
-  sweep get their input. Every caller you find is a file the plan names.
+- **Question 1, callers and calls.** This is where WP-8's name verification and Pass 3's impact
+  trace get their input. Every caller you find is a file the plan names.
 - **Question 5, retirement.** Anything this design replaces or abandons needs its removal written
   into a phase, with its tests, its config keys and its stored data. A plan that adds the new
   mechanism and never retires the old one ships both, and the next reader cannot tell which is
@@ -205,6 +206,43 @@ Subagents multiply cost and latency: each one re-establishes context, re-explore
 - **Security considerations:** [attack surface, input boundaries, access control]
 - **Files/modules affected:** [list with brief description of each interaction]
 
+## Impact Analysis
+*(Pass 3's result, and the second sweep's for this plan. `/existing-mechanisms`' impact trace, all
+three axes, at full depth. Counts, not adjectives. Written even when the trace found nothing: an axis
+that found nothing collapses to its one line with its count, and the rest of that axis's bullets are
+cut per WP-15. All three axis headings stay, because a line saying an axis found nothing is evidence
+it ran and a missing line is not.)*
+- **Hunted:** [which of the second sweep's named classes were looked for, by name]
+- **Index:** [the graph queries run; or "graphify not installed, fell back to grep and read"]
+- **Changes meaning:** [N] things: [each one, and whether the plan edits it or changes what it means without editing it]
+
+*Structural*
+- **Backward:** [N] inbound sites across [M] files, each at `file:line`; traced out to [the boundary] because [why that edge cannot be disturbed]
+- **Edges that do not spell the name:** [fixtures, test doubles, DI registrations, route/command tables, config keys, scheduled jobs, string dispatch, found here; or "none found", with what was searched]
+- **Forward:** [N] callees and dependencies reached, and the constraints this plan inherits from them
+- **Dependency directions:** [what this depends on, what depends on it, and any direction this change reverses]
+
+*Functional*
+- **Flows changed:** [N], each end to end: [entry surface → observable effect → the seam test that covers it]
+- **Flows depended on:** [N]: [what must already hold, and in what order, for this to deliver its value]
+- **Logical couplings:** [invariants assumed here and about here, ordering relied on, state shared with code that has no edge to this]
+
+*Consolidation*
+- **Left unused:** [what becomes dead, and the phase that removes it; or "nothing"]
+- **Parallel systems:** [second pathway added and what collapses it; or "none; this unifies X and Y"]
+- **Abandoned without deciding to:** [what stops being reached, surfaced to the owner; or "nothing"]
+- **Reuse and extraction:** [what this reuses instead of rewriting; what it extracts for others to reuse, and the phase that does it; or "no extraction available", naming what was checked]
+- **Verdict:** [fewer ways to do this job afterwards, or more; if more, that it was put to the owner in those words]
+
+*Result*
+- **Disposition:** [N] already named in the plan · [N] added by this pass, in phases [...] · [N] out of scope, each with its reason and what happens if it is left alone
+- **Found:** [each defect Passes 2 and 3 turned up, one line each; or "nothing"]
+- **Changed:** [what was edited in this plan as a result; or "nothing"]
+- **Re-verification:** [what Pass 1's decision walk said about the additions, including any departure now recorded in Decision Source] · [what Pass 2 checked in the new text] · [how many trace rounds ran until one added nothing]
+- **Evidence:** [the greps, reads and probes this rests on, beyond the graph queries above]
+
+*Names, never values.* This block enumerates environment variables, connection targets, config keys and external services, and the plan is committed to the repo and read by every downstream model. Write `DATABASE_URL`, never what it is set to; write "the payments API", never the key that reaches it. WP-5's credential rule is about commands; this is the same rule for the trace's output, and the trace is the likelier leak because enumerating dependencies is exactly when a real value gets pasted in for concreteness.
+
 ## Test Commands
 *(the project's test-scope ladder, read by every build and review gate)*
 - **T1 focused:** [how a single test or one file's tests are run here]
@@ -213,7 +251,7 @@ Subagents multiply cost and latency: each one re-establishes context, re-explore
   - `[segment name, e.g. backend]` : [test command] + [type check / lint for that segment only]
   - `[segment name, e.g. frontend]` : [test command] + [type check / lint for that segment only]
 - **T4 full:** [the whole suite + every static gate, the command CI runs], measured wall time: [Ns]
-- **Cross-segment shared paths:** [files or modules that void a scoped run when touched, beyond `/test-scope`'s standing triggers]
+- **Cross-segment shared paths:** [files or modules that void a scoped run when touched, beyond `/test-scope`'s standing triggers. Take these from the Impact Analysis block rather than guessing at them: "what reaches this file" and "what a change to this file invalidates a scoped test run for" are the same question, and Pass 3 has already answered it]
 
 ## State & Data Contracts
 *(omit only if no persisted, cached, derived, or shared state is touched)*
@@ -291,7 +329,7 @@ The build model is fenced in: it builds what the plan names and halts rather tha
 
 So budget for one or two relaunches, and read a halt correctly when it arrives: it is almost always a defect in this document, not the build model underperforming. A halt reported with an accurate diagnosis and no workaround is the fence doing exactly its job, at the cheapest possible moment. The failure mode you are buying protection from is the opposite one — a model that hits your gap, routes around it inside the files you *did* name, and hands back something that passes every gate while doing the wrong thing.
 
-That protection is only as good as the plan's file list, which is why the caller sweep in Pass 2 below is not optional: a caller you failed to name is a gap the build model will hit and must halt on.
+That protection is only as good as the plan's file list, which is why Pass 3's impact trace below is not optional: a caller you failed to name is a gap the build model will hit and must halt on.
 
 ## When a build halt comes back
 
@@ -326,7 +364,7 @@ is how a wrong halt gets written into the contract.
      the misreading, and say explicitly that the plan's substance is unchanged.
 3. **Check the blast radius before writing the fix.** The thing that broke this phase usually
    breaks two later ones. Re-run the affected part of `/existing-mechanisms` question 1 and Pass
-   2's caller sweep against the change you are about to make, and look at every later phase that
+   3's impact trace against the change you are about to make, and look at every later phase that
    depends on it. A halt fixed one phase at a time, three times, is a decision-level problem being
    paid for in instalments.
 4. **Amend the plan, and log it.** Edit the phases the fix touches, then append the Amendment Log
@@ -349,7 +387,10 @@ is how a wrong halt gets written into the contract.
    can see what changed *and* what it changed from.
 5. **Re-run the affected review passes.** An amendment is new plan text and has had no review. Run
    Pass 1 against it if it touched contracts, failure modes, or phase ordering; run Pass 2 against
-   it always, because the amendment introduces new names and new commands.
+   it always, because the amendment introduces new names and new commands; and run Pass 3 against
+   it whenever the amendment changes what an existing symbol does, which is most amendments. An
+   amendment is a change to a plan that was already traced, so its impact is the part nobody has
+   looked at, and step 3 above only sized the blast radius of the fix you intended.
 6. **Hand the plan back, and say what changed.** Tell the builder which phases were amended and the
    amendment ID, and tell it to re-read the plan from disk rather than from its thread. A resumed
    build thread remembers the version it discussed, and that memory silently beats the file nobody
@@ -360,9 +401,13 @@ chat and let the builder carry on. Then the plan describes a system that no long
 code, the handoff reports a deviation nobody can trace, and the final drift audit has nothing to
 compare against. One paragraph now; days of archaeology later.
 
-## Before Saving — The Two-Pass Plan Review
+## Before Saving — The Three-Pass Plan Review
 
-Review the finished plan twice, with a different lens each time, and do not collapse them into one pass. They catch different classes of defect: Pass 1 catches a plan that is wrong, Pass 2 catches a plan that is right but unrunnable. **Both passes must complete before the plan is saved, and before the plan is activated (moved out of `new/`).**
+Review the finished plan three times, with a different lens each time, and do not collapse them into fewer. They catch different classes of defect: Pass 1 catches a plan that is wrong, Pass 2 catches a plan that is right but unrunnable, Pass 3 catches a plan that is right, runnable, and breaks something it never mentions. **All three passes must complete before the plan is saved, and before the plan is activated (moved out of `new/`).**
+
+**Why the third one cannot be folded into the second.** Passes 1 and 2 both read outward from the document: they take what the plan says and check it against the code. Pass 3 reads inward from the code, and everything it returns is something the plan does not say. That is a different starting set, not a higher standard of care, and a pass that starts from the plan's own list can never reach it however mechanically it is run. This is not hypothetical. The two-pass version of this review passed plans whose caller lists were at half their real size, and the gap surfaced only when a human thought to ask for the trace by hand. That is a question no user should have to know to ask, which is why it is a numbered pass here rather than a bullet inside another one.
+
+Passes 2 and 3 together are `/existing-mechanisms`' **second sweep** run against the plan. Pass 2 hunts the classes visible from inside the document, dropped requirements, duplicates, inert steps, drift. Pass 3 hunts the ones only visible from the codebase, missed callers, retirements that left something dangling, bifurcated pathways. The sweep's result is written once, after Pass 3, into the plan's **Impact Analysis** section, because Pass 3 is the pass that carries the counts.
 
 ### Pass 1 — Contracts & Architecture: *is this the right plan?*
 
@@ -387,12 +432,11 @@ Review the finished plan twice, with a different lens each time, and do not coll
 
 ### Pass 2 — Executability: *can a different agent run this exactly as written?*
 
-This is `/existing-mechanisms`' **second sweep**, run against the plan you just wrote. Assume the first pass missed things; it was run against the problem, this one is run against the text. Hunt the named classes rather than re-reading generically: dropped requirements, retirements that left callers or config dangling, duplicates, missed callers, bifurcated pathways, inert changes that do nothing unless a second one lands with them, drift from the decision document.
+The whole of this pass reads the document's own list back against the codebase: names, files, commands, criteria, one item at a time, mechanically and not from memory of having read the code an hour ago. Assume the analysis you ran before writing missed things; it was run against the problem, this is run against the text. Hunt the named classes rather than re-reading generically: dropped requirements, duplicates of something that already exists, inert steps, drift from the decision document.
 
-**Write its result block into the plan's Codebase Analysis**, in the shape that skill gives, counts included, and including when the sweep found nothing. A pass with no result recorded is a pass nobody can tell apart from one that was skipped, which is how this sweep comes to be run only when a user thinks to ask for it.
+**What is not answerable from inside the document is Pass 3's, and is not attempted here.** Above all, whether this plan changes something that code it never lists depends on. Asking that question with this pass's method returns the callers the plan already names and nothing else, and reads as a clean result. That is the miss, and it is structural rather than careless, which is why it survives however carefully this pass is run.
 
 - **Does every name in this plan exist?** Walk the file paths, functions, classes, signatures, routes, fixtures, config keys, and flags one by one and confirm each — or that it is marked **new**. This is a mechanical check; do it mechanically, not from memory of having read the code earlier.
-- **Does the plan name every caller of everything it changes?** Run the finished plan's own file and symbol list back against the codebase, and for each existing symbol the plan modifies, find what calls it — query the index where one exists, since a grep finds the name and the graph finds what reaches it. **Anything the plan touches whose callers are not in the plan is a gap.** This is the most common way a plan breaks a build: a function gains a keyword argument, seven test doubles call it at the old arity, and the plan's file list names none of them. **Count them; do not estimate them.** A plan that names four call sites where there are seven is built at four, and the three nobody counted surface as a halt at best. The sweep takes a minute here; the same defect costs a halt and a relaunch during build, and it is found by machine either way.
 - **Is any step inert without another one?** Two guards on consecutive lines, a flag read in two places, a check duplicated at the caller and the callee. Remove or change one and the behaviour does not move. Where a phase's effect depends on a second change, say so and require them built together; otherwise the phase goes green having done nothing, and the test that proves it passes either way.
 - **Does every command in this plan run?** Confirm the runner, the target path, and the flags in this repo. No invented harnesses, no assumed test runners.
 - **Is the Test Commands block real, rung by rung?** Run each one. A T2 selector you assumed exists but does not is worse than writing "none available", because the build model will try it, get an error or a silently empty selection, and decide for itself what to do instead. Segment static gates must be scoped to their segment: if the frontend row's type check also walks the Python tree, the block has not separated anything. And T4's wall time must be measured, not estimated: it is what decides whether this project uses the ladder at all.
@@ -400,10 +444,48 @@ This is `/existing-mechanisms`' **second sweep**, run against the plan you just 
 - Is every test criterion an exact command with an expected result — no vague "tests pass", no unjustified manual step?
 - Is there a section a build model could delete without losing a decision? Cut it. (This pulls against the question above on purpose — detail that resolves ambiguity earns its length; prose that restates earns nothing.)
 
+### Pass 3 — Impact & Blast Radius: *what does this break that the plan never mentions?*
+
+Trace forward and backward, end to end, from everything this plan changes the meaning of. Pinpoint the call sites, the callers and the callees, the dependencies and the dependants, structural and logical. Find what impacts this and what is impacted by it, the code and the functional flows both. Then ask what the codebase looks like afterwards: are we leaving anything unused, are we building a parallel system beside one that already exists, are we abandoning something without deciding to, are we increasing reuse or adding another flow, is there something here to extract and share. Then verify the plan again with what you found, before it goes anywhere.
+
+**Run it every time, unprompted.** The paragraph above is a user's version of this pass, and it works: asked by hand of a finished plan, it turns up real defects nearly every time, which is itself the proof that the pass was not run. So treat that question as a trigger rather than a request, per `/existing-mechanisms`' *"do not wait to be asked"*. If a human has to ask for it once, every plan handed over before they asked went out with the same class of defect still in it and nothing on the page to show it, because a trace answered from memory reads exactly like a trace that was walked.
+
+**1 · Build the start set: what changes meaning, not what changes lines.** The plan's "Files to modify" list is the output of this pass, never its input; starting there is what collapses it back into Pass 2. Enumerate instead everything whose *contract* this plan alters:
+
+- **What the plan edits.** Signatures, parameters and their arity, return types and shapes, raised or returned errors, ordering, defaults, names, routes, config keys, schema fields.
+- **What the plan changes without editing.** This is the half that gets missed, because nothing in the diff points at it: an enum or status field that gains a value, a file or payload one component writes and three parse, a default that flips, a timing or ordering other code relied on, a table another query reads, a lock or transaction boundary that moves, an invariant that used to hold. Nothing is edited at the far end and every reader of it is affected.
+- **What the plan retires.** Every row of the removal table from `/existing-mechanisms` question 5, whose whole risk is what is still reaching it.
+
+**2 · Trace all three axes. All of them, every time.** The method is `/existing-mechanisms`' **impact trace**; read it there, because this does not restate it. What is binding here is that the structural axis is a third of an answer and feels like a whole one, which is why the other two get dropped:
+
+- **Structural, what connects to this.** Backward: every call site, then *their* callers, out to a boundary you name and justify. Forward: every callee and what those depend on in turn. Both directions of structural dependency, including any this change reverses. **Include the inbound edges that never spell the name**, which is the part that decides whether this axis works at all: test doubles and fixtures, DI registrations, route and command tables, event and signal subscriptions, decorators, serialized or persisted references, config keys, scheduled jobs, anything dispatched by string. A grep finds the name; none of those spell it. **Count them and name them `file:line`. Never estimate.** A plan that says four call sites where there are seven is built at four, and the three nobody counted are found by a build failure or by nobody.
+- **Functional, what behaviour runs through this.** Every end-to-end flow the plan can alter, from entry surface to observable effect, and every flow it depends on to deliver its value. Plus the logical couplings that have no edge in any graph: invariants this code assumes and invariants other code assumes about it, ordering and timing something relies on, state written here and read somewhere with no reference to this file. **This is the axis that catches what the structural one cannot**: the flow that breaks while every call site still compiles. A plan whose structural trace is spotless can still change a default, add a status value, or move a transaction boundary, and break a flow nothing in the diff points at.
+- **Consolidation, what the codebase looks like afterwards.** Asked against the set you just traced, not against the design sketch, which is why the answers differ from the ledger's: what does this leave unused, and which phase removes it; is there already a mechanism doing this job under a name nobody searched for; does this abandon something without anyone deciding to, which is the one nobody chooses and so nobody catches; does it increase reuse or add another flow beside an existing one, and if it adds one, what collapses them back; is there something to extract and reuse, in either direction. **Finish this axis with a verdict in one word**: fewer ways to do this job afterwards, or more. "More" is an owner's decision and it gets said to them in those words, not left in a diff to be discovered.
+
+Walk the graph for the structural axis: `graphify query` to find the thing, its incoming edges for backward, its outgoing edges for forward, `graphify path "A" "B"` to confirm two things actually connect rather than assuming they do. Where graphify is not installed, say so once and fall back to grep and read; the trace is still required, it is just slower. The other two axes are not in the graph. They are found by reading, by following a flow end to end, and by asking what else believes this.
+
+The graph locates, the source decides: open the definition before the plan names anything you found there (WP-8).
+
+**3 · Dispose of every finding, from all three axes. Three outcomes, and there is no fourth.** A finding is a call site, a flow, a leftover, a bifurcation, or an extraction worth taking; each gets disposed of the same way.
+
+- **Already named** in the plan, with the phase that handles it.
+- **Added now.** The plan gains the file, the implementation step, and the test criterion that proves it. A flow gains the seam test that covers it (WP-7); a leftover gains a row in the removal table and the phase that deletes it; an extraction gains the phase that performs it, before the phases that consume it. If that changes what a phase contains it may change what a phase depends on, so re-check phase ordering against WP-10.
+- **Out of scope, with the reason written down**, and with what happens to it if it is left alone. "Unaffected" is a claim and it carries its evidence like any other: say why the change cannot reach it. A bifurcation left in deliberately says what would collapse it and when; an extraction declined says why now is not the moment.
+
+A finding with no disposition is the gap this pass exists to close. Leaving it out of the plan does not make it not break. It makes the break arrive during the build as a halt, or after it as a regression nobody connects back to this change, or never as a break at all, just as a second way of doing something that everyone after you has to maintain.
+
+**4 · Then verify the plan again with what you found.** The trace is worth nothing on its own; the plan is only sound once it has been re-read against the new information. New impacted files change the plan's scope, and scope changes reach further than the file list:
+
+- **Re-run Pass 1's decision walk over everything Pass 3 changed.** This is not bookkeeping, it is where the second class of defect lives. Impact findings routinely push a plan past what was decided: a caller you now have to fix drags in a component the decision document put out of scope, or forces the approach it ruled against, or quietly widens a narrowing the user chose deliberately. That is a departure, and it is recorded in Decision Source now, while it is one line. While the plan is still in `new/` the better answer is often to take it back to the user instead of recording a permanent departure from something they no longer intend (WP-14). A departure found here and left unwritten is the undocumented drift that blocks `/verify-completion` at the very end, with the code already built.
+- **Re-run Pass 2 over the text Pass 3 added.** New names and new commands have had no verification; they arrived after that pass finished.
+- **Then trace the sites you just added.** A file the plan did not name an hour ago has callers of its own. Iterate until a round adds nothing. Two rounds is normal, and stopping after one is only honest if that round changed nothing. **If a third round is still adding sites, stop tracing and say so**: a blast radius that keeps growing after two rounds is not a tracing problem to grind out, it is the plan being smaller than the change. That is a decision-level finding and it goes to the user in those words, the same way a build halt that turns out to be decision-level does. Report what you traced, how many rounds, and how many sites each one added, so the size of the thing is visible rather than asserted.
+
+**5 · Write the Impact Analysis block into the plan, counts included, including when the trace found nothing.** Use the plan template's shape above. It is a superset of *both* blocks `/existing-mechanisms` defines, the impact trace's and the second sweep's, so filling it once discharges both; do not also paste those two. A pass with no artifact is indistinguishable from a pass that was skipped, and the counts are the part that cannot be produced from memory, which is exactly why they are the part that is required. The block doubles as the build model's blast-radius map: it is where a builder looks to see whether the file it is about to change has readers its phase does not mention.
+
 ## What Happens Next
 
-After both review passes are complete and the human approves the plan:
-1. **Move it from `docs/plans/new/` to `docs/plans/`** using plain `mv` (not `git mv` — the plan file may not be tracked by git yet). This marks it as the active plan. Do this immediately upon approval, do not leave it in `new/`. A plan that has not been through both passes is not eligible for activation, no matter how approved it is.
+After all three review passes are complete and the human approves the plan:
+1. **Move it from `docs/plans/new/` to `docs/plans/`** using plain `mv` (not `git mv` — the plan file may not be tracked by git yet). This marks it as the active plan. Do this immediately upon approval, do not leave it in `new/`. A plan that has not been through all three passes is not eligible for activation, no matter how approved it is. Pass 3 is the one that gets skipped under approval pressure, and it is the one whose absence is invisible until the build halts.
 2. The user will choose one of two paths:
 
 **Path A — Same model continues to build:**

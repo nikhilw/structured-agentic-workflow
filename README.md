@@ -195,7 +195,10 @@ A small build model fills every silence with the happy path. So `/write-plan` fo
 expensive model to write the foresight *down*: failure modes, lifetimes, error codes and
 their owners, concurrency and aliasing, named seam tests per value path, and exact
 command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
-or marked new.
+or marked new. Then three review passes before it is saved, the last of which starts from the
+codebase rather than the document: trace backward and forward from everything the plan changes
+the meaning of, count the callers, and re-verify the plan against what turns up. A caller that
+breaks the build is never in the plan, so checking the plan's own names will not find it.
 
 **5 · Index-first codebase search, with the questions that go with it.**
 `/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/Graphify-Labs/graphify)
@@ -204,6 +207,13 @@ brainstorm is reimplementing something that already exists under a name nobody g
 `existing-mechanisms` makes the search into eight required answers: every caller, every related
 flow, what already does this job, whether you are extending or replacing it, what becomes dead code
 if you do, and whether you are quietly adding a second pathway beside the first.
+
+It also holds the **impact trace**, which both phases run and which has three axes rather than the
+one everybody runs. Structural is the call graph. Functional is the end-to-end flows, because a
+change can leave every call site compiling and still break the product. Consolidation asks what the
+codebase looks like afterwards: what is left unused, what got abandoned without anyone deciding to,
+whether this unifies two pathways or adds a third, and what should be extracted and reused. The
+structural axis feels like a finished answer, which is exactly why it is usually the only one run.
 
 **6 · Drift is measured, not hoped for.**
 Plans change during a build, and a feature that ends up somewhere other than where it was aimed is

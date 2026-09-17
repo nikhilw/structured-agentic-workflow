@@ -27,7 +27,7 @@ flowchart TD
 
     subgraph Plan ["2 · Plan — /write-plan · planning model"]
         P1["Codebase analysis<br/>pattern scan · security · state · failure modes<br/>+ removal table, if anything is removed"] --> P2["Write phased plan<br/>zero ambiguity for external models"]
-        P2 --> P3["Two-pass plan review"]
+        P2 --> P3["Three-pass plan review<br/>right? · runnable? · what else breaks?"]
         P3 --> P4["Save to docs/plans/new/"]
     end
 
@@ -74,7 +74,7 @@ flowchart TD
         R2 -- "fixable in place" --> R3["Fix issues"]
         R3 --> R4["Re-test<br/>scoped per /test-scope"]
         R4 --> R1
-        R2 -- "too many / systemic" --> RB["Rework Brief<br/>a brief is a plan: Pass 2 it first<br/>back to the build model,<br/>then re-review from Round 1"]
+        R2 -- "too many / systemic" --> RB["Rework Brief<br/>a brief is a plan: Passes 2 and 3 first<br/>back to the build model,<br/>then re-review from Round 1"]
         R2 -- "none" --> R5["Sign-off run<br/>FULL suite - T4,<br/>or cite this review's own"]
     end
 
@@ -131,10 +131,19 @@ The skill will:
   there, which patterns the codebase already uses, and whether the change unifies pathways or
   bifurcates them. These are the questions that used to have to be asked by hand, and they found
   something almost every time
+- Run the **impact trace** on each approach, which is how question 1 is actually answered: three
+  axes, not one. **Structural**, the call graph both ways, including the inbound edges that never
+  spell the name. **Functional**, the end-to-end flows this changes and the flows it depends on,
+  which is what catches the behaviour that breaks while every call site still compiles.
+  **Consolidation**, what the codebase looks like afterwards: what is left unused, what gets
+  abandoned without anyone deciding to, whether this unifies two pathways or adds a third, and what
+  should be extracted and shared. An approach costed against a third of its blast radius is how the
+  wrong one wins the comparison, and that is more expensive than any missing file list later
 - Surface **contracts and constraints** (authority, identity, currentness, lifecycle,
   consumers, environment) *before* proposing approaches, because a contract discovered later
   invalidates the comparison rather than one option
-- Propose 2–4 approaches spanning **minimal to structural**, with impact and blast radius
+- Propose 2–4 approaches spanning **minimal to structural**, each with its traced blast radius
+  rather than a paragraph of adjectives
 - Derive one more, always last and always required: **the ideal, then adjusted**. Start from the
   design this problem deserves in this project if nothing were yet committed, then walk it into the
   codebase that exists, recording each collision as a named adjustment with its cost. It is how you
@@ -174,8 +183,14 @@ explicit."
   owners, cancellation paths, cross-component interactions, concurrency and aliasing
 - A **named no-mock seam test for every value path** — green unit tests do not prove wiring
 - Decisive gates ordered **before** the work that depends on them
-- A **two-pass review** before saving: *is this the right plan?* then *can a different agent
-  run this exactly as written?*
+- A **three-pass review** before saving: *is this the right plan?*, then *can a different agent
+  run this exactly as written?*, then *what does this break that the plan never mentions?* The
+  third pass is the only one that starts from the codebase instead of from the document, which is
+  why it is a pass of its own: it traces backward and forward from everything the plan changes the
+  meaning of, counts the call sites, disposes of each one, and then re-verifies the plan against
+  what it found, recording the whole thing in the plan's **Impact Analysis** block with counts
+  rather than adjectives. A caller that breaks the build is not in the plan, so no amount of
+  checking the plan's own names will ever return it
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it, with every departure named. Pass 1 walks that mapping line by line
 - A **removal table** whenever the plan takes anything out: one row per removal, naming what it
