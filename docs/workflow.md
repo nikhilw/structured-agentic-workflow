@@ -184,7 +184,8 @@ explicit."
 - An **Amendment Log**, empty at first, which is where every later change to the plan is recorded
 
 **On approval:** move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` — not
-`git mv`, since the plan file may not be tracked yet.
+`git mv`, since the plan file may not be tracked yet. That move is also what freezes the decision
+document: freely editable until it happens, append-only and user-amended-only afterwards (AW-27).
 
 ### The plan directory lifecycle
 
@@ -270,7 +271,9 @@ Then the loop closes on the planning side:
    one as a phase amendment is the single largest source of drift in this workflow. A builder error
    gets a clarification, and an explicit note that the plan's substance is unchanged.
 3. **Amend the plan and log it** in the plan's Amendment Log: trigger, what was reported, what
-   changed, decision impact, scope impact.
+   changed, decision impact, scope impact. If it supersedes something in the decision document,
+   name that decision here and put the change of intent to the user; the planning model does not
+   write to the decision document either.
 4. **Re-review the amendment** (it is new plan text that nobody has reviewed) and hand it back,
    telling the builder to re-read from disk rather than from its thread.
 

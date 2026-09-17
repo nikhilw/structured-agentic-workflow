@@ -37,7 +37,7 @@ Write a detailed, phased implementation plan for: **$ARGUMENTS**
 - **WP-11 · Each phase should deliver an observable slice.** Prefer a phase that carries the change through to the outermost surface it touches — backend → API → UI, or command → output — over one that stops at a layer boundary with nothing to look at. Layer-by-layer phases pass their tests individually and still deliver nothing, and the gap only surfaces at the end. Where a phase genuinely cannot reach the surface, say what proves it works instead, and make the very next phase the one that closes the loop.
 - **WP-12 · You own the plan document; the build model never edits it.** The build model halts and reports; you assess, decide, and amend. That split is what keeps the plan a contract instead of a running commentary, and it is what makes drift measurable later. See "When a build halt comes back" below.
 - **WP-13 · Every change to an approved plan gets an Amendment Log entry, written before the plan goes back.** An unlogged edit is indistinguishable from the plan having always said that, which is exactly the state that costs days to untangle at the end. The log is append-only: correcting an amendment means adding an entry, never editing one.
-- **WP-14 · Carry the decision document into the plan, and name every departure.** Fill in the Decision Source section from `docs/discussions/`. If the plan does something the decision ruled out, that is a departure and it is written down here, now, while it is one line. `/verify-completion` reads the decision doc against the plan line by line at the end; every departure you did not record surfaces there as undocumented drift, and blocks the completion claim.
+- **WP-14 · Carry the decision document into the plan, and name every departure.** Fill in the Decision Source section from `docs/discussions/`. If the plan does something the decision ruled out, that is a departure and it is written down here, now, while it is one line. `/verify-completion` reads the decision doc against the plan line by line at the end; every departure you did not record surfaces there as undocumented drift, and blocks the completion claim. Until the plan leaves `docs/plans/new/` the decision document is still live: if a departure is really a sign the decision was wrong, take it back to the user and let them correct the document itself, rather than recording a permanent departure from something they no longer intend. After approval that door closes and AW-27 governs.
 - **WP-15 · Length comes from resolved decisions, not prose.** "Hyper-granular" is an instruction about *decision density*, not word count. Every file path, signature, error code, and test assertion earns its space — that specificity is the whole contract. Padding does not: restated context, redundant summaries, motivational framing, the same decision explained in three places, or a template section left in with nothing under it. A plan is long because the work has many decisions, never because the writing is loose. If a paragraph carries no decision the build model needs, cut it.
 
 ## Before Writing the Plan — Codebase Analysis
@@ -331,11 +331,15 @@ is how a wrong halt gets written into the contract.
    paid for in instalments.
 4. **Amend the plan, and log it.** Edit the phases the fix touches, then append the Amendment Log
    entry: trigger, what was reported, what changed, decision impact, scope impact. If the amendment
-   supersedes something in the decision document, name that decision in the entry **and append the
-   matching Amendments entry to the decision document itself**, now, while you know why. That pair
-   of entries is what `/verify-completion`'s drift audit reads; reconstructing it at the end, from a
-   plan and a codebase that have both moved, is the days-long archaeology this whole loop exists to
-   avoid.
+   supersedes something in the decision document, name that decision in the entry, then **stop and
+   put AW-27's ask to the user**: quote what the decision document says, say what upholding it would
+   cost, and let them state the new intent in their own words. **You do not write to the decision
+   document.** It records their intent, not your finding, and a halt is not authority to change it.
+   If they declare the change, append *their words* there under the original; if they do not, the
+   decision stands and the plan is amended to work within it. Raise it now, while you know why: that
+   pair of entries is what `/verify-completion`'s drift audit reads, and reconstructing it at the
+   end, from a plan and a codebase that have both moved, is the days-long archaeology this whole
+   loop exists to avoid.
 
    **Append; never rewrite what a decision said.** The decision document records what was decided
    at the time, and a superseded decision is still what was decided. Add an entry underneath

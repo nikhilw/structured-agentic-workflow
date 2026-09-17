@@ -287,14 +287,22 @@ later reader checks the shipped code against, so keep the answers, not a summary
 - [What to watch for / revisit if assumptions change]
 
 ## Amendments
-*(appended later, by `/verify-completion`'s drift audit or by the planning model when a build halt
-supersedes something decided here. Empty at the time of writing.)*
+*(Empty at the time of writing, and it stays empty while this document is still live: until the
+plan moves out of `docs/plans/new/`, edit the document freely and leave this section alone. A
+change of mind before that point is not an amendment, it is content, and it belongs in Approaches
+Considered. After that move the document is append-only and only the user amends it — a gate
+proposes, the user declares, and the entry carries their words. See AW-27.)*
 ```
 
 This document is not a record of a conversation; it is the **baseline** the whole feature is later
 measured against. `/write-plan` maps each decision here into the plan, `/3p-review` reads it as
 binding, and `/verify-completion` compares it line by line against what actually shipped. Write it
 so a reader who was not in the session can tell whether the shipped code is still what was decided.
+
+What it records is **intent** — what the user set out to achieve and what they ruled out — which is
+why they are the only one who can change it once anything has been approved against it. Every gate
+downstream may find that reality disagrees with this document; none of them may resolve that by
+editing it (AW-27).
 
 ## What Happens Next
 
