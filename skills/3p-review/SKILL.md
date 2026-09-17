@@ -241,6 +241,11 @@ Severity sets *priority*, not whether it gets fixed — everything gets fixed:
 
 **If ANY findings of ANY severity remain — first decide who fixes them.**
 
+**Findings you are fixing yourself go to the ledger; the user gets one line** (AW-28): the counts by
+severity, who is fixing them, and that nothing is needed from them. The full round goes to them when
+they have to rule, which is when a Rework Brief goes back, when a finding changes the plan or the
+decision document, or when the review exits.
+
 Fixing them yourself is the default. Send the work back to the build model when any of these hold:
 
 - more than roughly **8 open findings**, or findings spanning more than half the phases;

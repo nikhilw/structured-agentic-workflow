@@ -348,15 +348,15 @@ amendment looks like a change of direction.
 
 Three comparisons:
 
-- **D1, decision document → the plan as it now stands.** Every decision is disposed of as upheld,
+- **DecisionDoc → Plan.** Every decision is disposed of as upheld,
   deliberately narrowed, superseded with an Amendment Log entry naming it, or **dropped**, which is
   the finding. Two lines get checked by name: the decision document's *"what would reverse this
   decision"* condition, in case the build discovered exactly that and patched around it; and its
   Open Questions, each of which is answered or still carried, never quietly abandoned.
-- **D2, the plan as approved → the plan as it now stands.** Every difference has a log entry. The
+- **Plan → Plan**, approved against current. Every difference has a log entry. The
   baseline is the plan file's git history where it is tracked, since that is the one record that
   cannot be edited after the fact.
-- **D3, decision document → what actually shipped.** The round trip. Does the code solve the
+- **DecisionDoc → Code.** The round trip. Does the code solve the
   problem that was decided, or a neighbouring one? Would the approach comparison still choose this
   approach, knowing what the build found out? Did the amendments add up to a different approach
   than the one chosen, without any single entry saying so?
@@ -374,9 +374,15 @@ a reader can still see what was decided *and* what happened instead. If they rej
 in the work and it goes back to build. A verdict of UNDOCUMENTED DRIFT describes what the build
 did, and writing something down afterwards does not turn it into DOCUMENTED DRIFT.
 
-To make that checkable rather than merely promised, the audit starts at **D0**: read the decision
-document from version control, compare it against the working copy, and report any difference. An
-edit to the Decision or Consequences sections with no Amendments entry is itself a finding.
+To make that checkable rather than merely promised, the audit starts at the **baseline**: read the
+decision document from version control, compare it against the working copy, and report any
+difference. An edit to the Decision or Consequences sections with no Amendments entry is itself a
+finding.
+
+The report leads with the differences, not with the comparisons that found them. A departure is one
+row with the decided text quoted on one side and what was built on the other, so the owner can rule
+on it without opening either document; everything that checked out is evidence and sits at the
+bottom.
 
 Then move the plan from `docs/plans/` to `docs/plans/done/` with plain `mv`.
 

@@ -138,10 +138,17 @@ a problem to tidy up. "Never edit the baseline" below is the full rule; read it 
 comparing, not after you have found something.
 
 **If no decision document exists** (a bug fix, a quick fix, or a plan written without a brainstorm),
-say so explicitly and run D2 and D3 against the plan alone. Silence about a missing decision doc
-reads as "checked, matched".
+say so explicitly and run the two plan comparisons against the plan alone. Silence about a missing
+decision doc reads as "checked, matched".
 
-### D0 — Establish the baseline before you read anything against it
+**Label things with what they are.** The four comparisons below are named for the two documents
+they read, because that is the only name a reader can decode without this file in front of them.
+Never invent a short code for them, and never let a label stand in for a finding: "3 upheld, 1
+widened" is a tally of findings with the findings removed, while "the endpoint check accepts any
+OpenAI-format server, and the decision document says a local host process" is the finding. Part 4
+is the shape the output takes.
+
+### Baseline: is the decision document still the one that was agreed?
 
 The audit is only worth what its baseline is worth, so fix the baseline first and say where it came
 from.
@@ -157,7 +164,7 @@ from.
   anyone could have edited at any time, which weakens every conclusion below, and the human should
   know that before reading the verdict.
 
-### D1 — Decision document → the plan as it now stands
+### DecisionDoc → Plan: what was decided, against the plan as it now stands
 
 Read the decision document and the current plan side by side. For every decision in the document,
 and every consequence it recorded:
@@ -169,6 +176,12 @@ and every consequence it recorded:
 | **Superseded** | the plan does something the decision ruled out | only with an Amendment Log entry naming the decision it supersedes |
 | **Dropped** | the decision is simply absent from the plan | **no**, this is the finding |
 
+**Record both sides as you go, and quote them.** The disposition word is your judgment about a
+difference; it is not the difference. Write down the decided text in the words it was decided in,
+and what the plan or the code does instead, with the file and line where it does it. Do it while
+both documents are open, because reconstructing the quote later is what turns a finding into
+"narrowed" and loses the only part the human needed.
+
 Also check the two lines of the decision document that age fastest:
 
 - **"What would reverse this decision."** The document named the condition under which the
@@ -178,7 +191,7 @@ Also check the two lines of the decision document that age fastest:
 - **Open Questions.** Each is answered, or still open and carried forward in writing. An open
   question that quietly stopped being asked was answered by whoever wrote the code.
 
-### D2 — The plan as approved → the plan as it now stands
+### Plan → Plan: the approved plan, against the plan as it now stands
 
 Every difference must have an entry in the plan's **Amendment Log**. Establish the approved
 baseline in this order, and say which one you used:
@@ -191,10 +204,10 @@ baseline in this order, and say which one you used:
 If the plan was never tracked and the log is empty while the code plainly implements something the
 plan does not describe, that absence *is* the finding. Write it that way.
 
-### D3 — Decision document → what actually shipped
+### DecisionDoc → Code: what was decided, against what actually shipped
 
-The round trip, and the one that catches what D1 and D2 individually cannot. Read the decision
-document's **Problem** statement, then read the code. Answer in your own words:
+The round trip, and the one that catches what the two comparisons above cannot on their own. Read
+the decision document's **Problem** statement, then read the code. Answer in your own words:
 
 - Does what shipped solve the problem that was decided, or a neighbouring one?
 - Would the approach comparison in that document still choose this approach, knowing what the build
@@ -205,13 +218,14 @@ document's **Problem** statement, then read the code. Answer in your own words:
 The third question is the point of this gate. Six reasonable amendments can add up to Approach C
 while every entry in the log reads like a detail.
 
-**A "yes" to any D3 question goes to the human, even when every amendment is logged.** Perfect
+**A "yes" to any of those three goes to the human, even when every amendment is logged.** Perfect
 bookkeeping and a feature that ended up somewhere nobody chose are entirely compatible states, and
 this is the last moment anyone is looking at both documents at once.
 
 **Scale the audit to what actually moved.** A plan with an empty Amendment Log and a decision
-document it never departed from is audited in minutes: D2 is trivially clean, and D1 and D3 are one
-careful read of two documents you already have open. The work grows with the drift, which is the
+document it never departed from is audited in minutes: the plan-against-plan comparison is trivially
+clean, and the two decision-document reads are one careful pass over documents you already have
+open. The work grows with the drift, which is the
 correct shape; if this gate feels expensive, that is the feature telling you something.
 
 ### Never edit the baseline to make the drift go away
@@ -220,8 +234,8 @@ correct shape; if this gate feels expensive, that is the feature telling you som
 difference, and the cheapest-looking move will be to change the decision document so it matches
 what was built, then report no drift. Do not do it. Rewriting the baseline does not remove drift;
 it destroys the only evidence that drift happened, and it produces a false clean verdict that every
-later reader believes. The whole feature was measured against that document. An auditor who edits
-it has stopped being an auditor.
+later reader believes. The whole feature was measured against that document. The moment you edit
+it, you are no longer measuring anything.
 
 Concretely, during this gate you may not:
 
@@ -275,41 +289,85 @@ it was ever a different one.
 
 # Part 4 — The completion report
 
+You are writing to the person who asked for the feature, and the only question they have is *did I
+get what we agreed, or not*. Answer that first, in their words. Three rules:
+
+- **Bad news first.** What is wrong opens the report. Everything that checked out is evidence, and
+  evidence goes at the bottom. Nobody should have to read a clean checklist to discover that the
+  thing they asked for is not there.
+- **Show both sides of every difference.** Quote what was decided, in the words it was decided in,
+  then say what was built instead and where it lives. "Narrowed", "half-implemented" and "widened"
+  are your labels for a difference, not the difference; a reader cannot rule on a label. One row,
+  two columns, both filled.
+- **Say it in the words of the work, not the words of this skill.** Section names, check names and
+  internal shorthand mean nothing outside this file. The verdict keyword and the rung on the suite
+  line are the only terms that travel, and each gets a plain sentence next to it.
+
+If there is no decision document, the first section says exactly that, because "nothing departed
+from what we decided" and "nothing recorded what we decided" look identical on a page and are not
+the same finding.
+
 ```markdown
 ## Completion Verification
 
 **Claim:** [what is being claimed complete]
-**Plan:** [path]   **Decision doc:** [path, or "none"]
+**Plan:** [path]   **Decision doc:** [path, or "none, so there is no record of what was decided"]
 
-### Suite
-- **[run name]** (rung T4) → exit [code], [N passed, M failed, K skipped]
-- [Fresh, or: cited from /3p-review's sign-off run; tree proven unchanged by git status and git diff]
+### Status: COMPLETE / NOT COMPLETE
+[One line, in the owner's terms: what is wrong, or that nothing is. If the drift verdict is not NO
+DRIFT, name it here in a clause: "...and nobody wrote that down before this gate (UNDOCUMENTED
+DRIFT)."]
 
-### Requirements (plan → code)
+### What we decided and did not build
+[Every departure from the decision document, one row each. Or: "Nothing. Every decision in [doc] is
+in the code as written."]
+
+| We decided | We built instead | Where | Was it written down before this gate? |
+|---|---|---|---|
+| "[quoted from the decision doc]" ([which section]) | [what the code actually does, plainly] | [file:line] | no, found here / yes, [amendment entry] |
+
+### What we built and nobody decided
+[Capability that widened past what was decided, scope the plan never carried, a plan step with no
+amendment behind it. Same two columns, same quoting. Or "Nothing."]
+
+### What the plan asked for and is not there
+[Requirements not built; requirements built but unproven; capabilities removed whose named
+replacement never landed, and deletions no removal table named. Or "Nothing."]
+
+| The plan asked for | What is actually there | Proven by |
+|---|---|---|
+| [requirement / contract line / seam test / removal-table row] | not built / built, nothing proves it / replacement never landed | [run name, or why nothing proves it] |
+
+### Your call
+[Numbered, one line each, cheapest first. What needs a ruling, and what each choice costs. Or
+"Nothing needs a ruling."]
+
+### Evidence
+**Suite:** [run name] (rung T4, the full suite) → exit [code], [N passed, M failed, K skipped].
+[Fresh, or: cited from /3p-review's sign-off run; tree proven unchanged by git status and git diff.]
+
+**Every requirement, including the ones that passed:**
+
 | Requirement | Status | Evidence |
 |---|---|---|
 | [phase / criterion / contract line / seam test] | built and proven / built but unproven / not built | [run name, or why not] |
 
-**Unproven or missing:** [each row that is not "built and proven", or "none"]
-**Built but not in the plan:** [scope that grew, or "none"]
-**Removed without a replacement:** [each removal whose replacement did not land, and each deletion
-no removal table named, or "none"]
-
-### Drift (decision → plan → code)
-- **D0 baseline:** [decision doc read from git at <ref> / untracked, working tree only] — [working
-  copy matches the committed version, or: what differs and whether an Amendments entry covers it]
-- **D1 decision doc → plan:** [upheld / narrowed / superseded with entry ID / dropped]
-- **D2 approved plan → current plan:** [every difference and its Amendment Log entry; baseline used]
-- **D3 decision doc → shipped code:** [does it still solve the decided problem; did the reversal
-  condition come true; did the amendments add up to a different approach]
-
-**Verdict:** NO DRIFT / DOCUMENTED DRIFT / UNDOCUMENTED DRIFT
-**Documents I changed during this gate:** [none, or: the appended Amendments entry, after the human
-accepted it, quoting what they said. Nothing else, ever. "None" is the normal answer.]
-**Record still to close:** [what the human has not yet ruled on, or "nothing"]
-
-### Status
-COMPLETE / NOT COMPLETE — [one line]
+**What the drift audit compared:**
+- **Baseline:** decision document read from [git at <ref> / the working tree only, because it is
+  untracked]; working copy [identical to the committed version / differs: what, and whether an
+  Amendments entry covers it]. Plan baseline: [git history / the Amendment Log read as a claim /
+  the handed-off copy].
+- **DecisionDoc → Plan:** [N] decisions read, [N] upheld, [N] narrowed, [N] superseded, [N] dropped.
+  Each departure is a row above.
+- **Plan → Plan:** [each difference from the approved plan and the Amendment Log entry behind it,
+  or "none"].
+- **DecisionDoc → Code:** [does the code solve the problem that was decided; did the document's
+  "what would reverse this decision" condition come true during the build; did the amendments add
+  up to an approach nobody chose].
+- **Verdict:** NO DRIFT / DOCUMENTED DRIFT / UNDOCUMENTED DRIFT
+- **Documents I changed during this gate:** [none, or: the appended Amendments entry, after the
+  human accepted it, quoting what they said. Nothing else, ever. "None" is the normal answer.]
+- **Record still to close:** [what the human has not yet ruled on, or "nothing"]
 ```
 
 If the verdict is UNDOCUMENTED DRIFT, or any requirement is "not built", the status is **NOT
@@ -331,6 +389,7 @@ COMPLETE** until the record is closed or the human accepts the gap in writing.
 | Built what we decided | The drift audit, all three comparisons | The plan being followed |
 | Nothing was lost | The removal table walked against the diff, each replacement found | The suite passing after the deletion |
 | No drift | Both documents read as they stand, differences named | The documents agreeing after you edited one |
+| A difference is reported | The decided text and the built behaviour quoted side by side | A disposition word, a check name, or a count of them |
 
 ## Red flags, stop
 
@@ -339,6 +398,9 @@ COMPLETE** until the record is closed or the human accepts the gap in writing.
 - About to commit, push, or open a PR without running this gate
 - Trusting an agent's or another model's success report
 - Relying on a partial run, or on a scoped rung described in full-suite words
+- Writing "narrowed", "partial", "widened" or "half-implemented" without the decided text and the
+  built behaviour beside it
+- A report that opens with what passed
 - **Reaching for the decision document or the plan with an edit in mind while the audit is running**
 - Noticing that a document "just needs updating" to match the code
 - "Just this once"
@@ -364,6 +426,7 @@ COMPLETE** until the record is closed or the human accepts the gap in writing.
 | "The decision was clearly superseded, so the old text is just wrong now" | Superseded text is the evidence. It stays, and the amendment goes below it |
 | "It's only a wording fix to the old decision" | There are no wording fixes to a baseline during an audit |
 | "Nothing went red when we removed it" | The tests for it were removed too. Name the capability, not the suite |
+| "The report is accurate" | Accurate and unreadable is a failed report. If the owner cannot see what they decided next to what they got, you have not told them |
 
 ## Key patterns
 

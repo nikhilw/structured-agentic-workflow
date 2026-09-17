@@ -121,6 +121,36 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 
   - **Silence is not consent.** An unanswered question leaves the document untouched and the decision standing.
 
+- **AW-28 · Speak when the human has to act. The rest is one line.** Before emitting anything,
+  answer one question: is there something they must do, decide, or know to stop a wrong thing from
+  landing? If yes, that goes in the first line and the report follows. If no, they still get told
+  what happened, in **one line**: what you found, what you are doing about it, and that nothing is
+  needed from them.
+
+  > found 3 critical, 2 major, sending back to cursor with fixes aligned with decision-doc intent.
+  > No action needed from you.
+
+  That is the whole of a no-action update. A round that finished, a round that starts next, findings
+  you are about to fix yourself, a run still going, what a later gate will or will not accept: each
+  is part of that one line at most, never paragraphs of it. Narrating them at length is seeking
+  approval nobody asked you to seek, and it costs the reader the one item they actually had to act
+  on.
+
+  - **When the human does have to act, the report opens with the ask.** Then what is wrong, ordered
+    by what it costs them to be wrong about. Everything that went as expected is evidence and goes
+    underneath, if it goes in at all.
+  - **Brevity is not achieved by shrinking the bad news.** Cut the narration, never the finding. A
+    real problem written as a footnote, a parenthetical or a hedge ("minor", "worth a look
+    sometime") is the more expensive failure, because the short report and the honest one look
+    identical at a glance and only one gets acted on.
+  - **Nothing gets mentioned unsized.** If it is worth a sentence, it is worth saying what it breaks
+    and what it costs to fix. Anything that turns out to matter more than the sentence implied was
+    hand-waved, whatever the intent was.
+  - **The asks this workflow does have are real and are not suppressed by this rule:** a build halt,
+    a Rework Brief handed back, a decision-document departure (AW-27), a capability being removed
+    (AW-26), a gate verdict that blocks completion, the level you are returning to (AW-25). Those
+    exist because the human must rule. Progress does not.
+
 ## Plan Directory Lifecycle
 
 - **`docs/plans/new/`** — Brainstormed and written, not yet started. Staging area.

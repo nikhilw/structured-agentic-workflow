@@ -126,6 +126,11 @@ is how the gap ships.
 
 ## How to answer
 
+- **Count the set, then list it.** Every answer about a set of things carries the size of the set
+  and the members: "7 call sites in 5 files" with the files named, not "all callers updated" and
+  not "the callers are handled". A count is checkable by the next reader and an adjective is not,
+  and the gap between a set you enumerated and a set you characterised is exactly where the
+  half-sized blast radius lives. If you did not count, say you did not count.
 - **Every answer names its evidence.** "Checked, looks fine" is not an answer. Say what you ran or
   read: the graph query, the grep, the file you opened, the probe you executed. `/brainstorm`'s
   evidence tiers apply here exactly as they do everywhere else; a claim from docs or comments is
@@ -145,10 +150,12 @@ evidence. Collapse the ones that genuinely do not apply onto a single "does not 
 ```markdown
 ### Existing Mechanisms
 1. **Callers and calls:**
-   - *backward:* [direct callers → their callers, to the boundary named here; plus the inbound
-     edges that do not spell the name] *(evidence: graph incoming edges / grep / read)*
-   - *forward:* [what it calls, and what those depend on: modules, tables, queues, services, env]
-     *(evidence: graph outgoing edges / read)*
+   - *backward:* [N] sites in [M] files: [each one, file:line; direct callers → their callers, to
+     the boundary named here; plus the inbound edges that do not spell the name]
+     *(evidence: graph incoming edges / grep / read)*
+   - *forward:* [N] dependencies: [each one; what it calls, and what those depend on: modules,
+     tables, queues, services, env] *(evidence: graph outgoing edges / read)*
+   - *boundary:* [where you stopped tracing outward, and why that edge cannot be disturbed]
 2. **Scope beyond the entry point:** [related methods and flows that reach the same thing]
 3. **Already exists:** [the mechanism that already does this, or what was searched for and not found]
 4. **Relationship to the incumbent:** [extend / replace / abandon] + [why]
@@ -185,9 +192,31 @@ confirming the first.
 - **Give yourself permission to reverse.** A sweep that can only confirm is not a sweep. Finding
   four defects in your own finished work is the mechanism paying for itself, not a failure.
 
+**A sweep that emits nothing did not happen.** Write the result down every time, including when it
+is clean, in this shape:
+
+```markdown
+**Second sweep**
+- *Hunted:* [which of the named classes above, by name]
+- *Walked:* [N] names and files out of the document, both directions; [N] call sites found against
+  the [N] the document claims
+- *Found:* [each defect, one line; or "nothing"]
+- *Changed:* [what was edited as a result; or "nothing"]
+```
+
+The counts are the part that cannot be produced from memory, which is why they are the part that is
+required. "I re-checked and it looks right" is the output of a sweep that was never walked, and it
+is indistinguishable on the page from one that was.
+
 **"Anything else you would rethink?" is a trigger, not a question.** When a human asks it, or when
 you are about to hand work over as done, re-run the sweep for real. Answering it from memory is the
 single cheapest way to waste the most valuable question anyone will ask you.
+
+**And do not wait to be asked.** When that question reliably finds defects, the sweep before it was
+not run, whatever was reported. The human's version of it works because it names the evidence to
+produce: trace the calls forward and backward, pinpoint the call sites, say what impacts this and
+what is impacted by it. That is this sweep, in a user's words. Producing it only when prompted
+means every unprompted handover shipped the version with the defects still in it.
 
 ## Where this is answered
 
