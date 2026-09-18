@@ -74,7 +74,7 @@ flowchart TD
         R2 -- "fixable in place" --> R3["Fix issues"]
         R3 --> R4["Re-test<br/>scoped per /test-scope"]
         R4 --> R1
-        R2 -- "too many / systemic" --> RB["Rework Brief<br/>a brief is a plan: Passes 2 and 3 first<br/>back to the build model,<br/>then re-review from Round 1"]
+        R2 -- "too many / systemic" --> RB["Rework Brief<br/>a brief is a plan: trace, then verify<br/>back to the build model,<br/>then re-review from Round 1"]
         R2 -- "none" --> R5["Sign-off run<br/>FULL suite - T4,<br/>or cite this review's own"]
     end
 
@@ -183,16 +183,19 @@ explicit."
   owners, cancellation paths, cross-component interactions, concurrency and aliasing
 - A **named no-mock seam test for every value path** — green unit tests do not prove wiring
 - Decisive gates ordered **before** the work that depends on them
-- A **three-pass review** before saving: *is this the right plan?*, then *can a different agent
-  run this exactly as written?*, then *what does this break that the plan never mentions?* The
-  third pass is the only one that starts from the codebase instead of from the document, which is
-  why it is a pass of its own: it traces backward and forward from everything the plan changes the
-  meaning of, counts the call sites, disposes of each one, and then re-verifies the plan against
-  what it found, recording the whole thing in the plan's **Impact Analysis** block with counts
-  rather than adjectives. A caller that breaks the build is not in the plan, so no amount of
+- A **three-pass review** before saving, in this order: *what does this break that the plan never
+  mentions?*, then *is this the right plan?*, then *can a different agent run this exactly as
+  written?* The impact pass goes first because it is the only one that starts from the codebase
+  instead of the document, and the only one that changes what the plan contains: it traces backward
+  and forward from everything the plan changes the meaning of, counts the call sites, disposes of
+  each one, and records the whole thing in the plan's **Impact Analysis** block with counts rather
+  than adjectives. Running it last, as this review once did, meant the two passes before it had
+  judged a plan that was about to change. A caller that breaks the build is not in the plan, so no amount of
   checking the plan's own names will ever return it
 - A **Decision Source** section mapping every decision in the decision document to the phase that
-  carries it, with every departure named. Pass 1 walks that mapping line by line
+  carries it. The contracts pass walks that mapping line by line. Before approval, a difference from the
+  decision document is a question for the owner rather than a departure — departures are only what
+  is left standing after they have answered
 - A **removal table** whenever the plan takes anything out: one row per removal, naming what it
   did, what replaces it, and what is lost. A blank replacement cell is a capability the plan is
   giving up, and that is the owner's call to make, not a detail to discover in the diff
@@ -201,6 +204,12 @@ explicit."
 **On approval:** move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` — not
 `git mv`, since the plan file may not be tracked yet. That move is also what freezes the decision
 document: freely editable until it happens, append-only and user-amended-only afterwards (AW-27).
+
+It is the line the vocabulary turns on, too. *Departure* and *amendment* both name a difference
+from something already approved, so while the plan is still in `new/` there are none of either —
+drafting is still deciding. A place where the plan has moved away from the decision document is an
+open question, and it goes to the owner before they approve, not into the plan as a permanent
+record of divergence from something they may no longer intend (WP-14, WP-13).
 
 ### The plan directory lifecycle
 
@@ -216,6 +225,13 @@ Plans accumulating in `new/` is a feature. They are *pre-invested design work* w
 the right moment — you can brainstorm three in the morning and build them in the afternoon.
 With AI-assisted development "later" means minutes or hours, so accumulating plans is
 *staging* work, not deferring it.
+
+**These, the decision document, and the code are where this workflow writes.** Everything else it
+produces — the Build Halt Report, the build completion report, the review ledger and sign-off, a
+Rework Brief, the handoff summary, the completion report — is a format for what a model *says*, to
+you or to the next model, and is emitted into the conversation rather than saved. A gate that
+invents a report file invents its path too, and what it leaves behind is a document no gate reads
+and nobody can later date or trust (AW-29).
 
 ## Step 3 — Build
 

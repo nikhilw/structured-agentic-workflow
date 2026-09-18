@@ -204,6 +204,16 @@ baseline in this order, and say which one you used:
 If the plan was never tracked and the log is empty while the code plainly implements something the
 plan does not describe, that absence *is* the finding. Write it that way.
 
+### The scenario table, if the decision document has one
+
+A decision that moved a rule carries a table of cases with the outcome decided for each (BS-13),
+and it is the only part of the decision document that ticks off mechanically rather than being read
+for intent. Take each **differing** row, find what the code now does in that case, and compare. A
+row labelled *collateral* is the one to check hardest: it was a behaviour change nobody asked for,
+the user accepted it explicitly, and it is the likeliest thing in the whole document to have been
+built as though it had never been decided. A row whose built behaviour does not match its decided
+outcome is a drift finding like any other, and it is reported with both cells quoted.
+
 ### DecisionDoc → Code: what was decided, against what actually shipped
 
 The round trip, and the one that catches what the two comparisons above cannot on their own. Read
@@ -244,6 +254,11 @@ Concretely, during this gate you may not:
   entry;
 - change, reword or delete any part of the plan, including existing Amendment Log entries;
 - do any of the above and then report a better verdict.
+
+**Where this gate writes, and that is all of it:** an `## Amendments` entry appended to the end of
+the decision document and the matching entry appended to the plan's Amendment Log — both only
+after the human has ruled — and the `mv` that moves the plan to `done/`. The completion report
+itself is said, not saved (AW-29).
 
 **The verdict is a fact about what the build did, not about what the documents say right now.** If
 the work departed from a decision and nobody recorded it, that is UNDOCUMENTED DRIFT, and it stays
@@ -290,7 +305,8 @@ it was ever a different one.
 # Part 4 — The completion report
 
 You are writing to the person who asked for the feature, and the only question they have is *did I
-get what we agreed, or not*. Answer that first, in their words. Three rules:
+get what we agreed, or not*. Answer that first, in their words. The report is said, not saved
+(AW-29). Three rules:
 
 - **Bad news first.** What is wrong opens the report. Everything that checked out is evidence, and
   evidence goes at the bottom. Nobody should have to read a clean checklist to discover that the
@@ -361,6 +377,9 @@ replacement never landed, and deletions no removal table named. Or "Nothing."]
   Each departure is a row above.
 - **Plan → Plan:** [each difference from the approved plan and the Amendment Log entry behind it,
   or "none"].
+- **Scenario table:** [N] differing rows checked against the built behaviour, [N] matched; each
+  mismatch is a row above. [Or: the decision document carries no table, or it records "not a rule
+  change".]
 - **DecisionDoc → Code:** [does the code solve the problem that was decided; did the document's
   "what would reverse this decision" condition come true during the build; did the amendments add
   up to an approach nobody chose].

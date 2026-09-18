@@ -195,9 +195,9 @@ A small build model fills every silence with the happy path. So `/write-plan` fo
 expensive model to write the foresight *down*: failure modes, lifetimes, error codes and
 their owners, concurrency and aliasing, named seam tests per value path, and exact
 command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
-or marked new. Then three review passes before it is saved, the last of which starts from the
+or marked new. Then three review passes before it is saved, the first of which starts from the
 codebase rather than the document: trace backward and forward from everything the plan changes
-the meaning of, count the callers, and re-verify the plan against what turns up. A caller that
+the meaning of, count the callers, and settle the plan's scope before the other two judge it. A caller that
 breaks the build is never in the plan, so checking the plan's own names will not find it.
 
 **5 · Index-first codebase search, with the questions that go with it.**

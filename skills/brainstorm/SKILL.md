@@ -67,6 +67,7 @@ fi
 - **BS-10 · A probe proves the proposition it tested, and no more.** Evidence tier answers *how strong* your evidence is; this answers *what it is evidence of* — they are independent, and a tier-3 probe can still prove the wrong sentence. Before a claim carries your recommendation, **write the claim as a sentence**, then ask whether the probe tested that exact sentence or a neighbouring one. The failure is almost never a bad probe; it is proving an intermediate step and reporting it as the end-to-end result. "The callback receives the metadata" is not "the metadata reaches the exported span". "The repo writes the column" is not "the API serves the column". "The handler is registered" is not "the handler runs". Each pair differs by exactly one hop, and the hop is where the defect lives. When you catch a gap, either probe the actual end of the chain or state plainly which hop is still unverified — an unverified hop named in the decision document is a risk; an unverified hop reported as a result is a wrong recommendation.
 - **BS-11 · External reviews are evidence to verify, not verdicts to comply with.** If the user brings you a critique of your thinking from another model, another agent, or another person, treat every claim in it as a hypothesis about *this* codebase and check it first-party before acting. Adopt what holds up, say plainly what does not, and keep your recommendation where the evidence puts it. A wrong critique adopted uncritically costs more than a right one missed, because it arrives wearing borrowed authority.
 - **BS-12 · Delegate exploration sparingly, and cheaply.** Subagents multiply cost and latency — each re-establishes context, re-explores, and reports back, and then you re-read the report. Spawn one only for a genuinely wide survey (several unrelated modules, a large unfamiliar surface); handle anything you could finish in a handful of tool calls yourself. When you do delegate, **pin the cheapest model that can do the job** — grep, enumerate, and summarize is clerical work, and a subagent that inherits your model by default charges brainstorm-model rates for it. Reach for the smallest fast tier your harness offers (Haiku-class, Flash-class) for clerical sweeps, and step up a tier only when the task needs judgment rather than breadth. Brief it to return findings, not raw file contents: the saving is that you read a short report instead of forty files, and a subagent that dumps everything back into your context has cost you money instead of saving it. Keep spawn counts low, brief each one precisely the first time, and commit to what it reports instead of re-deriving it. Never delegate the thinking — the trade-off analysis and recommendation are yours.
+- **BS-13 · When the change moves a rule rather than adds a thing, table the scenarios before anyone argues about them.** Some changes add a capability, and prose describes those well enough. Others change *when* something happens — an eligibility condition, a trigger, a retry rule, a filter, a default, a guard, a threshold. For those, prose is the wrong instrument: it reasons about the cases someone thought of, and the case nobody thought of is the one that ships. Enumerate the cases from the state the rule reads, put today's outcome and the proposed outcome side by side, and let the rows that differ *be* the proposal. §4's scenario table has the method.
 
 ## Output Structure
 
@@ -204,6 +205,71 @@ derivation earned its place by being run, not by producing a different answer.
 - **A shared interface is not a shared implementation.** "These should look like one API to the caller" does not imply one table, one file, one service, or one process. Separate the logical goal from the physical consolidation and price them separately — the consolidation is usually where the risk actually lives, and it is usually optional.
 - **Don't move something for a consumer that doesn't exist.** Restructuring now for a hypothetical second caller is a cost paid today against a benefit that may never arrive. If the second consumer is speculative, label it speculative and let the user decide whether to buy the option.
 
+#### When an approach changes a rule: the scenario table
+
+An approach that changes *when* something happens cannot be described in prose without leaving
+something out. "It will still suggest for a fresh project, and it won't suggest while targets are
+pending" is a claim about two cases out of a number the sentence never states. Build the table
+instead (BS-13).
+
+**One table, not one per approach.** The cases are a property of the rule, not of any proposal
+about it, so they are enumerated once and every approach that moves the rule gets a column beside
+today's. That is also what makes the approaches comparable here rather than merely described: two
+proposals that sound equally targeted turn out to move three rows and nine.
+
+**1 · Get the cases from the state, not from your imagination.** Name the variables the rule
+actually reads — counts, flags, statuses, presence and absence — and enumerate their combinations,
+including the empty one, the all-of-them one, and the mixed ones. A case list you brainstormed is a
+list of the cases you could think of, which is the failure prose already had. Where the full
+cross-product is too large, collapse it deliberately and say on what grounds: "status has five
+values, three behave identically here, so they are one row". A collapse you can justify is method;
+one you cannot is the imagination failure wearing a table.
+
+**2 · Today's column first, and read it out of the code.** It is derived case by case from the
+current implementation, never recalled — and it is the column that finds things, because filling it
+in is usually the first time anyone has stated today's behaviour case by case. Then one column per
+approach that moves this rule. Name what the outcome means above the table ("True = will suggest");
+a boolean with no legend is unreadable within a week.
+
+**3 · The rows where a column differs from today are that approach's change.** That is the entire
+proposal, as a finite set rather than an argument, and each differing row gets a label:
+
+- **the fix** — the row the user actually asked about;
+- **collateral** — a row that moves because the new rule is wider or narrower than the ask, and
+  which nobody has agreed to. These are why the table is worth building: they are invisible to
+  prose, because prose only visits the rows that occurred to someone.
+
+**The rows that do not differ are evidence, not filler.** A rule that moves three rows of twelve is
+a small change with a provable radius; one that moves nine is a different feature, and that count is
+the first honest thing anyone has said about its size.
+
+**4 · Then ask what each new rule exposes.** A rule is not only its outcomes. Some rows it leaves
+unchanged are now reached by a different route, and some that were unreachable before are reachable
+now. Walk those, per approach, and say whether they bite.
+
+```
+True = will suggest          (excerpt of a twelve-case table)
+
+case                                        active  wdrawn   TODAY       A       B
+1   empty, nothing ever added                    0       0    True    True    True
+2   2 pending user targets                       2       0    True   False   False   <- the fix
+3   2 pending suggested targets                  2       0   False   False   False
+11  1 active user + 1 withdrawn researched       1       1    True   False    True   <- A: collateral
+12  all researched, all removed                  0       2    True    True   False   <- B: collateral
+```
+
+Two approaches, both of which fix case 2, and the table is the first place their difference is
+visible: A also moves case 11, B also moves case 12, and neither was asked for.
+
+**Keep it readable at a glance.** Fixed-width columns, one row per case, booleans or short verdicts
+rather than sentences, changed rows marked in the margin. The shape is the point: a reader should
+see the diff without reading the table.
+
+**Writing it is not building it (BS-1).** The table is a thinking instrument — it settles what the
+change *is* before anyone argues about whether to make it. It does carry forward, and usefully: the
+differing rows are exactly the cases the plan owes test criteria for, and `/write-plan` lifts them
+straight out. That is a downstream convenience, not the reason to write it.
+
 ### 5. Challenge the Obvious Solution
 
 Before making your recommendation, ask yourself:
@@ -232,6 +298,7 @@ Run this audit against your own recommendation before you write anything down. I
   This axis is also the one that changes minds at this point: an approach whose structural cost looked acceptable, and which turns out to abandon a working mechanism in place or add a third way of doing something, is a different approach than the one you compared.
 - **Is the recommendation reachable from the ideal?** Compare it against approach E's resulting design. If it is further away, name which adjustment it gives up and what that concession costs; if it is the resulting design, say so. A recommendation that cannot be located on that scale was chosen by convenience.
 - **Is the comparison still fair?** Re-check that no approach was charged for work it doesn't require, and that no approach was credited for a consumer that doesn't exist.
+- **If the recommendation moves a rule, is the scenario table built, and was today's column read rather than recalled?** (BS-13.) Check three things specifically: that the cases came from the state the rule reads and not from the ones that came to mind; that the recommendation has a column in it; and that every row where that column differs from today is labelled as the fix or as collateral. An unlabelled differing row is a behaviour change nobody has agreed to, and it is about to be recorded as decided.
 - **What breaks that I have not named?** Earlier milestones, existing consumers, shared or aliased state, environment constraints, the thing the user will notice first.
 
 - **Then run `/existing-mechanisms`' second sweep against the written document**, once it exists. Not against the recommendation you are holding in your head: against the names, claims and mechanisms as they appear on the page. It has two halves and they are run separately, because merging them is how the second one silently becomes the first:
@@ -301,6 +368,11 @@ is a thing a later reader can see.]
 - [key reason 2]
 
 **What would reverse this decision:** [the condition under which the runner-up wins]
+
+**Scenario table:** [when this decision moves a rule, the table from §4: the cases, today's outcome,
+the decided outcome, and every differing row labelled as the fix or as collateral the user accepted.
+When it does not move a rule, this line says "not a rule change" and stays — a heading that is
+present and answered is evidence the question was asked, and a missing one is not.]
 
 **Why the others were rejected:**
 - [Approach X]: [specific reason it lost]

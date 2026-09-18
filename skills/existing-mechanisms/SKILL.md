@@ -180,7 +180,7 @@ second way of doing something the codebase already did one way.
 
 This is the full method. It is run wherever a gate has to know what a change reaches, at the depth
 that gate's row gives: `/brainstorm` runs it to cost each approach's blast radius, `/write-plan`
-runs it as Pass 3 against the finished plan, `/3p-review` runs it against a rework brief.
+runs it as the impact pass against the finished plan, `/3p-review` runs it against a rework brief.
 
 **Use the index if there is one, and use the command built for this.** `graphify affected "<the
 thing you are changing>"` is a reverse traversal that returns the nodes impacted by it, which is the
@@ -230,6 +230,24 @@ order: the structural axis produces a satisfying list of files and feels like a 
 the other two never get run. Which means the structural failures are the ones that get caught, and
 whatever damage survives a gate is concentrated in the two axes nobody ran.
 
+**Count against a set you enumerated, or say that you could not.** Every axis here asks for counts,
+and this is the limit of what a count proves: a complete list of four and an incomplete list of four
+are the same number. What turns a count into evidence is a **denominator** — a set enumerated by
+construction rather than discovered by search, and the fraction of it this change reaches. Axis 2
+already has one, because entry surfaces are a closed, listable set: *"14 entry surfaces, 4 reach
+this change"* is falsifiable and *"4 flows change"* is not. Axis 1 needs one too, and its absence is
+the hole that survives every instruction in this file: "count them, never estimate" is fully
+satisfied by a count that was accurate about what the search returned and silent about what the
+search could not see. That is how a blast radius comes back at half its real size with every rule
+here obeyed.
+
+**Where no denominator exists, say so in those words.** Logical couplings have none — they are found
+by reading and by asking what else believes this, and no set of them can be enumerated up front. An
+axis or a sub-question with no denominator reports what it looked at and where it looked. That is a
+weaker claim than a fraction, and it is *visibly* weaker, which is the whole point: a reader can
+tell "4 of 14" from "I searched and found 4", and an artifact that renders those two identically has
+thrown away the only distinction that mattered.
+
 ### Axis 1 — Structural: what connects to this?
 
 The call graph, both directions, counted.
@@ -241,6 +259,23 @@ The call graph, both directions, counted.
   by string. `graphify affected` is the fastest way to a first list here; it is a starting set to
   verify against the source, not a finished answer, and it will not carry the edges that no
   extractor can see.
+- **Enumerate the layers this thing passes through, then sweep each one. This is Axis 1's
+  denominator.** A search keyed on the identifier is a search of *one* layer, because the identifier
+  is renamed at every hop: a column is an attribute one layer up, a key in a serializer above that,
+  a field on the wire, a variable in a template, a label on a screen, a figure in a report. Not one
+  of those hops contains the column name, and every one of them is a consumer. So list the hops
+  first — they are a closed, enumerable set in any codebase with layers, exactly as entry surfaces
+  are for Axis 2 — and for each hop name the spelling it uses and sweep for *that*: the identifier,
+  the accessor, the wire key, the display string, the rendered figure. Some things genuinely keep
+  one name across every layer — a function called by name everywhere does — and that is a real
+  answer, but say it explicitly, because "one spelling, and here is why" and "one spelling, and I
+  stopped at the first hop" produce identical-looking traces. **Report it as a fraction of
+  the layers you listed**, *"6 layers between this column and its last consumer; it reaches 4; 11
+  consumers across them"*, so a reader can see which layer went unexamined rather than having to
+  trust that none did. **Count the consumers of the value, not the occurrences of the name.** On a
+  display, export or reporting path the sites that never spell the name are not a long tail, they
+  are usually most of them — and they are uniformly invisible to the search that found the rest,
+  which is exactly why that search comes back clean.
 - **Forward, what this reaches.** Every callee, and what those depend on in turn: modules, shared
   helpers, tables and columns, queues, caches, files, environment variables, external services.
 - **Structural dependencies both ways.** What this section of code depends on, and what depends on
@@ -252,7 +287,9 @@ The call graph, both directions, counted.
 count is one query and it is the number the comparison turns on; what varies with depth is whether
 every site is **enumerated** at `file:line`. "Several callers" is not an answer at any depth: a set
 you characterised is not a set you counted, and the gap between them is where the half-sized blast
-radius lives. If you did not count, say you did not count.*
+radius lives. If you did not count, say you did not count. And a count with no denominator is a
+count of what the search returned: report it against the layers you enumerated above, or name the
+layer you could not enumerate and why.*
 
 ### Axis 2 — Functional: what behaviour runs through this?
 
@@ -382,8 +419,9 @@ confirming the first.
 **The document half and the codebase half are separate passes wherever a gate runs both.** Walking
 the document's names outward and walking the codebase's edges inward start from opposite sets, and
 the second returns things the document never mentioned, so a gate that merges them answers the
-second with the first's method and reports clean. `/write-plan` splits them into its Pass 2 and
-Pass 3 for exactly that reason, and `/brainstorm`'s decision audit splits them the same way.
+second with the first's method and reports clean. `/write-plan` splits them into its impact and
+executability passes for exactly that reason, and `/brainstorm`'s decision audit splits them the
+same way.
 
 **The codebase half is the impact trace, run against the artifact.** All three axes, not just the
 structural one: the document's own names walked back to the code, the flows those names sit in,
@@ -427,8 +465,8 @@ its row here and does not restate the questions.
 | `/brainstorm`, Decision Audit | the approach you are about to recommend | re-check 3, 4, 5, 8 against the *chosen* design, and run the impact trace to full depth on it: only the winner is worth exhaustive tracing |
 | `/brainstorm`, after the decision document is written | the saved document's own claims and names | the second sweep, both halves, before handing over to `/write-plan`. The codebase half is the impact trace, run against the document |
 | `/write-plan`, Codebase Analysis | the concrete chosen design, not the problem space | all eight, recorded in the plan |
-| `/write-plan`, Pass 2 | the finished plan's own file and symbol list | the second sweep's document-side half: dropped, duplicated, inert, drifted |
-| `/write-plan`, Pass 3 | the codebase's edges into and out of everything the plan changes the meaning of | the second sweep's codebase-side half: the **impact trace**, all three axes, to full depth and counted. Writes the result block. Before the plan is saved or activated |
+| `/write-plan`, the impact pass | the codebase's edges into and out of everything the plan changes the meaning of | the second sweep's codebase-side half: the **impact trace**, all three axes, to full depth and counted. Writes the result block. Runs first of the three passes, before the plan is saved or activated |
+| `/write-plan`, the executability pass | the finished plan's own file and symbol list, the impact pass's additions included | the second sweep's document-side half: dropped, duplicated, inert, drifted |
 | `/build-phase`, Plan Review | this phase's named files and symbols | 1, 3, 5, 8; a gap here is a halt, not a fix |
 | `/3p-review`, Codebase Consistency | the code as built | 3, 5, 8; a gap here is a finding |
 | `/3p-review`, before a Rework Brief is handed over | the brief's own names, files, lines and commands | the second sweep against the brief, both halves; a brief is a plan |

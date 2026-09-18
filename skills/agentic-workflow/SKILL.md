@@ -111,6 +111,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 
 - **AW-27 · The decision document records intent, and only its author amends it.** It is freely editable while brainstorming and while the plan is still being drafted, and it **freezes the moment the plan moves out of `docs/plans/new/`** — that move is when something has been approved against it. Before the freeze, changing your mind is not an amendment, it is brainstorm output, and it belongs in *Approaches Considered*; a log started early records nothing but the author thinking, and that noise is what makes a document stop being read. After the freeze it is append-only and **no model writes to it on its own authority**. A gate that finds a difference reports and proposes; the user declares. The entry carries the user's own words, verbatim (AW-24), because "user approved" records a permission and not an intention, and the intention is the only thing this document holds.
 
+  - **Before the freeze there is no departure either, and no amendment.** Both words name a difference from something already approved, and approval is the freeze. A plan in `new/` whose design has moved away from the decision document has not departed from anything — it has found a question, and the question goes to the user before they approve the plan (WP-14). Recording it as a departure instead settles on their behalf something they were never asked; recording it in the plan's Amendment Log dates the plan's history from before the plan had one (WP-13).
   - **Not every change reaches this document.** A change to *how* something is built is a plan amendment and stops at the plan. It reaches the decision document only when it alters what the **Decision**, **Consequences** or **Distance from the ideal** sections claim: what is being achieved, what was ruled out, what gets retired, which concessions were accepted. That test is what keeps the strictness honest — if amending is expensive and the boundary is vague, the pressure moves to the cheap door and changes of intent start shipping as unremarkable plan departures, which is the drift this was built to catch.
   - **Ask before doing the work, never after.** Once it is built, sunk cost does the deciding and the answer is foregone.
   - **Do not ask a yes/no question.** "Are you sure?" collects a yes and produces an entry that records consent instead of intent. Quote the original, say what upholding it would cost, and ask for the new intent as prose:
@@ -150,6 +151,32 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
     a Rework Brief handed back, a decision-document departure (AW-27), a capability being removed
     (AW-26), a gate verdict that blocks completion, the level you are returning to (AW-25). Those
     exist because the human must rule. Progress does not.
+
+- **AW-29 · Know where each thing is written, before you write it.** Everything this workflow
+  produces has a destination, and for most of it that destination is the conversation:
+
+  | Output | Where it goes |
+  |---|---|
+  | The decision document | `docs/discussions/YYYY-MM-DD-<topic>.md`. Written by `/brainstorm`; after the freeze, amended only by the user (AW-27) |
+  | The plan | `docs/plans/new/` → `docs/plans/` → `docs/plans/done/`. Written and amended by the planning model, never by the builder (WP-12) |
+  | Code, tests, migrations, fixtures | wherever the phase being built names |
+  | Build Halt Report, build completion report, review ledger and sign-off, Rework Brief, handoff summary, completion report | **said, not saved.** Emitted into the conversation, for the human or the next model |
+
+  **A skill's output template is a format, not a filename.** "Write this out in full" means emit it
+  in full. Each of those reports is read at the moment it is produced, by someone who is in the
+  conversation, and none of them is a file a later gate opens by path — which is what a file would
+  be for. Where one does have to outlive its session, a sign-off carried to a different model for
+  example, it travels the way the user moves it: in a message, a commit message, a PR body. Not as a
+  document this workflow invented a home for.
+
+  - **Choosing the path is the tell.** The directories above are the ones this workflow names. If
+    you are inventing a directory or a filename, no skill asked for that file — you did, just now,
+    and the reason will sound like thoroughness. What it leaves behind is a document no gate reads
+    and nobody can later date or trust.
+  - **Wanting one is fine; it is a question, not a decision.** A rework that will cross sessions, a
+    trace too large to re-read in chat, a finding the owner wants to keep — those are real reasons
+    for a durable file. Say what you would write and where, in one sentence, and let them answer
+    before it exists. A file you were asked for once was one file, not a standing habit.
 
 ## Plan Directory Lifecycle
 
