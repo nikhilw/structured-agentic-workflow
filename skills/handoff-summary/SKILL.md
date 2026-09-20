@@ -60,5 +60,9 @@ Follow the template below: same headings, same order, same casing. Fill each sec
 
 ## What happens next
 
+The summary is *said, not saved* (AW-29): it is emitted into the conversation, for the human or the
+next model. It is not a file, and inventing a path for it is how a handoff ends up somewhere the
+reviewing model never looks.
+
 - **Dedicated build model** (launched via `/build-model`): present the summary, then **STOP**. The user carries it to the main model.
 - **Main model**: present the summary as the build record, then continue the workflow → `/verify-completion` → archive the plan.

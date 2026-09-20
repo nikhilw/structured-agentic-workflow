@@ -92,6 +92,15 @@ is the whole point of the independence the review is paid for.
 - Plans live in `docs/plans/`: `new/` (staged) → `plans/` (active) → `done/` (archived). Move with plain `mv`, not `git mv` — plan files may be untracked.
 - Brainstorm decision docs go to `docs/discussions/YYYY-MM-DD-<topic>.md`.
 - **Rules carry a prefixed, stable id.** `agentic-workflow` uses `AW-N`, `write-plan` uses `WP-N`, `brainstorm` uses `BS-N`. Cite a rule by that tag from anywhere, including from another skill; an unprefixed "Rule 8" is ambiguous, because three skills have one. The tag is a name, not a position, so a rule is never renumbered: insert new rules at the end, and retire one by marking it retired in place. A skill that gains its own rules section takes a new two-letter prefix and says so here.
+- **Report volume and destination are rules, and they live in `agentic-workflow`.** AW-28 (speak
+  when the human has to act; the rest is one line) and AW-29 (every report this workflow names is
+  said, not saved) are written out in full there and nowhere else. But **no skill loads
+  `agentic-workflow`**, and a `/build-model` session is defined by not using it, so a gate that
+  emits reports carries a compressed binding copy of both, with the tags, on the same principle as
+  the impact-trace axes: `build-phase`, `3p-review` and `build-model` near the top,
+  `verify-completion` and `handoff-summary` at their templates. A new gate that reports gets one
+  too. And when writing a template, mandate a report **per ruling, not per step**: a step that
+  reports because it finished is what makes the model chatty, and AW-28 outranks it.
 - Commit only when asked.
 - NEVER use em-dash(—) when writing. Use commas or semicolons to join sentences. Or just simply break them with fullstops.  
 

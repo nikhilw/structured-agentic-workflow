@@ -11,6 +11,12 @@ You are entering the **Build Phase** of the Structured Agentic Development Workf
 
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
+> **Where the reports go, and how much of one to write.** Every report this skill names is *said,
+> not saved*: emitted into the conversation, never written to a file this workflow did not name
+> (AW-29). Volume follows need (AW-28): when the user must act, the ask opens the report; when they
+> need not, they get **one line**. Progress is not an ask. A step below that says "record" means
+> keep it for the completion report, not say it now.
+
 ## Your Mission
 
 Execute **$ARGUMENTS** using the strict phase-wise loop.
@@ -195,15 +201,24 @@ Also track, for the handoff: any criterion you could not prove with a green auto
 
 If you find CRITICAL issues, fix them and re-test before proceeding. For minor concerns, note them — the full `/3p-review` will catch them after all phases.
 
-Report the self-review findings, then proceed. Do not block waiting for approval on a clean phase — flag and stop only for a plan defect or a CRITICAL you cannot fix.
+Record the self-review findings, then proceed. Do not block waiting for approval on a clean phase — flag and stop only for a plan defect or a CRITICAL you cannot fix.
 
 ### Step 5: Proceed
 
-Report:
-- What was implemented
-- Test results: rung, exit code, pass/fail/skip counts
-- Self-review findings and any fixes applied
-- Whether you recommend proceeding to the next phase
+**Record**, for Phase Completion and the handoff: what was implemented; the test results, rung, exit
+code and pass/fail/skip counts; the self-review findings and any fixes applied. That material has to
+exist, because the completion report and `/handoff-summary` are built from it. It does not have to be
+said now.
+
+**Say, now: one line** (AW-28). What the phase built, its rung and result, and that you are starting
+the next one.
+
+> Phase 2: repository layer built. T2 green, 84 passed, exit 0. Starting Phase 3.
+
+A clean phase is not an ask, so it does not get a report; the per-phase detail is emitted once, in
+the build completion report, not after every phase. The exception is a phase that needs a ruling, a
+plan defect, a CRITICAL you could not fix, a halt, or a capability removed (AW-26). Then the ask
+opens the report and the detail goes underneath it.
 
 **Then auto-advance:** if the phase is clean and more phases remain, immediately suggest and begin the next phase. Do not wait for the user to say "proceed" unless the plan requires a human decision gate.
 

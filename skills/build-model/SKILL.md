@@ -90,5 +90,11 @@ If an item is wrong or impossible as written, say so explicitly with the reason 
 - **Surface plan problems, don't paper over them.** This is the Standing Instruction above, and "If you halt" is the procedure. Anything still unresolved when you hand off goes in the handoff's Concerns.
 - **The review loop is a loop.** One clean pass is required; any fix triggers a fresh review.
 - **You pay for both mandatory full-suite runs, and you cannot net them out.** In this session you are the builder *and* the reviewer, so both of `/test-scope`'s "always" rows land on you: the one at Phase Completion and the one where `/3p-review` re-derives the builder's claims. They will often run minutes apart against an identical tree and that is not waste. The second exists precisely because the first was reported by the model being checked, which in this session is you. Scope the runs in between; never fold these two into one.
+- **A finished step is one line, not a report** (AW-28). This session emits four things in full:
+  `/build-phase`'s build completion report, a Build Halt Report if you halt, `/3p-review`'s sign-off,
+  and the handoff summary. Each is *said, not saved* (AW-29). Phases built, review rounds run and
+  suites gone green get one line each: what you found, and that nothing is needed from the user.
+  Narrating progress is seeking an approval nobody asked you to seek, and it buries this session's
+  two real asks, a halt and the pause at step 4.
 - **Never skip the handoff.** Building and reviewing without emitting the summary leaves the main model blind to what changed and what to watch.
 - **Stop means stop.** After the handoff, your job is done. Do not continue into verification or the next plan.

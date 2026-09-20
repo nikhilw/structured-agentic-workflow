@@ -306,7 +306,9 @@ it was ever a different one.
 
 You are writing to the person who asked for the feature, and the only question they have is *did I
 get what we agreed, or not*. Answer that first, in their words. The report is said, not saved
-(AW-29). Three rules:
+(AW-29), and it is **the one report this gate emits**: Parts 1 to 3 are worked, not narrated, and a
+check that came back clean is evidence for the bottom of this report rather than an update of its
+own (AW-28). Three rules:
 
 - **Bad news first.** What is wrong opens the report. Everything that checked out is evidence, and
   evidence goes at the bottom. Nobody should have to read a clean checklist to discover that the

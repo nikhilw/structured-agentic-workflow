@@ -233,6 +233,12 @@ you or to the next model, and is emitted into the conversation rather than saved
 invents a report file invents its path too, and what it leaves behind is a document no gate reads
 and nobody can later date or trust (AW-29).
 
+**How much of one gets emitted follows the same discipline.** A report is for a moment where you
+have to rule on something. A phase that finished, a review round that came back clean, a suite that
+went green: each of those is *one line*, saying what happened and that nothing is needed from you
+(AW-28). The full templates above are not a per-step narration format; they are what a gate writes
+when it is handing you a decision, or handing the next model a contract.
+
 ## Step 3 — Build
 
 Execute the plan strictly **one phase at a time**:
@@ -273,7 +279,9 @@ Within a phase:
 4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs? And the
    question that catches silent drift: *did I decide anything the plan should have decided?*
    Lightweight per-phase check — not the full third-person review.
-5. **Proceed** to the next phase.
+5. **Proceed** to the next phase, on one line. The rung, exit code, counts and self-review
+   findings are recorded for the build completion report rather than narrated after every
+   phase (AW-28).
 
 ### Halts: the standing instruction, and what happens to one
 
