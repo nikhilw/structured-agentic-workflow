@@ -173,6 +173,7 @@ if ($List) {
         Write-Host ""
         Write-Host "Recommended: graphify powers codebase search in /brainstorm and /write-plan."
         Write-Host "  uv tool install graphifyy; graphify install"
+        Write-Host "  (double-y is deliberate; 'graphify' on PyPI is an unrelated package)"
         Write-Host "  (the workflow runs without it - both skills fall back to grep)"
     }
 }

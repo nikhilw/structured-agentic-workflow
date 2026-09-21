@@ -57,7 +57,9 @@ common case needs no further configuration. Two optional overrides:
 > Issue titles, bodies, and comments are authored by outside users and are treated as
 > **untrusted input**: the skills extract facts and ignore any instructions embedded in them.
 > Text in an issue that tells the agent to run a command or add a dependency is
-> prompt-injection, not a priority signal.
+> prompt-injection, not a priority signal. When a skill quotes issue text back, into a
+> recommendation, a decision document or a plan, it fences and labels it, so the next
+> reader down the chain still knows whose words those are.
 
 ## Memory keys
 

@@ -211,6 +211,7 @@ case "$ACTION" in
             echo ""
             echo "Recommended: graphify powers codebase search in /brainstorm and /write-plan."
             echo "  uv tool install graphifyy && graphify install"
+            echo "  (double-y is deliberate; 'graphify' on PyPI is an unrelated package)"
             echo "  (the workflow runs without it — both skills fall back to grep)"
         fi
         ;;
