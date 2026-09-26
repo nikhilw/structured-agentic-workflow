@@ -161,8 +161,8 @@ is the whole point of the independence the review is paid for.
   said, not saved) are written out in full there and nowhere else. But **no skill loads
   `agentic-workflow`**, and a `/build-model` session is defined by not using it, so a gate that
   emits reports carries a compressed binding copy of both, with the tags, on the same principle as
-  the impact-trace axes: `build-phase`, `3p-review` and `build-model` near the top,
-  `verify-completion` and `handoff-summary` at their templates. A new gate that reports gets one
+  the impact-trace axes: `build-phase`, `3p-review`, `build-model`, `brainstorm` and `write-plan`
+  near the top, `verify-completion` and `handoff-summary` at their templates. A new gate that reports gets one
   too. And when writing a template, mandate a report **per ruling, not per step**: a step that
   reports because it finished is what makes the model chatty, and AW-28 outranks it.
 - Commit only when asked.

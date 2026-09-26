@@ -143,9 +143,8 @@ Each gate is a column. Depth is the gate's, and so is what happens to a finding.
 An outside reviewer, whether another vendor's model or a fresh-context agent, finds what you cannot:
 it does not know why anything was decided, so it sees the result the way a newcomer does. Every
 gate that finishes a reviewable artifact (a decision document, a plan, a build) offers the owner
-this brief, filled in, ready to paste. The owner decides whether to use it. `/write-plan` writes it
-out in full, because a plan is where it is used most. `/brainstorm` and `/3p-review` offer it in one
-line and write it out when the owner says yes.
+this brief in one line, and writes it out, filled in and ready to paste, when the owner says yes.
+The offer is made once per artifact, not repeated.
 
 What goes wrong without a brief: the reviewer starts fixing things, filing tickets, and proposing
 edits; it answers "do the plan and the code match?" when the question was "are they both right?";

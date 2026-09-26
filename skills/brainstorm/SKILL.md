@@ -11,6 +11,12 @@ You are entering the **Brainstorm Phase** of the Structured Agentic Development 
 
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
+> **How much of this reaches the user.** The approaches, the recommendation and the questions they
+> must answer are the brainstorm; say those in full. The audit and the lenses are worked, not
+> narrated: each result changes the recommendation, becomes an Open Question, or goes into the
+> decision document, and the user hears one line about what changed (AW-28). Everything you emit is
+> *said, not saved*, except the decision document (AW-29).
+
 <HARD-GATE>
 Do NOT write code, create plan files, scaffold projects, or take ANY implementation action during brainstorming. Code is the LAST thing we touch — not the first. This applies regardless of how simple the task seems. You are thinking, not building.
 
@@ -145,7 +151,7 @@ For each approach:
 - **Complexity:** Low / Medium / High
 - **Scope of change:** How many files/modules touched? Is this localized or cross-cutting?
 - **Impact estimate:** The blast radius, from `/existing-mechanisms`' **impact trace** run at survey depth against *this* approach. Not a paragraph of adjectives: **structural**, how many call sites and in which modules, counted rather than characterised, and what the approach makes depend on what; **functional**, which end-to-end flows it changes and which it depends on; **consolidation**, what it leaves unused, whether it adds a pathway beside an existing one or collapses two into one, and what it lets you delete. Survey depth means enough to compare approaches honestly, not every `file:line`: the winner gets the exhaustive trace in the Decision Audit. Two approaches that look equally costly on file count routinely differ by an order of magnitude here, and this line is the only place that shows up before the decision is made.
-- **Through the lenses, at survey depth** (`/review-lenses`, one line each, enough to compare): **what the user sees**, the one or two sentences a user would say about this approach's result; **business sense**, anything a typical user of this domain would find odd, and who; **logic**, the main case and its nearest edge walked with real values, plus any values or rules this approach sets against each other; **removal**, what it deletes or stops doing, and what does that job afterwards. An approach that wins on blast radius and loses here is a different trade than the one you thought you were comparing.
+- **Through the lenses, at survey depth** (`/review-lenses`), written only where they tell the approaches apart; a lens that would say the same of every approach gets no line: **what the user sees**, the one or two sentences a user would say about this approach's result; **business sense**, anything a typical user of this domain would find odd, and who; **logic**, the main case and its nearest edge walked with real values, plus any values or rules this approach sets against each other; **removal**, what it deletes or stops doing, and what does that job afterwards. An approach that wins on blast radius and loses here is a different trade than the one you thought you were comparing.
 - **Milestone impact:** Does this invalidate or rework something already shipped, and does it constrain something already planned? Name the earlier milestone it disturbs and the later one it boxes in. An approach that quietly forces a redo of last month's work — or paints the next feature into a corner — is more expensive than its file count suggests.
 
 #### The last approach: ideal, then adjusted

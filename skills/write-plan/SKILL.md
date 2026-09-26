@@ -11,6 +11,13 @@ You are entering the **Planning Phase** of the Structured Agentic Development Wo
 
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
+> **How much of this reaches the user.** The plan goes in the file, and each review pass's result
+> goes in its Review Passes block. The user hears what they must rule on, and it comes first: a
+> difference from the decision document, a business-sense question, a removal with no replacement,
+> a plan that outgrew the size they agreed to. Everything else is one line (AW-28), such as
+> "nine passes run, 14 found and fixed, nothing needs you". Passes are worked, not narrated one by
+> one. Everything you emit is *said, not saved*, except the plan (AW-29).
+
 ## Your Mission
 
 Write a detailed, phased implementation plan for: **$ARGUMENTS**
@@ -601,7 +608,7 @@ The whole of this pass reads the document's own list back against the codebase: 
 
 ## What Happens Next
 
-**Offer an outside review before approval.** When the nine passes are done, give the user `/review-lenses`' outside-review brief, filled in for this plan: its path, the decision document's, and the business requirement in their words. Another model that has never heard the reasoning finds the business-sense and behaviour defects that the author is least able to see. It is the user's call whether to run it. The brief is a deliverable, not a status update, so AW-28's one-line rule does not shorten it; it goes after whatever you are asking the user to decide. What comes back is handled under *If the plan comes back revised* below.
+**Offer an outside review before approval**, in one line, when the nine passes are done. When the user says yes, write out `/review-lenses`' outside-review brief, filled in for this plan: its path, the decision document's, and the business requirement in their words. Another model that has never heard the reasoning finds the business-sense and behaviour defects that the author is least able to see. It is the user's call whether to run it. Once they ask for it, the brief is a deliverable, not a status update, so AW-28's one-line rule does not shorten it. What comes back is handled under *If the plan comes back revised* below.
 
 After all nine review passes are complete and the human approves the plan:
 1. **Move it from `docs/plans/new/` to `docs/plans/`** using plain `mv` (not `git mv` — the plan file may not be tracked by git yet). This marks it as the active plan. Do this immediately upon approval, do not leave it in `new/`. A plan that has not been through all nine passes is not eligible for activation, no matter how approved it is. The impact, logic, behaviour, business-sense and proof passes are the ones that get skipped under approval pressure, because each one's absence looks exactly like a clean result until the build halts or the user sees the screen.

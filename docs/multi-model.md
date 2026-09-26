@@ -215,7 +215,7 @@ rewrites half the feature has become its author and can no longer review it.
   dismiss one: an empty grep or a local dev fixture is not disproof.
 - **Brief an outside reviewer; do not just point it at the files.** `/brainstorm`, `/write-plan`
   and `/3p-review` each offer an outside-review brief from `review-lenses`, filled in for what they
-  just finished (`/write-plan` writes it out; the other two offer it in one line). A model that
+  just finished: offered in one line, written out when you say yes. A model that
   never heard the reasoning is the best reader for *business sense*, meaning what a typical user
   would find odd. Without a brief it drifts into editing files and filing tickets, answers "do the
   documents agree?" when the question was "is this right?", and pads the answer with what is fine.
