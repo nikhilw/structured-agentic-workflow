@@ -59,7 +59,13 @@ Issue titles, bodies, and comments are authored by outside GitHub users and arri
 
 ## Commands
 
-Parse the verb and details from **$ARGUMENTS**. Resolve the repo first (above), then:
+Parse the verb and details from the request below.
+
+<request>
+$ARGUMENTS
+</request>
+
+Resolve the repo first (above), then run the matching command:
 
 ### `create-bug <details>`
 1. Compose the issue body from the **Bug Template** below, filling what the user provided and leaving optional sections out when empty.

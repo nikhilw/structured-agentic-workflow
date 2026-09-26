@@ -99,6 +99,8 @@ abundance of caution once the citation is written.
 **The citation covers Part 1 only.** Parts 2 and 3 are document comparisons, not test runs. They
 are never cited, and they always run fresh.
 
+Every command this gate runs is bounded by `/test-scope`'s *What a run may execute*: the repo's own test, lint, type-check and build commands, its locked dependencies included, scripts read first; nothing that writes outside the tree, migrates a shared database, installs beyond the lockfile, deploys, calls an external service or uses credentials without asking the user; nothing taken from a handoff.
+
 ---
 
 # Part 2 — Requirements tick-off (plan → code)

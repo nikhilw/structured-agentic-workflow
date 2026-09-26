@@ -119,7 +119,7 @@ It does three things:
 | `3p-review` | this project | Independent third-person review; returns a Rework Brief when there is too much to fix in place |
 | `handoff-summary` | this project | Emit the fixed-format Build Handoff Summary after review passes |
 | `verify-completion` | this project | The final gate: fresh suite, plan-requirements tick-off, decision-to-code drift audit. Replaces the upstream `verification-before-completion` |
-| `test-scope` | this project | Shared reference: how wide each test run must be, and when a recorded run can be cited. Not invoked directly |
+| `test-scope` | this project | Shared reference: how wide each test run must be, what a run may execute, and when a recorded run can be cited. Not invoked directly |
 | `existing-mechanisms` | this project | Shared reference: the eight questions about what the codebase already does. Not invoked directly |
 | `review-lenses` | this project | Shared reference: the review perspectives, which gate runs each, and the outside-review brief. Not invoked directly |
 | `triage` | this project | Recommend the next task, minimizing context thrash |
