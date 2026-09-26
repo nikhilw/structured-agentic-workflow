@@ -8,6 +8,20 @@ Every significant change follows one cycle:
 Phases are never skipped, plans are files rather than conversations, and nothing is "done"
 without evidence.
 
+## Intent-driven, supervised, any model
+
+Spec-driven development asks whether the code matches the spec. This workflow asks whether what
+shipped is what you meant, and makes the agent prove it.
+
+- **Your intent is the baseline.** What you chose, what you ruled out and what the user will see
+  are recorded before anything is planned. Once the plan is approved, only you can change them.
+- **A frontier model supervises.** It designs, writes a plan that leaves nothing to guess, and
+  reviews through seven lenses, from impact to business sense.
+- **Any model or tool builds.** Claude, Codex, Cursor, Gemini, across vendors, at a fraction of the
+  cost. A gap in the plan makes it stop and report, never improvise.
+- **Drift blocks "done".** Code is audited against the plan, and the plan against your intent.
+  A difference nobody agreed to stops the completion claim.
+
 ---
 
 ## Highlights
