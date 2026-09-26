@@ -54,9 +54,13 @@ comes from.
 You should follow the setup instructions as per the [graphify repo](https://github.com/Graphify-Labs/graphify), but for a quick reference we are including them here:
 
 ```bash
-uv tool install graphifyy   # note the double-y; `graphify` on PyPI is an unrelated package
+uv tool install graphifyy   # the official PyPI package, per graphify's own README
 graphify install            # registers the /graphify skill with your agent
 ```
+
+The double-y is graphify's own naming, not a typo: its README says *"The PyPI package is
+`graphifyy` (double-y). Other `graphify*` packages on PyPI are not affiliated."* Check there
+before installing if in doubt.
 
 If the `graphify` command isn't found afterwards, run `uv tool update-shell`. `pipx install
 graphifyy` and `pip install graphifyy` also work.
