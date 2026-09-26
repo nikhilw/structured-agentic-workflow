@@ -51,8 +51,10 @@ short, never skipped: a one-line fix gets one line per lens, saying what it chec
    a heavy step on a trivial task, and output nobody will use.
 6. **Proof.** This repo has no tests, so write a scratch checker for the change, outside the repo
    (a temporary directory, never committed). Have it check that every cited lens, tag and section name exists, that counts and
-   orders agree in every file that states them, that code fences balance, and that no new em dash
-   appears. **Prove each check can fail before you trust it**: inject one deliberate break per
+   orders agree in every file that states them, that code fences balance, that no new em dash
+   appears, and that every `SKILL.md` frontmatter parses as strict YAML (`yaml.safe_load`). Claude
+   Code tolerates an unquoted `description` containing `: `; other installers reject the skill
+   outright, so quote any value with a colon in it. **Prove each check can fail before you trust it**: inject one deliberate break per
    check into a copy of the tree and confirm it is caught (RL-4). Run it after every later fix.
 7. **Coherence, last, in two rounds with different angles** (RL-2):
    - **The diff and its surroundings.** Contradictions, orphans, stale counts and summaries, one
