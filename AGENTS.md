@@ -193,6 +193,7 @@ update whichever of these it touches:
 | `docs/configuration.md` | `/workflow-config` preferences and memory keys |
 | `docs/practices.md` | Task selection, refactoring monoliths, "no surprises" |
 | `docs/philosophy.md` | The "why" — principles and trade-offs |
+| `docs/comparison.md` | Side by side with other agent workflows. Marketing, so every cell must be defensible from that project's public docs; re-check it when a skill gains or loses a capability |
 
 Two diagrams exist and both must stay in sync with the skills: the **full lifecycle** in
 `docs/workflow.md` and the **reduced model-split** duplicated in `README.md` and

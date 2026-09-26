@@ -175,6 +175,7 @@ Law and adds the requirements tick-off and the drift audit.
 | [configuration.md](docs/configuration.md) | `/workflow-config` — TDD/BDD, caveman brevity, GitHub issues |
 | [practices.md](docs/practices.md) | Task selection, refactoring monoliths, the "no surprises" rule |
 | [philosophy.md](docs/philosophy.md) | Why the workflow is shaped this way |
+| [comparison.md](docs/comparison.md) | Side by side with Spec Kit, Kiro, BMAD, Superpowers, gstack, Compound Engineering and Traycer |
 | [extras/driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md) | Worked recipe: running Cursor's CLI agent headless as the build model |
 
 ---
@@ -183,7 +184,7 @@ Law and adds the requirements tick-off and the drift audit.
 
 There are other agent-skill libraries — [obra/superpowers](https://github.com/obra/superpowers)
 is the best known, and this workflow composes with it rather than competing. Eight things set
-this one apart:
+this one apart ([side by side with the alternatives](docs/comparison.md)):
 
 **1 · The build model doesn't have to be the planning model.**
 Because the plan is a *file* that resolves every decision, you can plan with Opus and build
