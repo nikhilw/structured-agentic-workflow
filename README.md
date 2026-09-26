@@ -225,7 +225,11 @@ the plan, so checking the plan's own names will not find it.
 
 **5 · Index-first codebase search, with the questions that go with it.**
 `/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/Graphify-Labs/graphify)
-knowledge graph of the repo before proposing anything. The most expensive mistake in a
+knowledge graph of the repo before proposing anything, and count what a change reaches with the
+type checker. The graph links symbols by name, so it finds where to look but misses a call made
+through an instance and merges two symbols that share a name; your language's type checker or language server (`tsc`,
+pyright, gopls, rust-analyzer and the like) resolves the types and gives the real count. Graph for where to look, types for the count, grep for names hidden
+in strings. The most expensive mistake in a
 brainstorm is reimplementing something that already exists under a name nobody grepped for, so
 `existing-mechanisms` makes the search into eight required answers: every caller, every related
 flow, what already does this job, whether you are extending or replacing it, what becomes dead code

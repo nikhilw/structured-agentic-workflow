@@ -107,8 +107,10 @@ a yes:
   could alter and every flow it depends on, plus the invariants and ordering that couple this to
   code with no edge to it; **consolidation**, what this leaves unused, whether it builds a parallel
   system beside one that exists, whether it abandons something without anyone deciding to, and
-  whether it increases reuse or adds another flow. Query the graph for the structural axis; the
-  other two are found by reading and by asking what else believes this.
+  whether it increases reuse or adds another flow. Query the graph to find where to look on the
+  structural axis, and in typed code count with the type checker or language server, since the
+  graph matches names, not types; the other two axes are found by reading and by asking what else
+  believes this.
 
   **An approach costed against a third of its blast radius is costed wrong**, and at this stage
   that is not a file list that comes out short, it is the wrong approach winning. That is the

@@ -148,7 +148,7 @@ Brainstorm discovered these contracts; the plan made them executable; you prove 
 - [ ] **Authority & precedence** — when sources disagree, does the code resolve it as the decision doc says?
 - [ ] **Currentness & rollback** — is there a version/generation/fingerprint, and is it actually *checked* rather than merely stored?
 - [ ] **State transitions & visibility** — can state be observed mid-change? Are illegal transitions blocked at a layer every writer passes through?
-- [ ] **Consumer authority** — grep the callers of everything this touched; do not trust the plan's list. Do they still get what they expect?
+- [ ] **Consumer authority**: find the callers of everything this touched, counted with the type checker or language server in typed code and grep for names held in strings; do not trust the plan's list. Do they still get what they expect?
 - [ ] **Execution locality & deployment** — does this run where it is assumed to? Does it hold up read-only, offline, air-gapped, or single-writer if required?
 - [ ] **Invariant enforcement layer** — is each invariant enforced where it cannot be bypassed (constraint, index, type), not only in the path this feature uses?
 
@@ -293,7 +293,7 @@ It goes to a model with no memory of this review, so it carries a plan's contrac
 **Do not touch:** [files/areas outside scope — unrelated worktree changes]
 
 ### R1 — [SEVERITY] [one-line title]
-**Where:** `file.py:120-134`
+**Where:** `path/to/file:120-134`
 **Now:** [what the code currently does]
 **Wrong because:** [defect, contract, or plan requirement violated — cite plan §/decision doc]
 **Required:** [the specific change — decided, not "consider"]

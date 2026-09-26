@@ -54,7 +54,9 @@ is how the gap ships.
    Backward tells you who breaks when this changes. Forward tells you what can break *this*, and
    what the change inherits whether or not you looked. Where an index exists, walk it both ways:
    `graphify query` to find the thing, its incoming edges for backward, its outgoing edges for
-   forward, and `graphify path "A" "B"` to confirm two things actually connect.
+   forward, and `graphify path "A" "B"` to confirm two things actually connect. The graph matches by
+   name, so in typed code take the count from the language server's *find references* or the type
+   checker instead, and grep for names held in strings.
 
    **This question is the structural third of a larger method.** Where a gate's row below says
    *impact trace*, answer it with "The impact trace" section further down: the same backward and
@@ -188,8 +190,10 @@ backward half of this trace asked directly rather than reassembled out of a gene
 there. Then `graphify query` to find and name things, its outgoing edges for the forward half, and
 `graphify path "A" "B"` to settle whether two things actually connect rather than assuming they do.
 `graphify god-nodes` is worth one look when the change touches a hub: an architectural hub with many
-inbound edges is where an underestimated blast radius is most expensive. A grep finds the name; the graph finds what reaches it, and
-the edges that never spell the name are only findable that way. Where graphify is not installed,
+inbound edges is where an underestimated blast radius is most expensive. A grep finds the name; the graph finds
+candidates by name; in typed code, the type checker or language server resolves what actually
+reaches it, including calls through an instance that the graph misses (`/knowledge-graph`,
+*Counting in typed code*). Where graphify is not installed,
 say so once and fall back to grep and read. The trace is still required; it is just slower.
 
 **Refresh the index before you trace, or say that you did not.** A trace is exactly as current as

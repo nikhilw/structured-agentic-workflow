@@ -34,8 +34,12 @@ its own question in front of you. What it finds is settled before the next lens 
 ### Impact: *what does this break that nobody mentioned?*
 
 The method is `/existing-mechanisms`' **impact trace**, all three axes (structural, functional,
-consolidation); it lives there and is not restated here. Two additions every gate uses:
+consolidation); it lives there and is not restated here. Three additions every gate uses:
 
+- **Count with types, not names.** A graph index links symbols by name, so it misses calls made
+  through an instance and merges symbols that share a name. In typed code, take every structural
+  count from the language server's *find references* or the type checker, and use the graph only to
+  find where to look (`/knowledge-graph`, *Counting in typed code*).
 - **Let the compiler do the structural axis for removals and signature changes.** In an isolated copy of the tree (a worktree or scratch checkout, never the working tree), apply every deletion, rename and signature change, then run the project's type checkers over it. Prove it sees the change first by feeding it a deliberate break (RL-4). Empty a deleted module rather than removing it, so every use fails at its own line instead of one unresolved import per file. Point it at everything, not just the source package: scripts, tests, frontend, tooling. Then search for the names as strings, because mocks, patch targets, dispatch tables and config keys are invisible to a type checker.
 - **Follow coupling through storage to both ends.** One piece of code writes a value to a table, file, queue or cache, and another acts on it. No call graph and no type checker connects them. For every value this change writes, find every reader; for every value it reads, find every writer. Check that both ends agree on what the value means. A reader with no writer is a feature that never shows anything. A writer whose value nothing reads is work thrown away. A flag that is set but never cleared makes something run forever.
 
@@ -165,8 +169,9 @@ agree and both be wrong, so agreement alone is never the answer.
 with no phase is a finding. For code: do not check that it matches the plan; check that it works.]
 
 Look through each of these separately:
-1. Impact: trace callers, call sites and dependants both ways [with graphify / the type checkers
-   this repo uses]. Include values one component writes to storage and another reads; no tool
+1. Impact: trace callers, call sites and dependants both ways. Count them with the type checker
+   or language server this repo uses [e.g. tsc, pyright, go build]; a name-based index misses calls made
+   through an instance. Include values one component writes to storage and another reads; no tool
    links those, so check that both ends agree.
 2. Removals: a scalpel, not a butcher's knife. Each removal is justified line by line, its job
    still done. If something is uncalled, ask whether it should be wired in rather than deleted.
