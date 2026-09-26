@@ -1,6 +1,8 @@
 # Driving agy as the plan reviewer and code reviewer
-*Prompts from the owner, 2026-09-26. Launch mechanics: `driving-agy-as-build-model.md`. Setup:
-`agent-cli-setup.md`.*
+*Prompts from the owner, 2026-09-26. Launch mechanics: [driving-agy-as-build-model.md](driving-agy-as-build-model.md).
+Setup: [agent-cli-setup.md](agent-cli-setup.md).
+The generic form of these prompts, for any outside model, is the outside-review brief in
+`skills/review-lenses/SKILL.md`, which every gate offers.*
 
 agy reviews twice per plan, in one conversation: the plan review before the build model is launched
 (after our own plan reviews), and the code review after the build and its review, before

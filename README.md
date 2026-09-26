@@ -177,6 +177,9 @@ Law and adds the requirements tick-off and the drift audit.
 | [philosophy.md](docs/philosophy.md) | Why the workflow is shaped this way |
 | [comparison.md](docs/comparison.md) | Side by side with Spec Kit, Kiro, BMAD, Superpowers, gstack, Compound Engineering and Traycer |
 | [extras/driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md) | Worked recipe: running Cursor's CLI agent headless as the build model |
+| [extras/driving-agy-as-build-model.md](docs/extras/driving-agy-as-build-model.md) | The same for Google's Antigravity CLI (agy): what differs from Cursor |
+| [extras/driving-agy-as-plan-and-code-reviewer.md](docs/extras/driving-agy-as-plan-and-code-reviewer.md) | agy as the outside reviewer: one conversation, a plan review then a code review |
+| [extras/agent-cli-setup.md](docs/extras/agent-cli-setup.md) | One-time setup for cursor-agent and agy: skills, one allowlist in two formats, two probes |
 
 ---
 
@@ -312,7 +315,8 @@ memory store extends it to work that is not phase-shaped.
 take the build lane, which is the point of making the plan a file rather than a conversation.
 Driving Cursor's agent headless in the background is written up end to end, including the
 launch prompt, the failure modes and the lines that prevent them, in
-[driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md).
+[driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md), and the same for
+Google's Antigravity CLI in [driving-agy-as-build-model.md](docs/extras/driving-agy-as-build-model.md).
 
 **Long-lived subagents for long-running work.** A one-off subagent starts cold every time: it
 re-establishes context, re-explores, reports, and throws all of it away. Across a long task

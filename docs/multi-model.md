@@ -163,7 +163,8 @@ here is a plain `SKILL.md`, which Claude Code, Cursor, Gemini CLI, and Copilot a
 > CLI agent headless — the launch command, the prompt that holds up, how to batch a long plan
 > across runs, and the failure modes worth guarding against. Run that way, a completed build
 > returns a few hundred bytes to the planning model instead of a transcript, which is the
-> token saving made concrete.
+> token saving made concrete. [Driving agy](extras/driving-agy-as-build-model.md) covers what
+> differs for Google's Antigravity CLI.
 
 ### Expect halts, and read them correctly
 
@@ -219,6 +220,8 @@ rewrites half the feature has become its author and can no longer review it.
   never heard the reasoning is the best reader for *business sense*, meaning what a typical user
   would find odd. Without a brief it drifts into editing files and filing tickets, answers "do the
   documents agree?" when the question was "is this right?", and pads the answer with what is fine.
+  [Driving agy as the plan and code reviewer](extras/driving-agy-as-plan-and-code-reviewer.md) is
+  a worked example: one conversation that reviews the plan, then the code built from it.
 - **Never put a secret in the plan.** The plan file is committed and read by every
   downstream model and tool. `/write-plan` requires credentials to appear as
   `<from env: API_KEY>` — a named source, never a value.

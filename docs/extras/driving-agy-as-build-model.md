@@ -1,7 +1,9 @@
 # Driving agy (Antigravity CLI) as the build model
-*Verified 2026-09-26 against agy 1.2.11 on the Pi. Setup first: `agent-cli-setup.md`.*
+*A worked recipe for the [multi-model split](../multi-model.md), like the
+[Cursor one](driving-cursor-as-build-model.md). Verified 2026-09-26 against agy 1.2.11 on a Raspberry Pi. Set up
+first: [agent-cli-setup.md](agent-cli-setup.md).*
 
-These sections of `driving-cursor-agent-as-build-model.md` apply to agy unchanged: Never run it
+These sections of [driving-cursor-as-build-model.md](driving-cursor-as-build-model.md) apply to agy unchanged: Never run it
 against a live app, After a killed run check for unrestored mutations, Reported-done is not done,
 It will sometimes work around a gap instead of halting, Batching a long plan, Test suite. This file
 holds only what differs.
