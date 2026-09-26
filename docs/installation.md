@@ -112,6 +112,7 @@ It does three things:
 | `agentic-workflow` | this project | Orchestrates the full development lifecycle |
 | `workflow-config` | this project | Configure preferences — TDD/BDD, caveman brevity, GitHub issues |
 | `brainstorm` | this project | Explore approaches, challenge the design, estimate impact, produce decision documents |
+| `decision-summary` | this project | Plain-words summary of what has been decided, from what you get and how it works. Any time; changes nothing |
 | `write-plan` | this project | Write phased implementation plans |
 | `build-phase` | this project | Execute plan phases with test + self-review; emits a build completion report |
 | `build-model` | this project | Dedicated build-model workflow — build-phase → 3p-review → handoff-summary → stop |

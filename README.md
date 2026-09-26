@@ -80,6 +80,7 @@ globally and define the development lifecycle:
 
 - `agentic-workflow` — orchestrates the full lifecycle; suggests phase transitions automatically
 - `/brainstorm` — explore the problem space before planning (no code, no plans)
+- `/decision-summary` : what has been decided so far, in plain words; ask any time, changes nothing
 - `/write-plan` — write phased plans to `docs/plans/new/` (agent-decoupled)
 - `/build-phase` — execute one plan phase: test-first → implement → scoped tests → self-review
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
@@ -126,6 +127,7 @@ Tier guidance is in [multi-model.md](docs/multi-model.md).
 |---|---|
 | `agentic-workflow` | Orchestrates the lifecycle and drives phase transitions |
 | `/brainstorm` | Explores approaches, challenges the design, writes a decision document |
+| `/decision-summary` | Summarises what has been decided, in plain words: what you will get and how it works. A capability, not a phase |
 | `/write-plan` | Writes a phased, fully-decided plan to `docs/plans/new/` |
 | `/build-phase` | Executes one phase: test-first → implement → scoped tests → self-review |
 | `/build-model` | Entry point for a dedicated build model: build → review → handoff → stop |

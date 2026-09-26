@@ -87,6 +87,7 @@ The workflow is **Brainstorm → Plan → Build → 3p-Review → Verify**, with
 - `vendor/superpowers/` holds upstream skills (`test-driven-development`, `systematic-debugging`, `brainstorming`) pulled by `pull-superpowers.sh`; their kebab names are kept verbatim. Don't hand-edit vendored skills.
 
 ### `verify-completion` replaces the upstream verification skill
+- `decision-summary` : a **capability, not a phase**: a plain-words summary of what has been decided, offered by `brainstorm` once a direction settles and invocable any time. It changes nothing and writes nothing.
 
 `verification-before-completion` is **no longer pulled or installed**. `verify-completion` is a
 superset of it: the same Iron Law, gate function, failure/red-flag/rationalization tables and key

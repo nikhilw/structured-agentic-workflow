@@ -205,6 +205,7 @@ For best results, list the workflow skills in your project's config file (`CLAUD
 - `agentic-workflow` — orchestrates the structured development lifecycle
 - `/workflow-config` — configure workflow preferences (TDD/BDD, caveman output style)
 - `/brainstorm` — explore problem space, challenge the design, produce decision documents
+- `/decision-summary` : plain-words summary of what has been decided so far; any time, changes nothing
 - `/write-plan` — write phased plans to docs/plans/new/
 - `/build-phase` — execute plan phases with test + self-review; produces a build completion report (no review/handoff)
 - `/build-model` — dedicated build-model workflow: build-phase → 3p-review → handoff-summary → stop (alternative entry point to this workflow, for a smaller/faster build session)

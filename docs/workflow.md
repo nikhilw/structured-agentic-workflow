@@ -160,6 +160,9 @@ The skill will:
   checked against
 - Run a **decision audit** against its own recommendation before writing anything down, with the
   lenses run in full on the winner
+- Offer a **`/decision-summary`** once a direction settles, and give one whenever asked: everything
+  decided so far in plain words, from what you will get and how it works. It is not a step; the
+  brainstorm carries on if you do
 - Offer an **outside-review brief** in one line, written out if the owner wants it: another model that never heard the reasoning reads the
   decision the way a newcomer would, which is the reading that finds what makes no business sense
 

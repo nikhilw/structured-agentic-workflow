@@ -37,6 +37,7 @@ globally and define the development lifecycle:
 
 - `agentic-workflow` — orchestrates the full lifecycle; suggests phase transitions automatically
 - `/brainstorm` — explore the problem space before planning (no code, no plans)
+- `/decision-summary` : what has been decided so far, in plain words; ask any time, changes nothing
 - `/write-plan` — write phased plans to `docs/plans/new/` (agent-decoupled)
 - `/build-phase` — execute one plan phase: test-first → implement → scoped tests → self-review
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
@@ -132,6 +133,7 @@ globally and define the development lifecycle:
 
 - `agentic-workflow` — orchestrates the full lifecycle; suggests phase transitions automatically
 - `/brainstorm` — explore the problem space before planning (no code, no plans)
+- `/decision-summary` : what has been decided so far, in plain words; ask any time, changes nothing
 - `/write-plan` — write phased plans to `docs/plans/new/` (agent-decoupled)
 - `/build-phase` — execute one plan phase: test-first → implement → scoped tests → self-review
 - `/build-model` — dedicated build-model session: build → 3p-review → handoff-summary → stop
