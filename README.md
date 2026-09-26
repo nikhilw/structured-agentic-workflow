@@ -15,6 +15,8 @@ without evidence.
 - **Plan with a frontier model, build with a cheap one.** The plan is a file, so the build lane can be any model, or another tool entirely.
 - **Redundant full-suite runs retired.** A four-rung test ladder, scoped per gate, instead of the same suite six or seven times per feature.
 - **Intent is a document, not a ticket.** `/brainstorm` records what you chose, why, and what would reverse it.
+- **A rule change is a table, not a paragraph.** Every case the rule can meet, today's outcome beside each proposal's; the rows that differ are the change, and they become the plan's test cases.
+- **One set of review lenses, from first idea to finished code.** Impact, removal, logic, behaviour, business sense, proof and coherence, one question each, on the approaches, the plan and the built code.
 - **Drift blocks the claim.** Decision doc against plan, plan against code, checked before anything is called done.
 - **A review that owns the code.** `/3p-review` loops to zero findings at every severity, minors included.
 - **No mock on the value path.** A path with no test across the real seam cannot pass review.
@@ -166,7 +168,7 @@ Law and adds the requirements tick-off and the drift audit.
 ## What makes this different
 
 There are other agent-skill libraries — [obra/superpowers](https://github.com/obra/superpowers)
-is the best known, and this workflow composes with it rather than competing. Six things set
+is the best known, and this workflow composes with it rather than competing. Eight things set
 this one apart:
 
 **1 · The build model doesn't have to be the planning model.**
@@ -199,17 +201,9 @@ A small build model fills every silence with the happy path. So `/write-plan` fo
 expensive model to write the foresight *down*: failure modes, lifetimes, error codes and
 their owners, concurrency and aliasing, named seam tests per value path, and exact
 command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
-or marked new. Then nine review passes before it is saved, one question each, because a pass with
-mixed goals answers the easiest one: **impact** (trace backward and forward from everything the plan
-changes the meaning of, count the callers, and let a type checker on an isolated copy find the rest),
-**removal** (justify every deletion and prove its job is still done), **logic** (step the design
-through concrete cases, crashes, concurrent runs and settings that defeat each other), **behaviour**
-(what a human user sees on every surface), **business sense** (would a typical user who never heard
-the reasoning find it odd), **contracts** (is it what was decided, at the size agreed),
-**proof** (would each test fail if the phase were built wrong), **coherence** (does the edited plan
-still agree with itself and build in order), and **executability** (can another agent run it as
-written). Impact runs first and starts from the codebase, not the document: a caller that breaks
-the build is never in the plan, so checking the plan's own names will not find it.
+or marked new. Then nine review passes before it is saved, one question each (see 7), and the
+first starts from the codebase rather than the document: a caller that breaks the build is never in
+the plan, so checking the plan's own names will not find it.
 
 **5 · Index-first codebase search, with the questions that go with it.**
 `/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/Graphify-Labs/graphify)
@@ -233,6 +227,27 @@ down: the build model halts and reports rather than working around a gap, the pl
 the plan and appends to its **Amendment Log**, and `/verify-completion` reads the decision document
 against the plan and the plan against the code before anything is called done. Undocumented drift
 blocks the completion claim.
+
+**7 · Every review looks through the same lenses, and one at a time.**
+A review that carries several questions at once answers the easiest and reports clean on the rest.
+So `review-lenses` gives each question its own pass: **impact** (what else this reaches),
+**removal** (is every deletion justified and its job still done), **logic** (step it through real
+cases, crashes and concurrent runs), **behaviour** (what the user actually sees, on every surface),
+**business sense** (would a typical user who never heard the reasoning find it odd), **proof** (would
+the tests fail if it were built wrong) and **coherence** (does the document still agree with
+itself). `/brainstorm` looks through them at every approach, where a lens can still rule one out;
+`/write-plan` runs them as its passes; `/3p-review` runs them on the built code. What the user will
+see is written into the decision document and checked at every later gate, and each gate can hand a
+filled-in brief to another model, because the reader who never heard the reasoning is the one who
+spots what makes no business sense.
+
+**8 · A rule change is a table, not a paragraph.**
+Some changes add a thing; others change *when* something happens: a trigger, a filter, a default, a
+threshold. Prose describes the cases someone thought of, and the case nobody thought of is the one
+that ships. So `/brainstorm` enumerates the cases from the state the rule reads, puts today's outcome
+beside each approach's, and labels every row that differs as the fix or as collateral nobody asked
+for. Two proposals that sound equally targeted turn out to move three rows and nine, and the
+differing rows become the plan's test cases.
 
 ```mermaid
 flowchart LR

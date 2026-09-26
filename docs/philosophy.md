@@ -140,6 +140,20 @@ things well, and with codebase-comprehension tools (like
 Install domain-specific skills for TDD, debugging, and verification. Then let this workflow
 orchestrate when to invoke them.
 
+### 9. Look From More Than One Place, One Question at a Time
+
+A reviewer asked to check everything checks what is easiest and reports the rest as clean. So
+every review here is split into lenses, each with one question: what else this reaches, what it
+removes, whether it works when it runs, what the user sees, whether it makes business sense,
+whether the tests would catch it, whether the document agrees with itself. The same lenses are used
+on the first idea, the plan and the finished code, and they matter most at the start, when a lens
+can still rule an approach out instead of patching it.
+
+Two of them need a different reader. What the user sees is judged from the user's seat, not the
+builder's. Business sense is judged best by someone who never heard the reasoning, because every
+odd choice looks sensible to the person who knows why it was made. That is why each gate can hand
+its work to another model with a brief.
+
 ## The Trade-offs
 
 **What you gain:**

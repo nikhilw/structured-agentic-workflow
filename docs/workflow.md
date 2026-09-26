@@ -16,11 +16,13 @@ flowchart TD
 
     subgraph Brainstorm ["1 · Brainstorm — /brainstorm · planning model"]
         B1["Refresh graphify index once, if installed,<br/>then explore the problem space"] --> B1a["existing-mechanisms<br/>all 8 questions answered"]
-        B1a --> B2["Propose approaches<br/>minimal ↔ structural<br/>+ E: ideal, then adjusted"]
-        B2 --> B3["Challenge the obvious solution"]
+        B1a --> B2["Propose approaches<br/>minimal ↔ structural<br/>+ E: ideal, then adjusted<br/>each through the review lenses"]
+        B2 --> B2a["Scenario table<br/>if a rule moves"]
+        B2a --> B3["Challenge the obvious solution"]
         B3 --> B4{"Human satisfied?"}
         B4 -- "refine / pivot" --> B1
-        B4 -- "direction chosen" --> B5["Decision audit, then save<br/>docs/discussions/"]
+        B4 -. "any time" .-> DS["/decision-summary<br/>plain-words recap<br/>changes nothing"]
+        B4 -- "direction chosen" --> B5["Decision audit, lenses in full,<br/>then save docs/discussions/<br/>with What the User Sees"]
     end
 
     B5 --> P1
@@ -70,7 +72,7 @@ flowchart TD
     BC --> R1
 
     subgraph FullReview ["4 · Holistic Review — /3p-review · main model, fresh eyes"]
-        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>re-derive claims: FULL suite - T4"] --> R2{"Findings?"}
+        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>behaviour · business sense on the built thing<br/>re-derive claims: FULL suite - T4"] --> R2{"Findings?"}
         R2 -- "fixable in place" --> R3["Fix issues"]
         R3 --> R4["Re-test<br/>scoped per /test-scope"]
         R4 --> R1
@@ -151,6 +153,10 @@ The skill will:
   decisions are actually costing you
 - **Challenge the obvious solution** — how far is the recommendation from that ideal, and what does
   the distance buy?
+- When an approach changes a rule rather than adding a thing (a trigger, a filter, a default, a
+  threshold), build a **scenario table**: every case from the state the rule reads, today's
+  outcome beside each approach's, and every differing row labelled as the fix or as collateral.
+  The differing rows become the plan's test cases
 - Look at every approach through the **review lenses** (`review-lenses`): impact, removal, logic,
   behaviour, business sense, proof and coherence, one question at a time. They matter most here,
   where a lens can still eliminate an approach instead of patching a plan. **Behaviour** writes down
