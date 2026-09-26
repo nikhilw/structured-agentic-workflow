@@ -37,6 +37,7 @@ cell is out of date, open an issue and it gets fixed.*
 | Plan audited against the original intent before "done" | ✅ | ◐ artifact analysis | – | – | – | – | – | – |
 | Builder halts on plan gaps; every plan change logged | ✅ | – | – | – | – | – | – | – |
 | Plan built by another model or vendor, with a return report | ✅ | – | – | ◐ | – | ◐ second opinion | ◐ cross-model work | ✅ |
+| Review by another vendor's model | ✅ ready-made brief | – | – | – | – | ✅ built in | – | – |
 | Separate single-question review passes, idea to code | ✅ | – | – | ◐ personas | ◐ two-stage | ◐ role reviews | ◐ multi-agent | – |
 | Business-sense review, owner's own decisions included | ✅ | – | – | ◐ PM persona | – | ✅ CEO review | – | – |
 | Rule changes tabled case by case, today against proposed | ✅ | ◐ scenarios | ◐ EARS criteria | – | – | – | – | – |

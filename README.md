@@ -16,7 +16,8 @@ shipped is what you meant, and makes the agent prove it.
 - **Your intent is the baseline.** What you chose, what you ruled out and what the user will see
   are recorded before anything is planned. Once the plan is approved, only you can change them.
 - **A frontier model supervises.** It designs, writes a plan that leaves nothing to guess, and
-  reviews through seven lenses, from impact to business sense.
+  reviews through seven lenses, from impact to business sense. Another vendor's model can review
+  too, from a ready-made brief.
 - **Any model or tool builds.** Claude, Codex, Cursor, Gemini, across vendors, at a fraction of the
   cost. A gap in the plan makes it stop and report, never improvise.
 - **Drift blocks "done".** Code is audited against the plan, and the plan against your intent.
@@ -26,15 +27,11 @@ shipped is what you meant, and makes the agent prove it.
 
 ## Highlights
 
-- **Plan with a frontier model, build with a cheap one.** The plan is a file, so the build lane can be any model, or another tool entirely.
 - **Redundant full-suite runs retired.** A four-rung test ladder, scoped per gate, instead of the same suite six or seven times per feature.
-- **Intent is a document, not a ticket.** `/brainstorm` records what you chose, why, and what would reverse it.
 - **A rule change is a table, not a paragraph.** Every case the rule can meet, today's outcome beside each proposal's; the rows that differ are the change, and they become the plan's test cases.
 - **One set of review lenses, from first idea to finished code.** Impact, removal, logic, behaviour, business sense, proof and coherence, one question each, on the approaches, the plan and the built code.
-- **Drift blocks the claim.** Decision doc against plan, plan against code, checked before anything is called done.
 - **A review that owns the code.** `/3p-review` loops to zero findings at every severity, minors included.
 - **No mock on the value path.** A path with no test across the real seam cannot pass review.
-- **The build model halts, never works around.** A plan gap comes back as a report, not an invented fix.
 - **Nothing finishes smaller than it started.** Every removal is audited with its replacement named.
 - **Evidence before claims.** No "done" without a run you made yourself this session.
 - **Works with any agent.** Claude Code, Cursor, Gemini CLI, Copilot, and 40+ others.
