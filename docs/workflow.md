@@ -1,7 +1,8 @@
 # The Development Lifecycle
 
 Every significant change follows a rigid, iterative cycle:
-**Brainstorm → Plan → Build → 3rd-Person Review → Verify**.
+**Brainstorm → Plan → Build → 3rd-Person Review → Verify**. It is intent-audited: Brainstorm
+records what you meant, and Verify checks what shipped against it.
 
 Phases are never skipped and never collapsed together. Each catches a different class of
 error — see [philosophy.md](philosophy.md) for why.

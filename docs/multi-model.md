@@ -3,7 +3,9 @@
 *Buy expensive reasoning once. Spend cheap execution as often as you like.*
 
 This is the part of the workflow that most other agent-skill libraries do not have, and it
-is the reason the plan is a **file** rather than a conversation.
+is the reason the plan is a **file** rather than a conversation. It is also what makes
+intent-audited development affordable: the frontier model spends its reasoning on your intent and
+on checking the work against it, and cheaper models do the typing in between.
 
 ---
 

@@ -33,6 +33,12 @@ you.
 This is not a limitation. It is a superpower. You operate at the speed of thought with an
 incredibly fast engineer executing your vision — as long as you provide the scaffolding.
 
+**And a manager checks the result against what they asked for.** That is the name for how this
+workflow works: **intent-audited development**. Spec-driven development builds to a spec;
+intent-driven development writes the intent down. Here, your intent becomes the baseline. The plan
+is audited against it, the code against the plan, and a difference nobody agreed to blocks "done".
+The spec is a means; what you meant is the measure.
+
 ## The Principles
 
 ### 1. Never Skip Phases

@@ -1,8 +1,9 @@
 # How it compares
 
-Most agent workflows stop at "does the code match the spec?". This one keeps going: **does what
-shipped match what you meant, and can the agent prove it?** Here is how that lands next to the
-best-known alternatives.
+Most agent workflows stop at "does the code match the spec?". This one practises
+**intent-audited development**: your intent is the baseline, and the work is checked against it
+before it counts as done. Does what shipped match what you meant, and can the agent prove it? Here
+is how that lands next to the best-known alternatives.
 
 *Compared from each project's public documentation as of September 2026. Tools move fast; if a
 cell is out of date, open an issue and it gets fixed.*

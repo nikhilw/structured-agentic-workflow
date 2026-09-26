@@ -1,17 +1,20 @@
 # The Structured Agentic Development Workflow
 
-*Agent skills that keep humans and AI agents focused while building real software — and let
-you spend frontier-model reasoning on design while a cheaper model does the typing.*
+*Agent skills for **intent-audited development**: you decide what to build, a frontier model
+plans and supervises, any model builds, and nothing is done until the work is checked against what
+you meant.*
 
 Every significant change follows one cycle:
 **Brainstorm → Plan → Build → 3rd-Person Review → Verify.**
 Phases are never skipped, plans are files rather than conversations, and nothing is "done"
 without evidence.
 
-## Intent-driven, supervised, any model
+## Intent-audited development
 
-Spec-driven development asks whether the code matches the spec. This workflow asks whether what
-shipped is what you meant, and makes the agent prove it.
+Spec-driven development builds to a spec. Intent-driven development writes the intent down.
+**Intent-audited development** makes your intent the baseline and checks the work against it
+before anything ships: not "does the code match the spec?" but "is this what you meant, and can
+the agent prove it?"
 
 - **Your intent is the baseline.** What you chose, what you ruled out and what the user will see
   are recorded before anything is planned. Once the plan is approved, only you can change them.
