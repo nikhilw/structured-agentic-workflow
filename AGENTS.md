@@ -39,6 +39,13 @@ short, never skipped: a one-line fix gets one line per lens, saying what it chec
 4. **Behaviour.** Take the owner's seat and the loading model's. Does everything the owner has to
    rule on reach the chat under AW-28, or could it be squeezed into a one-line update? Does a model
    that loads only this one skill still have every rule it needs?
+   **Then check the change has not made the agent more talkative.** This has been fixed before and
+   comes back whenever a change adds steps. Look for what *induces* chatter, not for missing
+   brevity rules (AW-28 and AW-29 own brevity; do not add a third source): a new step a model could
+   narrate as its own update; a template that reports because a step finished rather than because
+   the owner must rule; a block written into chat that nobody asked for; an offer repeated every
+   turn; a per-item field that says the same for every item. A gate that gained steps and emits
+   reports needs the AW-28/29 binding copy (see Conventions). Cut the inducer.
 5. **Business sense.** Read the change as a cost-conscious owner who hands builds to cheaper
    models. Look for noise repeated at every gate, points they already ruled on being raised again,
    a heavy step on a trivial task, and output nobody will use.
@@ -64,6 +71,7 @@ short, never skipped: a one-line fix gets one line per lens, saying what it chec
 - History in an instruction ("used to", "no longer", "as this once did"): the reader needs the
   rule, not the story.
 - A binding copy that drifted from its reference, or that was never written.
+- More steps with no AW-28 copy at the gate, so each step becomes its own chat update.
 
 **Report it bad news first**: the findings that would have misled a model, then a count per lens,
 then what the review could not do (RL-3). Your own business-sense read is the weakest one, because
@@ -79,6 +87,7 @@ The workflow is **Brainstorm → Plan → Build → 3p-Review → Verify**, with
 - `build-phase` — **model-agnostic**: builds phases via TDD → test → self-review, emits a build completion report. Owns no review/handoff.
 - `handoff-summary` — emits the fixed-format **Build Handoff Summary** (loaded at generation time for format reliability).
 - `3p-review`, `brainstorm`, `write-plan`, `triage`, `workflow-config` — the rest of the lifecycle.
+- `decision-summary` : a **capability, not a phase**: a plain-words summary of what has been decided, offered by `brainstorm` once a direction settles and invocable any time. It changes nothing and writes nothing.
 - `verify-completion` — the final gate: fresh full-suite result, line-by-line plan-requirements tick-off, and the **drift audit** (decision doc → plan → code). Ours, and it **replaces** the upstream verification skill; see the note below.
 - `test-scope` : a **reference, not a step**. Holds the test-run ladder (focused → impacted → segment → full), the triggers that void a scoped run, and the citable-run rule. `user-invocable: false`; the skills that run tests read their rung out of it.
 - `existing-mechanisms` : a **reference, not a step**. Holds the eight questions about what the codebase already does (callers, duplicates, incumbent relationship, retirement, bifurcation), the **impact trace** (structural, functional, consolidation) that answers question 1 properly, the **second sweep** and its two halves, and the table of which gate answers which at what depth. `user-invocable: false`. The gates that run the trace keep a compressed binding copy of the three axes inline, on the same principle as the graph's three limits: the reference carries the method, the gate carries enough that nothing is lost if it is never opened.
@@ -87,7 +96,6 @@ The workflow is **Brainstorm → Plan → Build → 3p-Review → Verify**, with
 - `vendor/superpowers/` holds upstream skills (`test-driven-development`, `systematic-debugging`, `brainstorming`) pulled by `pull-superpowers.sh`; their kebab names are kept verbatim. Don't hand-edit vendored skills.
 
 ### `verify-completion` replaces the upstream verification skill
-- `decision-summary` : a **capability, not a phase**: a plain-words summary of what has been decided, offered by `brainstorm` once a direction settles and invocable any time. It changes nothing and writes nothing.
 
 `verification-before-completion` is **no longer pulled or installed**. `verify-completion` is a
 superset of it: the same Iron Law, gate function, failure/red-flag/rationalization tables and key
