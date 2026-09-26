@@ -214,6 +214,14 @@ the user accepted it explicitly, and it is the likeliest thing in the whole docu
 built as though it had never been decided. A row whose built behaviour does not match its decided
 outcome is a drift finding like any other, and it is reported with both cells quoted.
 
+### What the User Sees, if the decision document has it
+
+The same check for the section that records what the user was promised (BS-14): each expectation
+sentence, in the user's words, against what the built thing does on the surface where the user
+would check it. Run it where you can drive it, and say where you only read the code. A sentence the
+build does not honour is a drift finding, reported with the sentence quoted beside what the user
+actually gets. So is an item under *Would find odd* that the owner ruled on and the build ignored.
+
 ### DecisionDoc → Code: what was decided, against what actually shipped
 
 The round trip, and the one that catches what the two comparisons above cannot on their own. Read
@@ -250,7 +258,7 @@ it, you are no longer measuring anything.
 Concretely, during this gate you may not:
 
 - change, reword, soften, "clarify", "correct", or delete **one word** of the decision document's
-  Problem, Contracts, Approaches, Decision, or Consequences sections, or of any existing Amendments
+  Problem, Contracts, Approaches, Decision, What the User Sees, or Consequences sections, or of any existing Amendments
   entry;
 - change, reword or delete any part of the plan, including existing Amendment Log entries;
 - do any of the above and then report a better verdict.
@@ -382,6 +390,8 @@ replacement never landed, and deletions no removal table named. Or "Nothing."]
 - **Scenario table:** [N] differing rows checked against the built behaviour, [N] matched; each
   mismatch is a row above. [Or: the decision document carries no table, or it records "not a rule
   change".]
+- **What the User Sees:** [N] expectation sentences checked against the built behaviour, [N] held;
+  each broken one is a row above. [Or: the decision document has no such section.]
 - **DecisionDoc → Code:** [does the code solve the problem that was decided; did the document's
   "what would reverse this decision" condition come true during the build; did the amendments add
   up to an approach nobody chose].

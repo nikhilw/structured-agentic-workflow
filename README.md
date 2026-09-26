@@ -88,6 +88,7 @@ globally and define the development lifecycle:
 - `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
 - `test-scope` : how wide each test run must be, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
+- `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
@@ -133,6 +134,7 @@ Tier guidance is in [multi-model.md](docs/multi-model.md).
 | `/verify-completion` | The final gate: fresh suite, requirements tick-off, decision-to-code drift audit |
 | `test-scope` | The shared test-run ladder and the citable-run rule the other skills defer to |
 | `existing-mechanisms` | The eight questions about what already exists, shared by brainstorm, plan, build and review |
+| `review-lenses` | The review perspectives (impact, removal, logic, behaviour, business sense, proof, coherence), which gate runs each, and the brief for an outside reviewer |
 | `/triage` | Recommends the next task, minimizing context thrash |
 | `/github-backlog` | Maintains features and bugs as GitHub issues |
 | `/workflow-config` | Sets TDD/BDD, output brevity, and backlog source |
@@ -195,10 +197,17 @@ A small build model fills every silence with the happy path. So `/write-plan` fo
 expensive model to write the foresight *down*: failure modes, lifetimes, error codes and
 their owners, concurrency and aliasing, named seam tests per value path, and exact
 command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
-or marked new. Then three review passes before it is saved, the first of which starts from the
-codebase rather than the document: trace backward and forward from everything the plan changes
-the meaning of, count the callers, and settle the plan's scope before the other two judge it. A caller that
-breaks the build is never in the plan, so checking the plan's own names will not find it.
+or marked new. Then nine review passes before it is saved, one question each, because a pass with
+mixed goals answers the easiest one: **impact** (trace backward and forward from everything the plan
+changes the meaning of, count the callers, and let a type checker on an isolated copy find the rest),
+**removal** (justify every deletion and prove its job is still done), **logic** (step the design
+through concrete cases, crashes, concurrent runs and settings that defeat each other), **behaviour**
+(what a human user sees on every surface), **business sense** (would a typical user who never heard
+the reasoning find it odd), **contracts** (is it what was decided, at the size agreed),
+**proof** (would each test fail if the phase were built wrong), **coherence** (does the edited plan
+still agree with itself and build in order), and **executability** (can another agent run it as
+written). Impact runs first and starts from the codebase, not the document: a caller that breaks
+the build is never in the plan, so checking the plan's own names will not find it.
 
 **5 · Index-first codebase search, with the questions that go with it.**
 `/brainstorm` and `/write-plan` build and query a [graphify](https://github.com/Graphify-Labs/graphify)

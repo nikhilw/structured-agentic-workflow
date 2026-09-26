@@ -13,7 +13,8 @@ allowed-tools: Read, Grep, Glob, Edit, Bash
 
 > **How much of a review reaches the user.** Three things are emitted in full, and they are the
 > three they have to rule on: a Rework Brief going back, a finding that changes the plan or the
-> decision document, and the Part 3 sign-off. Everything else is **one line** (AW-28): intake done,
+> decision document, and the Part 3 sign-off, whose *For the owner* line carries the business-sense
+> questions. The outside-review brief is written out too, but only when they ask for it. Everything else is **one line** (AW-28): intake done,
 > a round finished, findings you are fixing yourself, a suite gone green. All of it is *said, not
 > saved* (AW-29). The ledger below is your working record, not a document on disk and not a
 > transcript for them.
@@ -65,7 +66,7 @@ State what you are diffing against and cover the **whole** change surface. A rev
 
 ### Read the governing artifacts
 
-These define what "correct" means here: project instructions (`CLAUDE.md`, `AGENT.md`, `.cursorrules`), the active plan in `docs/plans/`, any binding decision doc in `docs/discussions/`, and the Build Handoff Summary if one exists.
+These define what "correct" means here: project instructions (`CLAUDE.md`, `AGENTS.md`, `.cursorrules`), the active plan in `docs/plans/`, any binding decision doc in `docs/discussions/`, and the Build Handoff Summary if one exists.
 
 ### Build the review ledger
 
@@ -117,6 +118,8 @@ Everything below re-runs each round, re-reading the code **from disk**. You are 
 
 ## Round N: Review
 
+**Load `/review-lenses` once, before Round 1**, if you have not this session. Several sections below are its lenses run on built code, and name their lens; they carry a binding copy, and the reference has the full checklist.
+
 ### Plan & Decision Conformance
 
 Do this first — a well-written function implementing the wrong decision is not fixable by a code-quality pass.
@@ -157,6 +160,8 @@ Brainstorm discovered these contracts; the plan made them executable; you prove 
 - [ ] Concurrency: race conditions, thread safety, deadlocks
 - [ ] **Failure timeline** — for any operation with an external or non-transactional side effect, reconstruct the step order (resolve input → claim work → lock → revalidate → write → confirm → record completion → reconcile), then walk each gap: what does a crash, lost lease, cancellation, or lock timeout leave behind, and what cleans it up? "Check for races" catches nothing; the timeline is what makes a missing revalidation visible. Detail in `deep-audits.md`.
 - [ ] **Aliasing** — where two call sites hold the same object, connection, buffer, or config, a mutation by one is visible to the other. Check what is shared vs copied at each boundary.
+- [ ] **Walk it, do not read it.** This section is `/review-lenses`' **logic lens**, its `/3p-review` column: step the built code through concrete values rather than reading it for plausibility. The items above are its core; also walk the ones a read never catches. **Work reported but never cleared**: every scheduler, sweeper or retry has a condition that stops it; find it. **Values against each other**: every threshold, weight and timeout beside the ones it meets. **Can the code express the decided rule at all?** **Rules that overlap**, and whether their order is pinned. **Reuse across a contract**: a helper built for unpaged, ordered, single-threaded or trusted input, now called where that does not hold.
+- [ ] **Coupling through storage, both ends.** For every value this change writes to a table, file, queue or cache, find every reader; for every value it reads, find every writer. No call graph links them. A reader with no writer, a writer nobody reads, or a flag nobody clears is a finding.
 
 ### Conditional Deep Audits
 
@@ -188,10 +193,23 @@ If you find yourself reasoning "this is minor, so a lighter review is proportion
 - [ ] **Is there a better structural approach?** A different data model, a different abstraction, removing instead of adding. Flag as MAJOR with `[DESIGN ALTERNATIVE]`.
 - [ ] **Root problem or symptom?** If this will need revisiting when the underlying issue resurfaces, say so.
 
+### Behaviour
+
+`/review-lenses`' **behaviour lens**, run on the built thing rather than on its description. Where you can drive it (a browser, a CLI, a script against a local instance), drive it; a surface you only read about is recorded as read, not checked.
+- [ ] **The decision document's What the User Sees, sentence by sentence.** Does the built thing do what each sentence says, on the surface where the user would check? Where the document has no such section, say so and write the two or three main expectations yourself before judging.
+- [ ] **Every surface that shows the changed data**: screens, reports, exports, dossiers, notifications, prompts to models. A field blank on one of them, or a link that opens nothing, is a finding the tests cannot see.
+- [ ] **Similar actions behave the same.** Re-read and delete, archive and remove, retry and resume. If one cleans up and the other does not, that is a finding.
+- [ ] **The second caller and the late one** get a sensible answer, and "already done" is distinguishable from "nothing there".
+
+### Business Sense
+
+`/review-lenses`' **business-sense lens**. The plan does not matter on its own; the built thing has to work the way the business needs. Read what it does as a typical user of this domain who never heard the reasoning, and flag what they would find odd, surprising or pointless, including where the plan and decision document asked for exactly that. A point the owner already ruled on, recorded under the decision document's *Would find odd*, is not raised again unless the build behaves differently from what they ruled on. What this turns up is **a question for the owner, not a finding**: the thing being questioned is usually a decision, and deciding it is not yours. Record each one in the ledger as `[BUSINESS SENSE]`, with who is surprised, by what, and what they expected. They do not carry a severity and do not hold the gate, so they cannot keep the loop open. They also cannot be dropped: every one goes in the exit report's *For the owner* line, and one the owner rules a defect reopens the review at Round N+1 as a finding. Where the built thing departs from what the plan asked for, that is a conformance finding in the usual way, not one of these.
+
 ### Codebase Consistency & Refactoring
 Go beyond the changed files — grep and read the surrounding code. This is `/existing-mechanisms`' *"`/3p-review`, Codebase Consistency"* row: questions 3, 5 and 8, run against the code as built. Load it if you have not this session.
 - [ ] **Consistency:** does new code solve this the way the codebase already solves it? If not, which wins, and should other call sites change?
 - [ ] **Pattern extraction:** does this duplicate logic that already exists, or now exists twice? (question 3)
+- [ ] **Removed with a scalpel** (`/review-lenses`' removal lens). Each deletion in the diff: what job it did, what does that job now, and the test on the new path proving it. Before accepting "it was dead", ask whether it was really missing its call.
 - [ ] **Retirement actually happened** (question 5): walk the plan's *Retired by this plan* removal table row by row against the diff. A superseded mechanism still installed is dead weight the next reader cannot tell from live code. Two rows fail harder than that: one whose *Replaced by* never landed, which is a capability the feature took away. That one is **CRITICAL**, and reported in those words, because no suite can see it once the tests went with it. The other is a deletion in the diff that the table never named, which is a removal nobody audited. And a test still covering a path this change made unreachable is a coverage hole, not a pass: green, and proving nothing.
 - [ ] **Bifurcation** (question 8): if this added a second pathway beside an existing one, the plan said so and said what collapses it back. If the plan did not, this is the finding.
 - [ ] **The plan's Impact Analysis block, checked against the code as built.** The plan's impact pass wrote it and nothing has read it since, so its claims have been carried this whole way unverified. Three of them are checkable here and nowhere else. **The consolidation verdict**: the plan said this leaves the codebase with fewer ways to do this job, or more; is that what the diff actually did? A plan claiming "this unifies X and Y" whose diff leaves both standing is a finding. **The extractions**: each one the block named, with the phase that was supposed to perform it. An extraction planned and quietly skipped is the duplication this review would otherwise log as pre-existing mess. **The out-of-scope sites**: each one the plan declared unaffected, with its stated reason. A site ruled out on a reason the built code no longer satisfies is a regression nobody is looking for, because the document says it cannot happen. Where the plan carries no such block, say so; it means these went unchecked rather than checked clean.
@@ -224,6 +242,7 @@ Enforce these as **engineering judgment, not a rulebook**: each item is a questi
 - [ ] Would they catch a regression if someone changes this code?
 - [ ] **Negative guards tested in a non-default state?** A permission check tested only as admin, a filter tested only with a matching row, an error branch tested only on the happy fixture — all pass while proving nothing.
 - [ ] **Mutation-check what matters.** For each test guarding security, authority, or filtering: break the guard in the source, confirm the test fails, restore it. A guard whose test still passes without the guard is decoration — **CRITICAL**.
+- [ ] **Proof, per `/review-lenses`' proof lens.** Tests run the path production runs, not a shortcut constructor or an internal step production never takes. Existing tests that kept passing but now assert something true in every mode are a finding, not a pass. Fixtures are large enough to reach the path under test.
 - [ ] **Fixture hygiene:** no private or production data, no secrets, no oversized assets, no nondeterminism (real clocks, network, randomness, ordering assumptions).
 
 ## Round N: Report Findings
@@ -301,10 +320,12 @@ Every item gets a failing-test-first instruction. Never send a partially-fixed w
 
 #### Before you hand it over
 
-A brief is executed literally by a model that cannot see what you meant, so a wrong line number does not produce a question; it produces an invented implementation. Run a plan's three review passes against your own brief, in the order the plan runs them and for the same reason: the trace can still add fixes to the brief, so names verified before it are names verified against a list that was about to grow.
+A brief is executed literally by a model that cannot see what you meant, so a wrong line number does not produce a question; it produces an invented implementation. Run the plan reviews that apply to a brief, the ones below, in the order `/write-plan` runs them and for the same reason: the trace can still add fixes to the brief, so names verified before it are names verified against a list that was about to grow.
 
 - **First, trace what the fixes change the meaning of.** This is a plan's impact pass, run on the brief, and it starts from the code rather than from the brief: `/existing-mechanisms`' **impact trace**, all three axes. **Structural**, for every symbol, default, format or contract a fix alters, what reaches it and what it reaches, including the inbound edges that never spell the name. **Functional**, which end-to-end flows the fixes move, since a review fix that satisfies a finding and breaks a flow is the worst possible trade at this stage. **Consolidation**, whether the fixes leave anything unused, add a pathway beside an existing one, or duplicate something the codebase already has; a rework round is where that happens most, because each finding is fixed in isolation. **Count the call sites; do not estimate them.** A brief that says four sites where there are seven is executed at four, and comes back green. A fix whose callers are not in the brief is the review handing the build model the same gap the plan had.
+- **Then walk each fix through the cases around it.** This is `/review-lenses`' logic lens, applied to the brief. A review fix is written against one finding, which makes it the most likely change to break the cases next to it: the empty input, the page boundary, a crash between its writes, two copies running at once, a helper reused across a contract it was never built for. Step each fix through those with concrete values before handing it over.
 - **Then read the brief back against the decision document.** It can satisfy every finding you raised and still ask for something the decision ruled out. It is the same drift pass you run on the code, run on your own instructions.
+- **Then check that each fix's failing test would actually fail.** This is the proof lens: name the revert, and confirm the assertion sees it. A brief whose tests go green on the unfixed code comes back green and unfixed.
 - **Then confirm every name, file, line and command in it exists.** Check them one at a time against the codebase, not against your memory of reading it an hour ago. This is `/existing-mechanisms`' *"`/3p-review`, before a Rework Brief is handed over"* row: the second sweep, run against the artifact.
 - **And check whether any fix is inert without another.** Two guards on consecutive lines means removing one changes nothing. Name the pairing and require them built together, or the round costs a relaunch and moves nothing.
 
@@ -362,8 +383,12 @@ Final: 0 critical, 0 major, 0 minor
 **Changes made during review:** [files touched while fixing — or "none"]
 **Manual gates / risk acceptance:** [what was accepted, by whom, in what words — or "none"]
 **Follow-ups (non-blocking):** [file:line — description, or "none"]
+**For the owner (business sense):** [each `[BUSINESS SENSE]` question: who is surprised, by what, what they expected; or "none", with the journeys walked]
 
 Status: PASSED — I am signing off on this code as its new owner.
 ```
 
 If you cannot truthfully write `0 / 0 / 0`, you have not finished. Loop again.
+
+**Offer an outside review with the sign-off**, unless you are running under `/build-model`: the main model re-reviews a handed-off build on its return, and that review is the one that offers it. Offer it in one line, and when the user says yes, write out `/review-lenses`' outside-review brief, filled in for this build: the commits, the plan, the decision document and the business requirement. Say plainly that it asks whether the code is *right*, not whether it matches the plan. A second model with no stake in the reasoning is the cheapest source of business-sense findings there is. If the user runs it, its findings reopen this review at Round N+1, and are rejected only under RL-5.
+

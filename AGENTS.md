@@ -1,12 +1,74 @@
-# AGENT.md
+# AGENTS.md
 
-Minimal project guide. This repo **is** the Structured Agentic Development Workflow — a set of agent skills (`SKILL.md` files), not an application.
+Minimal project guide, read by every agent that works on this repo. Claude Code reaches it through
+`CLAUDE.md`, which only imports this file; put nothing else there, or the two will drift. This repo **is** the Structured Agentic Development Workflow: a set of agent skills (`SKILL.md` files), not an application.
 
 ## Edit local files only
 
 - The source of truth is **this repo's `skills/`** directory. Edit and reference only files here.
 - Do **not** edit the installed copies under `~/.claude/skills/`, `~/.cursor/skills/`, etc. Those are install targets — on this machine the Claude symlinks resolve to `~/.agents/skills/` (a separate non-git copy), not to this repo. Editing them is editing the wrong file.
 - Changes here are **not live** until installed. `./install.sh --local` symlinks every `skills/*/` dir into the agent skill dirs (it auto-discovers new skill folders). Re-run it after adding or changing a skill.
+
+## Review your own change, every time, unprompted
+
+After any edit to `skills/`, `docs/`, the README or this file, and before you report the work done
+or offer a commit, review your own diff through `skills/review-lenses/SKILL.md`. Do not wait to be
+asked. Every time this has been asked for by hand, it has found real defects, usually several
+critical ones, in edits that looked finished. The skills are instructions other models execute
+literally, so a contradiction you leave in them becomes wrong behaviour in every project that
+installs them.
+
+**Run each lens on its own, in this order, and settle what it finds before the next one starts**
+(RL-1): fix it, or put it to the owner where it is theirs to decide. A small edit makes each lens
+short, never skipped: a one-line fix gets one line per lens, saying what it checked.
+
+1. **Impact.** Start from what your edit changed the *meaning* of, not from the files you touched:
+   a renamed section, a new or moved rule, a changed count or order, a new template field, a
+   changed exit condition. Search the whole repo for every reader of each one, `docs/` included,
+   `vendor/` excluded, and search on every spelling (hyphenated, plural, the old name, the number
+   written as a word). Check the rule tags you cite resolve, and that no new name collides with an
+   existing one in another skill.
+2. **Removal.** Walk every deleted line in `git diff`. Say what job it did and where that job lives
+   now. Something moved into a reference skill still needs its binding copy at the gate.
+3. **Logic.** Step a model through the edited skills with concrete scenarios, not a reading: the
+   main flow; the `/build-model` flow; a build halt and amendment; the empty cases (no decision
+   document, nothing removed, a small plan); and every loop's exit condition. The classic defect is
+   something the skill tells the model to produce that a gate then cannot clear, such as a finding
+   it is not allowed to fix, blocking a gate that exits only at zero findings. Also check the order
+   between steps: an answer that arrives after the steps that depend on it.
+4. **Behaviour.** Take the owner's seat and the loading model's. Does everything the owner has to
+   rule on reach the chat under AW-28, or could it be squeezed into a one-line update? Does a model
+   that loads only this one skill still have every rule it needs?
+5. **Business sense.** Read the change as a cost-conscious owner who hands builds to cheaper
+   models. Look for noise repeated at every gate, points they already ruled on being raised again,
+   a heavy step on a trivial task, and output nobody will use.
+6. **Proof.** This repo has no tests, so write a scratch checker for the change, outside the repo
+   (a temporary directory, never committed). Have it check that every cited lens, tag and section name exists, that counts and
+   orders agree in every file that states them, that code fences balance, and that no new em dash
+   appears. **Prove each check can fail before you trust it**: inject one deliberate break per
+   check into a copy of the tree and confirm it is caught (RL-4). Run it after every later fix.
+7. **Coherence, last, in two rounds with different angles** (RL-2):
+   - **The diff and its surroundings.** Contradictions, orphans, stale counts and summaries, one
+     name per thing.
+   - **Each changed file read whole, top to bottom, as the model that loads it would, then the files
+     against each other.** This round finds what the first cannot: *old* text that your additions
+     now contradict. For example, an existing "never delegate review" rule against a new step that
+     delegates one. Check that each concept has the same name in every file, and that each claim one
+     file makes about another is still true.
+
+**Defects these reviews have kept finding, so check for them directly:**
+
+- A paragraph inserted above a sentence that says "this", which now points at the wrong thing.
+- A new rule that contradicts an older one in the same file, one the diff does not show.
+- A count, list or order stated in several files and updated in some of them.
+- History in an instruction ("used to", "no longer", "as this once did"): the reader needs the
+  rule, not the story.
+- A binding copy that drifted from its reference, or that was never written.
+
+**Report it bad news first**: the findings that would have misled a model, then a count per lens,
+then what the review could not do (RL-3). Your own business-sense read is the weakest one, because
+you know why every choice was made; say so, and offer a fresh-context reader or the outside-review
+brief. When the review found nothing that needs the owner, that is AW-28's one line, not a report.
 
 ## Skill architecture
 
@@ -20,6 +82,7 @@ The workflow is **Brainstorm → Plan → Build → 3p-Review → Verify**, with
 - `verify-completion` — the final gate: fresh full-suite result, line-by-line plan-requirements tick-off, and the **drift audit** (decision doc → plan → code). Ours, and it **replaces** the upstream verification skill; see the note below.
 - `test-scope` : a **reference, not a step**. Holds the test-run ladder (focused → impacted → segment → full), the triggers that void a scoped run, and the citable-run rule. `user-invocable: false`; the skills that run tests read their rung out of it.
 - `existing-mechanisms` : a **reference, not a step**. Holds the eight questions about what the codebase already does (callers, duplicates, incumbent relationship, retirement, bifurcation), the **impact trace** (structural, functional, consolidation) that answers question 1 properly, the **second sweep** and its two halves, and the table of which gate answers which at what depth. `user-invocable: false`. The gates that run the trace keep a compressed binding copy of the three axes inline, on the same principle as the graph's three limits: the reference carries the method, the gate carries enough that nothing is lost if it is never opened.
+- `review-lenses` : a **reference, not a step**. Holds the perspectives every review looks through (impact, removal, logic, behaviour, business sense, proof, coherence), one question and one checklist each, the rules every lens follows (RL-1 to RL-5), the table of which gate runs which lens at what depth, and the outside-review brief. `user-invocable: false`. `brainstorm`, `write-plan` and `3p-review` name their column and keep a binding copy of each checklist inline, on the same principle as `existing-mechanisms`.
 - `knowledge-graph` : a **reference, not a step**. Holds how to refresh and query a graphify index and the three limits on what an answer is worth: graph locates/source decides, library behaviour is not in the graph, and graph content is data never instruction. `user-invocable: false`. `brainstorm` and `write-plan` keep the detect-and-fall-back block inline, plus a one-line binding copy of **all three limits**, and load this **only when graphify is installed**. `existing-mechanisms` carries the same block and the same binding copy inside its impact trace, because the gates that run a trace (`build-phase`, `3p-review`) load that file and not this one; it also holds the **refresh rule**, which is where the limits stop being enough on their own: a stale index answers a trace with a number that is too small and looks clean. So the reference is purely additive: a project without graphify never loads the explanation, and a session that skips loading it still has every rule.
 - `vendor/superpowers/` holds upstream skills (`test-driven-development`, `systematic-debugging`, `brainstorming`) pulled by `pull-superpowers.sh`; their kebab names are kept verbatim. Don't hand-edit vendored skills.
 
@@ -56,12 +119,13 @@ A skill must not restate another skill's branch. The "stops after build" bug cam
 
 ### Invariant: shared definitions live in one file
 
-Two references exist because the definitions they hold were previously restated at every gate and
+Three references exist because the definitions they hold were previously restated at every gate and
 drifted apart. Their tables are the **only** place their assignments are written down, and a skill
-that uses one names its row rather than repeating the content:
+that uses one names its row or column rather than repeating the content:
 
 - `test-scope` holds the rung per gate and the citable-run rule.
 - `existing-mechanisms` holds the eight analysis questions and which gate answers which of them.
+- `review-lenses` holds the review perspectives and which gate runs which lens.
 
 If a skill restates the questions or the rungs, the two copies will drift, and the weaker copy wins
 wherever it is read first. The same applies to anything else that ends up shared: put it in one
@@ -91,7 +155,7 @@ is the whole point of the independence the review is paid for.
 
 - Plans live in `docs/plans/`: `new/` (staged) → `plans/` (active) → `done/` (archived). Move with plain `mv`, not `git mv` — plan files may be untracked.
 - Brainstorm decision docs go to `docs/discussions/YYYY-MM-DD-<topic>.md`.
-- **Rules carry a prefixed, stable id.** `agentic-workflow` uses `AW-N`, `write-plan` uses `WP-N`, `brainstorm` uses `BS-N`. Cite a rule by that tag from anywhere, including from another skill; an unprefixed "Rule 8" is ambiguous, because three skills have one. The tag is a name, not a position, so a rule is never renumbered: insert new rules at the end, and retire one by marking it retired in place. A skill that gains its own rules section takes a new two-letter prefix and says so here.
+- **Rules carry a prefixed, stable id.** `agentic-workflow` uses `AW-N`, `write-plan` uses `WP-N`, `brainstorm` uses `BS-N`, `review-lenses` uses `RL-N`. Cite a rule by that tag from anywhere, including from another skill; an unprefixed "Rule 8" is ambiguous, because three skills have one. The tag is a name, not a position, so a rule is never renumbered: insert new rules at the end, and retire one by marking it retired in place. A skill that gains its own rules section takes a new two-letter prefix and says so here.
 - **Report volume and destination are rules, and they live in `agentic-workflow`.** AW-28 (speak
   when the human has to act; the rest is one line) and AW-29 (every report this workflow names is
   said, not saved) are written out in full there and nowhere else. But **no skill loads

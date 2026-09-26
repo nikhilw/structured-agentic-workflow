@@ -211,7 +211,14 @@ rewrites half the feature has become its author and can no longer review it.
   absence.
 - **An external review is evidence, not a verdict.** Verify another model's claims
   first-party before acting on them. Multi-model workflows fail most often by laundering
-  unchecked claims through a second model's confidence.
+  unchecked claims through a second model's confidence. And evidence is also what it takes to
+  dismiss one: an empty grep or a local dev fixture is not disproof.
+- **Brief an outside reviewer; do not just point it at the files.** `/brainstorm`, `/write-plan`
+  and `/3p-review` each offer an outside-review brief from `review-lenses`, filled in for what they
+  just finished (`/write-plan` writes it out; the other two offer it in one line). A model that
+  never heard the reasoning is the best reader for *business sense*, meaning what a typical user
+  would find odd. Without a brief it drifts into editing files and filing tickets, answers "do the
+  documents agree?" when the question was "is this right?", and pads the answer with what is fine.
 - **Never put a secret in the plan.** The plan file is committed and read by every
   downstream model and tool. `/write-plan` requires credentials to appear as
   `<from env: API_KEY>` — a named source, never a value.

@@ -27,7 +27,7 @@ flowchart TD
 
     subgraph Plan ["2 · Plan — /write-plan · planning model"]
         P1["Codebase analysis<br/>pattern scan · security · state · failure modes<br/>+ removal table, if anything is removed"] --> P2["Write phased plan<br/>zero ambiguity for external models"]
-        P2 --> P3["Three-pass plan review<br/>right? · runnable? · what else breaks?"]
+        P2 --> P3["Nine-pass plan review<br/>impact · removal · logic · behaviour · business sense<br/>contracts · proof · coherence · runnable"]
         P3 --> P4["Save to docs/plans/new/"]
     end
 
@@ -151,14 +151,24 @@ The skill will:
   decisions are actually costing you
 - **Challenge the obvious solution** — how far is the recommendation from that ideal, and what does
   the distance buy?
-- Run a **decision audit** against its own recommendation before writing anything down
+- Look at every approach through the **review lenses** (`review-lenses`): impact, removal, logic,
+  behaviour, business sense, proof and coherence, one question at a time. They matter most here,
+  where a lens can still eliminate an approach instead of patching a plan. **Behaviour** writes down
+  what the user will actually see; **business sense** asks whether a typical user who never heard
+  the reasoning would find it odd, the owner's own steer included. The recommendation's answers go
+  into the decision document's **What the User Sees**, which the plan and the code review are later
+  checked against
+- Run a **decision audit** against its own recommendation before writing anything down, with the
+  lenses run in full on the winner
+- Offer an **outside-review brief** in one line, written out if the owner wants it: another model that never heard the reasoning reads the
+  decision the way a newcomer would, which is the reading that finds what makes no business sense
 
 **Your active role:** while the AI analyses, you research in parallel. Often you will find a
 library or approach it missed — say so and pivot. That is the phase working.
 
 **Decision documents.** When a direction is chosen, `/brainstorm` offers to save
 `docs/discussions/YYYY-MM-DD-<topic>.md` — the mechanism ledger, what was considered, what won,
-what was rejected, and what would reverse the decision. Invaluable when someone asks "why did we do
+what was rejected, what would reverse the decision, and what the user will see. Invaluable when someone asks "why did we do
 it this way?" six months later, and load-bearing well before that: it is the **baseline** the drift
 audit in step 5 measures the finished feature against. Without it, drift has nothing to be measured
 against except the plan, which is the thing that drifted.
@@ -183,15 +193,25 @@ explicit."
   owners, cancellation paths, cross-component interactions, concurrency and aliasing
 - A **named no-mock seam test for every value path** — green unit tests do not prove wiring
 - Decisive gates ordered **before** the work that depends on them
-- A **three-pass review** before saving, in this order: *what does this break that the plan never
-  mentions?*, then *is this the right plan?*, then *can a different agent run this exactly as
-  written?* The impact pass goes first because it is the only one that starts from the codebase
-  instead of the document, and the only one that changes what the plan contains: it traces backward
+- A **nine-pass review** before saving, one question per pass and each pass's findings settled (fixed,
+  or put to the owner) before the next one reads the plan: *what does this break that the plan never mentions?*, *is every
+  removal justified and its job still done?*, *does the design work when it actually runs?*, *does a
+  human user get what they expect on every surface?*, *would a typical user who never heard the
+  reasoning find it odd?*, *is this the plan we decided on, at the size agreed?*, *would the tests fail if this were built wrong?*, *does the plan still agree with itself
+  and build in order?*, and *can a different agent run this exactly as written?* The passes after
+  impact exist because asking those questions by hand of already-reviewed plans kept finding
+  critical defects: state rules that overlapped, progress written before the work it recorded,
+  read-modify-write races, two settings that defeated each other, blank screens and dead links from
+  a correct mechanism, criteria that stayed green with the defect live, phases that could not pass
+  on their own, and phases whose reason a later edit had removed. They run from the passes that
+  move the plan most to the ones that only read it. The impact pass goes first because it starts
+  from the codebase instead of the document, and it changes what the plan contains: it traces backward
   and forward from everything the plan changes the meaning of, counts the call sites, disposes of
   each one, and records the whole thing in the plan's **Impact Analysis** block with counts rather
   than adjectives. Running it last, as this review once did, meant the two passes before it had
   judged a plan that was about to change. A caller that breaks the build is not in the plan, so no amount of
-  checking the plan's own names will ever return it
+  checking the plan's own names will ever return it. Every pass records its findings on its own line
+  of the plan's **Review Passes** block
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it. The contracts pass walks that mapping line by line. Before approval, a difference from the
   decision document is a question for the owner rather than a departure — departures are only what
@@ -337,6 +357,13 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   the benefits of pair programming.
 - The reviewer looks at architectural coherence, cross-cutting concerns, and systemic issues
   visible only across the full change set.
+- It looks through the same **review lenses** as brainstorm and plan review, on the built code:
+  the logic walked with concrete values, coupling through storage traced to both ends, the built
+  thing driven on each surface against the decision's **What the User Sees**, and a
+  **business-sense** read that flags what a typical user would find odd even where the plan asked
+  for it, as questions for the owner rather than findings, so they neither block the loop nor get
+  dropped. At sign-off it offers the outside-review brief: the question for a second model is
+  whether the code is right, not whether it matches the plan.
 - It is a **loop**: findings → fix → re-test → re-review from scratch, until clean.
 - Past its volume threshold (roughly eight findings, findings across most phases, a repeated
   systemic defect, or a missing/unwired phase) it stops fixing and emits a **Rework Brief**
@@ -398,7 +425,9 @@ Three comparisons:
 - **DecisionDoc → Code.** The round trip. Does the code solve the
   problem that was decided, or a neighbouring one? Would the approach comparison still choose this
   approach, knowing what the build found out? Did the amendments add up to a different approach
-  than the one chosen, without any single entry saying so?
+  than the one chosen, without any single entry saying so? And does the user get what the
+  decision document's **What the User Sees** promised, sentence by sentence, on the surface where
+  they would check?
 
 The verdict is NO DRIFT, DOCUMENTED DRIFT, or UNDOCUMENTED DRIFT. The last one blocks the
 completion claim.

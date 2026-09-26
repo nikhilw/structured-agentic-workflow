@@ -36,8 +36,8 @@ brevity style. Every skill checks memory for the configured level and adapts its
 Technical accuracy is never sacrificed — only verbosity changes.
 
 **This workflow does not bundle or vendor caveman.** Compatibility is built into each skill
-independently. If you also want caveman to govern the agent's base system prompt, outside of
-workflow skills, install the caveman package separately.
+independently. If you also want caveman to govern the agent's output outside of workflow skills,
+install the caveman package separately.
 
 ## Backlog source
 
