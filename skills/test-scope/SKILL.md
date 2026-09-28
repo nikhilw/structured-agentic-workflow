@@ -1,6 +1,6 @@
 ---
 name: test-scope
-description: How wide a test run must be at each gate of the workflow, what a run may execute, and when a run already made can be cited instead of re-run. Shared definition loaded by build-phase, 3p-review, build-model and agentic-workflow. It is a reference, not a step of its own.
+description: How wide a test run must be at each gate of the workflow, what a run may execute, and when a run already made can be cited instead of re-run. Shared definition loaded by build-phase, 3p-review, build-model, verify-completion and agentic-workflow. It is a reference, not a step of its own.
 user-invocable: false
 allowed-tools: Read, Grep, Glob, Bash
 ---
@@ -16,7 +16,7 @@ Neither is a step. Reading this satisfies no gate; it only tells you which run s
 
 ## Why this exists
 
-Each gate used to demand the full suite independently, because no gate could see any other gate's runs. A three-phase plan paid for six or seven full-suite runs, most of them re-proving code untouched since the previous one. The ladder gives a gate a vocabulary narrower than "everything". The citable-run rule lets the last gates share one run instead of duplicating it.
+Without it, each gate demands the full suite independently, because no gate can see any other gate's runs, and a three-phase plan pays for six or seven full-suite runs, most of them re-proving code untouched since the previous one. The ladder gives a gate a vocabulary narrower than "everything". The citable-run rule lets the last gates share one run instead of duplicating it.
 
 Neither is permission to prove less. Both are accounting, and the accounting is the price: a narrow run is only acceptable because it is **recorded as narrow** and stays visible to every later reader.
 
@@ -86,7 +86,7 @@ This table is the only place rung assignments are written down. A skill that run
 
 | Gate | Rung | Notes |
 |---|---|---|
-| `/build-phase` Step 3, per phase | T1, then T2 (T3 if the plan lists no T2) | The common case, and the one that used to run T4 once per phase |
+| `/build-phase` Step 3, per phase | T1, then T2 (T3 if the plan lists no T2) | The common case. T4 here, once per phase, is the waste this table exists to remove |
 | `/build-phase` Phase Completion | **T4, always** | The builder's own honesty gate. Never cited from anywhere. This is the run the handoff reports |
 | `/3p-review` re-deriving the builder's claims | **T4, always** | The builder's reported run is a claim, never a citable run. Holds even when you built this yourself minutes ago and the tree is provably clean: re-deriving is the whole reason the review is worth running |
 | `/3p-review` while fixing findings inside a round | T1, then T2 or T3 | The "widening circles" |

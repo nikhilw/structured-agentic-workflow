@@ -220,7 +220,9 @@ explicit."
   each one, and records the whole thing in the plan's **Impact Analysis** block with counts rather
   than adjectives. Running it last, as this review once did, meant the two passes before it had
   judged a plan that was about to change. A caller that breaks the build is not in the plan, so no amount of
-  checking the plan's own names will ever return it. Every pass records its findings on its own line
+  checking the plan's own names will ever return it. The impact pass also lists every unit the plan's
+  phases specify and groups the ones that do the same job, so a helper the plan would have had
+  built twice becomes one extraction phase. Every pass records its findings on its own line
   of the plan's **Review Passes** block
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it. The contracts pass walks that mapping line by line. Before approval, a difference from the
@@ -308,6 +310,8 @@ Within a phase:
    at the end of the build, not once per phase.
 4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs? And the
    question that catches silent drift: *did I decide anything the plan should have decided?*
+   And *did this phase rewrite something an earlier phase already built?* It lists its new units
+   against theirs and calls the earlier one rather than keeping a second copy.
    Lightweight per-phase check — not the full third-person review.
 5. **Proceed** to the next phase, on one line. The rung, exit code, counts and self-review
    findings are recorded for the build completion report rather than narrated after every
@@ -374,6 +378,9 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   for it, as questions for the owner rather than findings, so they neither block the loop nor get
   dropped. At sign-off it offers the outside-review brief: the question for a second model is
   whether the code is right, not whether it matches the plan.
+- It lists every unit the diff adds and groups the ones that do the same job. Copies spread
+  across files each read fine where they sit, so this is done by inventory, not by reading, and a
+  duplicate the change created is a MAJOR finding.
 - It is a **loop**: findings → fix → re-test → re-review from scratch, until clean.
 - Past its volume threshold (roughly eight findings, findings across most phases, a repeated
   systemic defect, or a missing/unwired phase) it stops fixing and emits a **Rework Brief**

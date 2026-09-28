@@ -36,7 +36,7 @@ Only one can be active at a time. Setting one disables the other.
 - **caveman full** — Terse. Bullet points over paragraphs. Minimal preamble. All technical accuracy preserved.
 - **caveman ultra** — Maximum compression. Sentence fragments. Only essential information.
 
-When caveman is enabled, ALL workflow skills (brainstorm, write-plan, build-phase, 3p-review, triage, systematic-debugging, verify-completion) adapt their output to the requested brevity level. Technical accuracy is never sacrificed — only prose style changes.
+When caveman is enabled, every workflow skill that checks `workflow-config:caveman-level` adapts its output to the requested brevity level; the vendored superpowers skills do not read it. Technical accuracy is never sacrificed; only prose style changes.
 
 **Important:** This workflow does NOT bundle or vendor the Caveman skills package. If the user wants caveman to also govern the agent's output outside of workflow skills, they should install the caveman package separately, from its own source. The workflow's caveman compatibility works independently: it adapts workflow skill output regardless of whether the caveman package is installed.
 

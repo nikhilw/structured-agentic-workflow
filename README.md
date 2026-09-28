@@ -67,6 +67,12 @@ graphifyy` and `pip install graphifyy` also work.
 
 Add `graphify-out/` to your project's `.gitignore`; it is a build artifact.
 
+**In typed code, graphify is not enough on its own.** It links symbols by name, so it misses a call
+made through an instance and merges two symbols that share one. The skills use the graph to find
+where to look and take the count from your type checker, so have it runnable in the project: for
+Python, pyright and mypy; for TypeScript, `tsc`. See [Counting in typed
+code](skills/knowledge-graph/SKILL.md#counting-in-typed-code) for how each is used.
+
 ### 2. Install the workflow skills
 
 ```bash
@@ -80,11 +86,6 @@ npx skills add obra/superpowers -s test-driven-development -s systematic-debuggi
 Prefer one command that pulls everything? Clone the repo and run `./install.sh`
 (`.\install.ps1` on Windows). Per-agent targets, manual steps, and the full skill inventory
 are in [installation.md](docs/installation.md).
-
-> **Upgrading from an earlier install?** Re-run it. Two skills are new (`verify-completion`,
-> `existing-mechanisms`), and superpowers' `verification-before-completion` is no longer part of
-> this workflow: `/verify-completion` replaces it. `./install.sh` removes the link the old install
-> created, leaving any copy you installed another way alone.
 
 ### 3. Point your project's agent config at the workflow
 

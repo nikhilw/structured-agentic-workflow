@@ -23,8 +23,9 @@ Only one is active at a time. The core rule — **test first, always** — appli
 
 ## Output style: caveman brevity
 
-The workflow integrates with the [caveman](https://www.npmjs.com/package/@anthropics/skills)
-brevity style. Every skill checks memory for the configured level and adapts its own output.
+The workflow integrates with the [caveman](https://github.com/JuliusBrussee/caveman)
+brevity style. Each workflow skill that reports checks memory for the configured level and adapts
+its own output; the vendored superpowers skills do not.
 
 | Level | Style |
 |---|---|

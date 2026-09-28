@@ -140,11 +140,11 @@ a problem to tidy up. "Never edit the baseline" below is the full rule; read it 
 comparing, not after you have found something.
 
 **If no decision document exists** (a bug fix, a quick fix, or a plan written without a brainstorm),
-say so explicitly and run the two plan comparisons against the plan alone. Silence about a missing
-decision doc reads as "checked, matched".
+say so explicitly, run the Plan → Plan comparison, and record that the two decision-document
+comparisons had nothing to read. Silence about a missing decision doc reads as "checked, matched".
 
-**Label things with what they are.** The four comparisons below are named for the two documents
-they read, because that is the only name a reader can decode without this file in front of them.
+**Label things with what they are.** The three comparisons below (DecisionDoc → Plan, Plan → Plan
+and DecisionDoc → Code) are named for the two documents they read, because that is the only name a reader can decode without this file in front of them.
 Never invent a short code for them, and never let a label stand in for a finding: "3 upheld, 1
 widened" is a tally of findings with the findings removed, while "the endpoint check accepts any
 OpenAI-format server, and the decision document says a local host process" is the finding. Part 4

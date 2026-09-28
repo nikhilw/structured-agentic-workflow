@@ -139,7 +139,7 @@ drift at the end of a project is usually made of.
 
 ### Step 2: TDD — Write Tests, Then Implement
 
-Use `/test-driven-development`. This is mandatory for every phase.
+Use `/test-driven-development`. This is mandatory for every phase. Check memory for `workflow-config:testing-methodology`: if it is `bdd`, write the failing tests in step 1 as Given-When-Then scenarios in the project's own BDD harness instead of unit-first tests. Red, green and refactor are unchanged, and so is the rule that nothing is implemented before a test fails. If the project has no BDD harness, that is a plan defect, not a reason to install one or to fall back to unit tests quietly; halt and say so.
 
 1. **Red:** Write the failing tests first — encode the expected behavior from the plan's test criteria before writing any production code.
 2. **Green:** Implement the minimum code to make the tests pass. Implement exactly what the plan describes — no more, no less. Do not refactor surrounding code unless the plan explicitly calls for it.
@@ -173,7 +173,7 @@ In practice, while implementing:
 - **Names** carry meaning on their own — no abbreviations that need decoding, no mental mapping.
 - **Functions** are small and do one thing. A growing parameter list or a boolean that switches behaviour is the signal of a missing abstraction — extract it now rather than defending it later.
 - **No hidden side effects** — a function's name must not conceal a mutation, an I/O call, or a state change.
-- **DRY** — if you paste a block, extract it. If the codebase already solves this, use its solution rather than writing a parallel one.
+- **DRY**: if you paste a block, extract it. If the codebase already solves this, use its solution rather than writing a parallel one, and "the codebase" includes what earlier phases of this plan built: rewriting it from the plan is duplication even though nothing was pasted.
 - **KISS / YAGNI** — build exactly what the phase requires. No speculative abstractions, no flags for futures nobody asked for.
 - **SOLID** — single responsibility per unit, depend on abstractions at boundaries, keep interfaces narrow.
 - **Design patterns: build the one the plan named, in this codebase's idiom.** Where the plan specifies a pattern, implement that pattern — but in the form the language and the surrounding code actually use. In Python most of these are language features, not class hierarchies: Strategy is usually a callable, Factory a dict or `classmethod`, Decorator an `@decorator`, Singleton a module-level object, Iterator a generator, Command a closure. Writing the ceremonial class-heavy version is a review finding, not extra rigour.
@@ -204,6 +204,7 @@ Check for:
 - **If this phase removed anything, does the diff match the plan's removal table row for row?** Every row's replacement actually landed, nothing was deleted that the table does not name, and no test was deleted because it went red. A changed rule needs a test stating the new rule, not one fewer test. A row whose replacement did not land is a capability this phase took away; halt and report it rather than noting it (AW-26).
 - Does the code follow existing project conventions and patterns?
 - Does it clear the quality bar above — naming, function size, hidden side effects, DRY, KISS/YAGNI? Fix what you'd be embarrassed to hand to a reviewer.
+- **Did this phase write something this plan already has?** Run `/existing-mechanisms`' **self-duplication inventory**, its *"`/build-phase`, Self-Review"* row: this phase's new units against the ones earlier phases added. Binding copy: list every new unit · one line each on what it does, as behaviour, not its name · group the lines that do the same job, in part included (the same call skeleton, the same lookup, the same calculation). Then settle each group. Duplicates inside this phase's own files you extract now; that is TDD's refactor step, so re-run Step 3 after it. A copy of an earlier phase's unit you replace with a call to it as it stands. If it can only be shared by changing the earlier unit or by creating a module the plan does not name, halt: the plan owed you that extraction. Record the count in the self-review, not as a report of its own.
 - Is anything over-engineered or under-tested?
 
 Also track, for the handoff: any criterion you could not prove with a green automated run — checked by reading, skipped, deferred, or done manually, plus any criterion proven only at a scoped rung. A scoped pass is a real result, but it is not the same claim as a full-suite pass, and only you know which one it was. Write it down as you go; reconstructing this at the end is how it gets lost.

@@ -61,7 +61,8 @@ Follow the template below: same headings, same order, same casing. Fill each sec
 ## What happens next
 
 The summary is *said, not saved* (AW-29): it is emitted into the conversation, for the human or the
-next model. It is not a file, and inventing a path for it is how a handoff ends up somewhere the
+next model. It is this skill's one report, emitted in full because the next reader must rule on
+it; nothing around it is narrated (AW-28). It is not a file, and inventing a path for it is how a handoff ends up somewhere the
 reviewing model never looks.
 
 - **Dedicated build model** (launched via `/build-model`): present the summary, then **STOP**. The user carries it to the main model.

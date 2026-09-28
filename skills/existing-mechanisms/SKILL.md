@@ -1,6 +1,6 @@
 ---
 name: existing-mechanisms
-description: The eight questions that must be answered about what a codebase already does before anything new is proposed, planned, or built. Shared reference loaded by brainstorm, write-plan, build-phase and 3p-review. It is a reference, not a step of its own.
+description: The eight questions that must be answered about what a codebase already does before anything new is proposed, planned, or built, and the self-duplication inventory that catches a change duplicating its own code. Shared reference loaded by brainstorm, write-plan, build-phase and 3p-review. It is a reference, not a step of its own.
 user-invocable: false
 allowed-tools: Read, Grep, Glob, Bash
 ---
@@ -77,6 +77,12 @@ is how the gap ships.
    state what you searched for and did not find. Search by *behaviour*, not by the name you would
    have given it; the duplicate you are about to write is nearly always sitting under a word you
    did not think of. *Prevents: the second implementation of something the codebase already had.*
+
+   **Asked of a plan or a diff, this question has a second half: does the change already contain
+   it?** A plan that specifies three readers can give each its own copy of the same skeleton, and a
+   later phase can rewrite what an earlier phase built an hour before. Each copy reads fine in its
+   own file, so that half is answered by listing, not by reading: the **self-duplication
+   inventory** below.
 
 4. **Relationship to the incumbent.** If something related exists, say which of these you are
    doing, in one word, and then justify it: **extend** it, **replace** it, **abandon** it, or
@@ -352,10 +358,11 @@ sketch, which is why the answers differ: you now know what actually reaches this
 - **Are we increasing reuse, or adding parallel flows?** Say which, in one word, and then justify
   it. If the honest answer is that this adds a flow beside an existing one, say what would collapse
   them back.
-- **Is there something to extract and reuse?** In both directions: existing code this change should
-  be reusing instead of rewriting, and common behaviour this change exposes that existing code
-  should now share. The second implementation is the cheapest moment to extract; the third is
-  where it stops being optional.
+- **Is there something to extract and reuse?** In three directions: existing code this change should
+  be reusing instead of rewriting; common behaviour this change exposes that existing code
+  should now share; and, where the artifact lists new units, the change repeating itself, which is
+  the self-duplication inventory below. The second implementation is the cheapest moment to
+  extract; the third is where it stops being optional.
 
 *The trace is not finished until you can say plainly whether this leaves the codebase with fewer
 ways to do this job or more. "More" is an answer, and it goes to the owner in those words rather
@@ -457,6 +464,40 @@ produce: trace the calls forward and backward, pinpoint the call sites, say what
 what is impacted by it. That is this sweep, in a user's words. Producing it only when prompted
 means every unprompted handover shipped the version with the defects still in it.
 
+## The self-duplication inventory
+
+Every question above looks outward, at code that existed before the change. This one looks at the
+change itself. It is the check that catches a plan's own helpers, lookups and call skeletons written
+two or three times over, which no outward search can see because none of the copies existed when
+the search ran.
+
+1. **List every unit the artifact adds.** Each new function, method and class, and each new block
+   of more than a few lines inside an existing function. From a plan, the units its phases
+   specify; from a build, the added lines in the diff against the comparison base, not the file list.
+2. **Say what each one does, in one line, as behaviour**: what it takes, what it does to it, what
+   it returns or changes. Not its name; two copies of one job rarely share a name.
+3. **Group the lines that describe the same job**, including in part: the same skeleton with a
+   different step in the middle (build the prompt, call the model, parse, retry), the same lookup
+   keyed differently, the same calculation with a different constant.
+4. **Settle each group of two or more** as one of three: **extract** it into one unit the others
+   call, **reuse** the earlier unit as it stands, or **keep them apart** because they change for
+   different reasons, naming the reason each one changes. "They look different" is not a reason, and
+   a pair kept apart without one is a duplicate.
+
+Check the same list against existing code while you have it; that is question 3's first half, and it
+costs nothing more here.
+
+```markdown
+**Self-duplication inventory**
+- *Listed:* [N] new units, from [the plan's phases / the diff against <base>]
+- *Groups:* [N] doing the same job: [each: its units at `file:line` or by phase → extract / reuse /
+  kept apart because <what each changes for>]; or "none"
+```
+
+A gate whose own template has a *Self-duplication* line records this there instead of pasting the
+block. The count of units listed is the part that shows the inventory was walked. "No duplication found"
+without it is the answer of an inventory that was never made.
+
 ## Where this is answered
 
 This table is the only place these assignments are written down. A skill that runs the audit names
@@ -469,10 +510,11 @@ its row here and does not restate the questions.
 | `/brainstorm`, Decision Audit | the approach you are about to recommend | re-check 3, 4, 5, 8 against the *chosen* design, and run the impact trace to full depth on it: only the winner is worth exhaustive tracing |
 | `/brainstorm`, after the decision document is written | the saved document's own claims and names | the second sweep, both halves, before handing over to `/write-plan`. The codebase half is the impact trace, run against the document |
 | `/write-plan`, Codebase Analysis | the concrete chosen design, not the problem space | all eight, recorded in the plan |
-| `/write-plan`, the impact pass | the codebase's edges into and out of everything the plan changes the meaning of | the second sweep's codebase-side half: the **impact trace**, all three axes, to full depth and counted. Writes the result block. Runs first of the three passes, before the plan is saved or activated |
+| `/write-plan`, the impact pass | the codebase's edges into and out of everything the plan changes the meaning of | the second sweep's codebase-side half: the **impact trace**, all three axes, to full depth and counted, and the **self-duplication inventory** over the units the plan's phases specify. Writes the result block. Runs first of the plan's review passes, before the plan is saved or activated |
 | `/write-plan`, the executability pass | the finished plan's own file and symbol list, the impact pass's additions included | the second sweep's document-side half: dropped, duplicated, inert, drifted |
 | `/build-phase`, Plan Review | this phase's named files and symbols | 1, 3, 5, 8; a gap here is a halt, not a fix |
-| `/3p-review`, Codebase Consistency | the code as built | 3, 5, 8; a gap here is a finding |
+| `/build-phase`, Self-Review | this phase's new units, against those the earlier phases of this plan added | the **self-duplication inventory**; reusing an earlier unit as it stands is not a halt, changing it or extracting it outside this phase's files is |
+| `/3p-review`, Codebase Consistency | the code as built | 3, 5, 8, and the **self-duplication inventory** over the whole diff; a gap here is a finding |
 | `/3p-review`, before a Rework Brief is handed over | the brief's own names, files, lines and commands | the second sweep against the brief, both halves; a brief is a plan |
 | Bug or quick-fix path, no plan | the fix you are about to make | 1, 2 and 8, before the fix. Question 2 is the one that matters here: a bug reached through four entry points is fixed at one of them and reported as fixed |
 
