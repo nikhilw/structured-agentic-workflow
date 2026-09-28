@@ -141,6 +141,20 @@ defect, then builds every phase, reviews its own work, emits a handoff summary, 
 Bring that summary back to your main model, which re-reviews with fresh eyes and verifies.
 Tier guidance is in [multi-model.md](docs/multi-model.md).
 
+### My recommendation
+
+What I run day to day. Any capable model works in each seat; these are the ones I use.
+
+| Role | Model | CLI | Driven from Claude Code |
+|---|---|---|---|
+| Brainstorm, plan, review, verify | Opus 5.5 | Claude Code | (the main session) |
+| Build | Composer 2.5 | Cursor CLI | [recipe](docs/extras/driving-cursor-as-build-model.md) |
+| Outside reviewer | Gemini Flash 3.8 | Antigravity CLI (agy) | [recipe](docs/extras/driving-agy-as-plan-and-code-reviewer.md) |
+
+The Codex CLI also works as the build model, but I run it by hand; it is not yet driven from
+Claude Code. agy can take the build seat too ([recipe](docs/extras/driving-agy-as-build-model.md)).
+One-time setup for both automated CLIs is in [agent-cli-setup.md](docs/extras/agent-cli-setup.md).
+
 ### The skills
 
 | Skill | Does |
