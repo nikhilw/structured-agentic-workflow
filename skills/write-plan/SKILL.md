@@ -357,7 +357,7 @@ This plan is designed as a **contract between agents**. The agent that writes th
 - **Never write "consider using X or Y"** — pick one and specify it. If the choice depends on something, investigate it now and decide.
 - **Specify exact function signatures, class names, and return types** — not just descriptions of what they should do.
 - **Specify exact test assertions** — not just "write tests for this". Name the test functions, the inputs, and the expected outputs.
-- **If a step requires installing a package, name it** with the exact install command.
+- **If a step requires a new package, name it and its version**, say which manifest it goes in, and link its official install instructions. Adding it is outside what a build may run on the plan's say-so (`/test-scope`, *What a run may execute*), so the builder asks the user first.
 - **Resolve all design trade-offs in the plan itself.** The plan need not include all the code, but it MUST include all decisions. The dev model's job is to execute, not to design.
 
 ### Expect halts, and expect them to be yours

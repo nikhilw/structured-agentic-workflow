@@ -74,7 +74,8 @@ short, never skipped: a one-line fix gets one line per lens, saying what it chec
    - Run the pattern scan (hidden Unicode, injection phrasing, pipe-to-shell, secrets, credential
      paths, exfiltration) over every published file, with a planted control first. When a scanner
      flags a skill, read its report at `skills.sh/<owner>/<repo>/<skill>/security/<scanner>`
-     before changing anything.
+     before changing anything. A warning accepted as the cost of what a skill does goes in
+     `docs/security.md` with what contains it.
 8. **Coherence, last, in two rounds with different angles** (RL-2):
    - **The diff and its surroundings.** Contradictions, orphans, stale counts and summaries, one
      name per thing.
@@ -215,6 +216,7 @@ update whichever of these it touches:
 | `docs/practices.md` | Task selection, refactoring monoliths, "no surprises" |
 | `docs/philosophy.md` | The "why" — principles and trade-offs |
 | `docs/comparison.md` | Side by side with other agent workflows. Marketing, so every cell must be defensible from that project's public docs; re-check it when a skill gains or loses a capability |
+| `docs/security.md` | The standing scanner warnings and what contains each. Re-check it when a skill's data handling or command boundary changes |
 
 Two diagrams exist and both must stay in sync with the skills: the **full lifecycle** in
 `docs/workflow.md` and the **reduced model-split** duplicated in `README.md` and

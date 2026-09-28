@@ -1,6 +1,6 @@
 ---
 name: 3p-review
-description: Independent third-person code review. Use after ALL build phases are complete for a holistic review of the entire feature, or anytime the user wants a quality gate. Switches persona to a Senior Architect who did NOT write the code and now owns it — it must meet world-class standards.
+description: Independent third-person code review. Use after ALL build phases are complete for a holistic review of the entire feature, or anytime the user wants a quality gate. Reviews as an independent Senior Architect who did NOT write the code and now owns it, so it must meet world-class standards.
 argument-hint: "[file path, function name, or 'recent changes']"
 allowed-tools: Read, Grep, Glob, Edit, Bash
 ---
@@ -89,7 +89,7 @@ Every row needs a disposition in the final summary — verified, fixed, or expli
 
 ### Handoff Summary Mode
 
-If `$ARGUMENTS` contains or references a Build Handoff Summary:
+If the request contains or references a Build Handoff Summary:
 
 1. Load **Concerns** into the ledger as MAJOR findings until proven otherwise — they are the build model's own flags about its own work.
 2. Load **Deviations** — verify each was handled correctly, and ask whether it should have amended the plan instead of being absorbed silently. A deviation marked "no amendment" is the one to look at hardest.

@@ -180,6 +180,7 @@ Law and adds the requirements tick-off and the drift audit.
 | [practices.md](docs/practices.md) | Task selection, refactoring monoliths, the "no surprises" rule |
 | [philosophy.md](docs/philosophy.md) | Why the workflow is shaped this way |
 | [comparison.md](docs/comparison.md) | Side by side with Spec Kit, Kiro, BMAD, Superpowers, gstack, Compound Engineering and Traycer |
+| [security.md](docs/security.md) | The standing scanner warnings on skills.sh, and what contains them |
 | [extras/driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md) | Worked recipe: running Cursor's CLI agent headless as the build model |
 | [extras/driving-agy-as-build-model.md](docs/extras/driving-agy-as-build-model.md) | The same for Google's Antigravity CLI (agy): what differs from Cursor |
 | [extras/driving-agy-as-plan-and-code-reviewer.md](docs/extras/driving-agy-as-plan-and-code-reviewer.md) | agy as the outside reviewer: one conversation, a plan review then a code review |
@@ -206,7 +207,7 @@ for typing. → [multi-model.md](docs/multi-model.md)
 > recipe.](docs/extras/driving-cursor-as-build-model.md)*
 
 **2 · A review gate that takes ownership.**
-`/3p-review` switches persona to an independent Senior Architect who *owns the code on
+`/3p-review` reviews as an independent Senior Architect who *owns the code on
 sign-off*, loops until **zero findings of any severity** (minors get fixed, not waved), and
 cannot pass without a no-mock test across the real integration seam. Past a volume threshold
 it refuses to fix things itself and emits a **Rework Brief** instead — a reviewer who rewrites
