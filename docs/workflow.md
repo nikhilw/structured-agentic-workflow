@@ -30,7 +30,7 @@ flowchart TD
 
     subgraph Plan ["2 · Plan — /write-plan · planning model"]
         P1["Codebase analysis<br/>pattern scan · security · state · failure modes<br/>+ removal table, if anything is removed"] --> P2["Write phased plan<br/>zero ambiguity for external models"]
-        P2 --> P3["Nine-pass plan review<br/>impact · removal · logic · behaviour · business sense<br/>contracts · proof · coherence · runnable"]
+        P2 --> P3["Ten-pass plan review, in rounds<br/>impact · consolidation · removal · logic · behaviour<br/>business sense · contracts · proof · coherence · runnable"]
         P3 --> P4["Save to docs/plans/new/"]
     end
 
@@ -203,8 +203,9 @@ explicit."
   owners, cancellation paths, cross-component interactions, concurrency and aliasing
 - A **named no-mock seam test for every value path** — green unit tests do not prove wiring
 - Decisive gates ordered **before** the work that depends on them
-- A **nine-pass review** before saving, one question per pass and each pass's findings settled (fixed,
-  or put to the owner) before the next one reads the plan: *what does this break that the plan never mentions?*, *is every
+- A **ten-pass review** before saving, one question per pass and each pass's findings settled (fixed,
+  or put to the owner) before the next one reads the plan: *what does this break that the plan never mentions?*, *does the
+  codebase end with fewer ways to do each job, or more?*, *is every
   removal justified and its job still done?*, *does the design work when it actually runs?*, *does a
   human user get what they expect on every surface?*, *would a typical user who never heard the
   reasoning find it odd?*, *is this the plan we decided on, at the size agreed?*, *would the tests fail if this were built wrong?*, *does the plan still agree with itself
@@ -220,9 +221,13 @@ explicit."
   each one, and records the whole thing in the plan's **Impact Analysis** block with counts rather
   than adjectives. Running it last, as this review once did, meant the two passes before it had
   judged a plan that was about to change. A caller that breaks the build is not in the plan, so no amount of
-  checking the plan's own names will ever return it. The impact pass also lists every unit the plan's
+  checking the plan's own names will ever return it. The consolidation pass follows it, on its own
+  because as the impact pass's last axis it got the leftover attention: over the traced set it asks
+  whether this unifies, reuses and extracts or builds in parallel, and it lists every unit the plan's
   phases specify and groups the ones that do the same job, so a helper the plan would have had
-  built twice becomes one extraction phase. Every pass records its findings on its own line
+  built twice becomes one extraction phase. When a round of passes changes what the plan contains,
+  the passes run again over that change, until a round changes nothing; a third round still
+  changing it goes to the owner, because the change is bigger than the plan. Every pass records its findings on its own line
   of the plan's **Review Passes** block
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it. The contracts pass walks that mapping line by line. Before approval, a difference from the
@@ -375,7 +380,8 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   the logic walked with concrete values, coupling through storage traced to both ends, the built
   thing driven on each surface against the decision's **What the User Sees**, and a
   **business-sense** read that flags what a typical user would find odd even where the plan asked
-  for it, as questions for the owner rather than findings, so they neither block the loop nor get
+  for it. An odd outcome nobody decided on is a defect, fixed like any finding. One a decision
+  produced is a question for the owner rather than a finding, so it neither blocks the loop nor gets
   dropped. At sign-off it offers the outside-review brief: the question for a second model is
   whether the code is right, not whether it matches the plan.
 - It lists every unit the diff adds and groups the ones that do the same job. Copies spread

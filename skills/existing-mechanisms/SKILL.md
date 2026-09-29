@@ -188,7 +188,7 @@ second way of doing something the codebase already did one way.
 
 This is the full method. It is run wherever a gate has to know what a change reaches, at the depth
 that gate's row gives: `/brainstorm` runs it to cost each approach's blast radius, `/write-plan`
-runs it as the impact pass against the finished plan, `/3p-review` runs it against a rework brief.
+runs it as the impact and consolidation passes against the finished plan, `/3p-review` runs it against a rework brief.
 
 **Use the index if there is one, and use the command built for this.** `graphify affected "<the
 thing you are changing>"` is a reverse traversal that returns the nodes impacted by it, which is the
@@ -430,8 +430,8 @@ confirming the first.
 **The document half and the codebase half are separate passes wherever a gate runs both.** Walking
 the document's names outward and walking the codebase's edges inward start from opposite sets, and
 the second returns things the document never mentioned, so a gate that merges them answers the
-second with the first's method and reports clean. `/write-plan` splits them into its impact and
-executability passes for exactly that reason, and `/brainstorm`'s decision audit splits them the
+second with the first's method and reports clean. `/write-plan` splits them into its impact and consolidation passes on one side and its
+executability pass on the other for exactly that reason, and `/brainstorm`'s decision audit splits them the
 same way.
 
 **The codebase half is the impact trace, run against the artifact.** All three axes, not just the
@@ -510,7 +510,8 @@ its row here and does not restate the questions.
 | `/brainstorm`, Decision Audit | the approach you are about to recommend | re-check 3, 4, 5, 8 against the *chosen* design, and run the impact trace to full depth on it: only the winner is worth exhaustive tracing |
 | `/brainstorm`, after the decision document is written | the saved document's own claims and names | the second sweep, both halves, before handing over to `/write-plan`. The codebase half is the impact trace, run against the document |
 | `/write-plan`, Codebase Analysis | the concrete chosen design, not the problem space | all eight, recorded in the plan |
-| `/write-plan`, the impact pass | the codebase's edges into and out of everything the plan changes the meaning of | the second sweep's codebase-side half: the **impact trace**, all three axes, to full depth and counted, and the **self-duplication inventory** over the units the plan's phases specify. Writes the result block. Runs first of the plan's review passes, before the plan is saved or activated |
+| `/write-plan`, the impact pass | the codebase's edges into and out of everything the plan changes the meaning of | the second sweep's codebase-side half, first part: the **impact trace**'s structural and functional axes, to full depth and counted. Writes the result block. Runs first of the plan's review passes, before the plan is saved or activated |
+| `/write-plan`, the consolidation pass | the set the impact pass traced, and the units the plan's phases specify | the second sweep's codebase-side half, second part: the impact trace's **consolidation** axis and the **self-duplication inventory**. Writes the block's *Consolidation* part. Runs straight after the impact pass |
 | `/write-plan`, the executability pass | the finished plan's own file and symbol list, the impact pass's additions included | the second sweep's document-side half: dropped, duplicated, inert, drifted |
 | `/build-phase`, Plan Review | this phase's named files and symbols | 1, 3, 5, 8; a gap here is a halt, not a fix |
 | `/build-phase`, Self-Review | this phase's new units, against those the earlier phases of this plan added | the **self-duplication inventory**; reusing an earlier unit as it stands is not a halt, changing it or extracting it outside this phase's files is |
