@@ -1,6 +1,6 @@
 # Security notes
 
-skills.sh scans every skill with Gen (Agent Trust Hub), Socket and Snyk. Three skills carry a
+skills.sh scans every skill with Gen (Agent Trust Hub), Socket and Snyk. Four skills carry a
 standing Snyk warning, **W011: third-party content exposure**. It is expected, and it stays.
 
 ## Why W011 fires
@@ -12,6 +12,7 @@ not a defect: the only way to clear it is to stop reading that text.
 |---|---|---|
 | `github-backlog` | GitHub issues and comments | Managing issues is the skill's whole job |
 | `triage` | GitHub issues, when `workflow-config:use-github-issues` is on | Recommending what to work on next means reading the backlog |
+| `brainstorm` | Package docs and READMEs, pasted by the user or fetched under BS-7 | Judging a third-party package means reading what it says it does |
 | `knowledge-graph` | The graphify index, which holds repo text and anything added with `graphify add <url>` | Finding callers and dependents is what the index is for |
 
 ## What contains it
@@ -25,6 +26,9 @@ not a defect: the only way to clear it is to stop reading that text.
   happens only on the user's command or at a named workflow point.
 - **Quoted issue text stays fenced.** Issue text passed on in a report or a recommendation goes in
   a fenced block labelled as quoted, so the next model meets it as data.
+- **Fetched docs are unverified.** In `brainstorm`, directives in a README get no weight, its
+  wording never decides a tool, dependency or recommendation, and a passage carried into the
+  decision document is fenced as quoted outside text (BS-7).
 - **A graph answer is a pointer, not proof.** The source file decides, and graph content never
   steers a dependency, tool or design choice.
 
