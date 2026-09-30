@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — Pull superpowers and symlink workflow skills for coding agents
+# install.sh: development tool, Linux only. Users install with npx skills (docs/installation.md)
 #
 # Usage:
 #   ./install.sh                    # Pull superpowers + install for all agents

@@ -6,8 +6,7 @@ write `~` into a config file, agy rejects it (see Skills).
 
 ## Workflow skills
 
-The skills live in `$HOME/.agents/skills/` (installed and updated by `npx skills`, or by this repo's
-`./install.sh`). Claude Code reads
+The skills live in `$HOME/.agents/skills/` (installed and updated by `npx skills`). Claude Code reads
 them through symlinks in `$HOME/.claude/skills/`. Do not copy them anywhere else.
 
 - **agy** reads them through `$HOME/.gemini/config/skills.json`. The path must be absolute: `~/...`

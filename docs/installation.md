@@ -1,8 +1,8 @@
 # Installation Reference
 
 The [README](../README.md) covers the three-step setup. This file is the reference for
-everything else: per-agent targets, script options, the full skill inventory, and manual
-installation.
+everything else: per-agent targets, the full skill inventory, manual installation, and the
+development script for working on this repo.
 
 ---
 
@@ -24,12 +24,12 @@ installed in *its* environment.
 
 A few skills ship supporting files alongside their `SKILL.md` (for example
 `3p-review/deep-audits.md`, loaded only when the change touches derived state, migrations, or
-third-party dependencies). Both install paths symlink the **whole skill directory**, so those
+third-party dependencies). Every install path symlinks the **whole skill directory**, so those
 files travel with the skill automatically. Supporting files always live inside the skill that
 uses them, never shared across skill directories — `npx skills` lets users install skills
 individually, and a cross-directory reference would break for anyone who does.
 
-## Option A — the `skills` CLI
+## Install with the `skills` CLI
 
 Works with Claude Code, Cursor, Gemini CLI, GitHub Copilot, and 40+ other agents.
 
@@ -59,47 +59,6 @@ into your agent's skills directory.
 > vendored skills into `skills/` and a same-named skill of ours would be clobbered on every pull.
 > If you already have the upstream one from an earlier install, `./install.sh` removes the link it
 > created; a copy you installed by another route stays, and `/verify-completion` is still the gate.
-
-## Option B — the install script
-
-One command that pulls superpowers and installs everything.
-
-```bash
-git clone https://github.com/nikhilw/structured-agentic-workflow.git
-cd structured-agentic-workflow
-
-./install.sh          # all supported agents (pulls superpowers automatically)
-.\install.ps1         # Windows PowerShell — requires Developer Mode or admin
-```
-
-It does three things:
-
-1. **Pulls superpowers skills** — sparse-clones [obra/superpowers](https://github.com/obra/superpowers)
-   (MIT-licensed) into `vendor/superpowers/`, then copies the adopted skills into `skills/`
-   under their upstream names.
-2. **Symlinks all skills** into the global skills directory for each supported agent.
-3. **Cleans up retired skills** — `verification-before-completion` is no longer part of this
-   workflow, so a stale copy under `skills/` and the symlink an earlier install created are
-   removed. Only a link that is broken or points back into this repo is touched; a copy you
-   installed some other way is left alone.
-
-### Targeting one agent
-
-```bash
-./install.sh --target claude     # Claude Code only
-./install.sh --target cursor     # Cursor only
-./install.sh --target gemini     # Gemini CLI only
-./install.sh --target copilot    # GitHub Copilot only
-```
-
-### Other options
-
-```bash
-./install.sh --local                   # skip the superpowers pull, use existing vendor/
-./install.sh --remove                  # remove all symlinks
-./install.sh --remove --target claude  # remove for one agent
-./install.sh --list                    # show agents and install status
-```
 
 ---
 
@@ -146,12 +105,17 @@ Installed, but not part of the workflow.
 
 ## Manual installation
 
-If the install script does not work on your system. Two steps: pull the superpowers skills,
+Without Node, or to link a clone of this repo directly. Two steps: pull the superpowers skills,
 then symlink everything into your agent's skills directory.
 
 ### Step 1 — pull superpowers skills
 
+From a clone of this repo:
+
 ```bash
+git clone https://github.com/nikhilw/structured-agentic-workflow.git
+cd structured-agentic-workflow
+
 git clone --depth 1 https://github.com/obra/superpowers.git /tmp/superpowers
 
 # Keep a vendored reference copy
@@ -209,3 +173,24 @@ ls -la ~/.claude/skills/
 ```
 
 Each entry should be a symlink pointing back into this repo's `skills/` directory.
+
+---
+
+## Developing this repo (Linux only)
+
+`install.sh` is a tool for working on these skills, not an installer for users: it is tested on
+Linux only, and it replaces any same-named symlink in the global agent directories, including
+one another installer created. Users install with `npx skills` above.
+
+```bash
+./install.sh --local                   # link skills/ into every agent dir, no superpowers pull
+./install.sh                           # pull superpowers first (pull-superpowers.sh), then link
+./install.sh --target claude           # one agent only: claude, cursor, gemini, copilot
+./install.sh --remove                  # remove the links
+./install.sh --list                    # show agents and install status
+```
+
+It pulls the superpowers skills into `vendor/superpowers/` and copies them into `skills/` under
+their upstream names, symlinks every skill directory into each agent's global skills directory,
+and removes retired skills: a stale copy under `skills/`, and a leftover link only when it is
+broken or points back into this repo.

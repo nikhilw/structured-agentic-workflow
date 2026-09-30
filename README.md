@@ -83,9 +83,8 @@ npx skills add nikhilw/structured-agentic-workflow
 npx skills add obra/superpowers -s test-driven-development -s systematic-debugging
 ```
 
-Prefer one command that pulls everything? Clone the repo and run `./install.sh`
-(`.\install.ps1` on Windows). Per-agent targets, manual steps, and the full skill inventory
-are in [installation.md](docs/installation.md).
+Per-agent targets, manual steps, and the full skill inventory are in
+[installation.md](docs/installation.md).
 
 ### 3. Point your project's agent config at the workflow
 
