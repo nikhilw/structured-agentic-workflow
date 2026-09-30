@@ -100,7 +100,7 @@ Two full-suite runs per feature are mandatory and cannot be traded away: the bui
 
 A run already recorded satisfies a run now required **only when all four hold**:
 
-1. **You made it, in this session, with your own hands.** A run reported to you in a handoff summary, a build completion report, or any other model's summary is a claim, not a run. Re-run it. This is what keeps `/3p-review` independent of the builder, and it holds even when the builder and the reviewer are the same model wearing a different persona.
+1. **You made it, in this session, with your own hands.** A run reported to you in a handoff summary, a build completion report, or any other model's summary is a claim, not a run. Re-run it. This is what keeps `/3p-review` independent of the builder, and it holds even when the builder and the reviewer are the same model wearing a different persona. A context compaction ends "this session" for this purpose: a run from before it survives only as a summary, and a summary of a run is a claim.
 2. **Same command, same rung.** A T2 run does not satisfy a T4 requirement because it passed. Never describe a narrow run in wide words.
 3. **Same tree.** `git status --porcelain` and `git diff` show zero changes since the run, untracked files included. One comment, one formatting pass, one file you touched and reverted by hand, all void it. Re-run.
 4. **You write the citation down.** Name the run you are citing and state what proved the tree unchanged. An unstated citation is indistinguishable from a skipped gate, and will be read as one.

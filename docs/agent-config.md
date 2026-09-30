@@ -44,6 +44,7 @@ globally and define the development lifecycle:
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
 - `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
+- `/compact-brief` : a one-line compact command and a resume brief to paste after it; suggested at the compact slots, any time
 - `test-scope` : how wide each test run must be, what a run may execute, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
 - `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief
@@ -140,6 +141,7 @@ globally and define the development lifecycle:
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
 - `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
+- `/compact-brief` : a one-line compact command and a resume brief to paste after it; suggested at the compact slots, any time
 - `test-scope` : how wide each test run must be, what a run may execute, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
 - `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief

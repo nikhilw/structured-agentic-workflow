@@ -119,6 +119,7 @@ It does three things:
 | `3p-review` | this project | Independent third-person review; returns a Rework Brief when there is too much to fix in place |
 | `handoff-summary` | this project | Emit the fixed-format Build Handoff Summary after review passes |
 | `verify-completion` | this project | The final gate: fresh suite, plan-requirements tick-off, decision-to-code drift audit. Replaces the upstream `verification-before-completion` |
+| `compact-brief` | this project | A one-line compact command and a resume brief to paste after it, carrying the session past a context compaction. Suggested at the two compact slots (plan approved, before the build; before verify), or any time |
 | `test-scope` | this project | Shared reference: how wide each test run must be, what a run may execute, and when a recorded run can be cited. Not invoked directly |
 | `existing-mechanisms` | this project | Shared reference: the eight questions about what the codebase already does, and the self-duplication inventory that catches a change duplicating its own code. Not invoked directly |
 | `review-lenses` | this project | Shared reference: the review perspectives, which gate runs each, and the outside-review brief. Not invoked directly |

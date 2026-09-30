@@ -643,7 +643,7 @@ Begin execution with `/build-phase <plan-file> Phase 1`. The workflow continues 
 **Path B — User hands off to a different model for build:**
 The user takes the plan file to a smaller/faster model (Gemini Flash, Cursor, Copilot, a local model) for execution. The dev model will build all phases and produce a **handoff summary**. The user will return to this planning model with that summary, and the workflow resumes with `/3p-review` → `/verify-completion`.
 
-Ask the user which path they prefer. If they don't specify, suggest both options.
+Ask the user which path they prefer. If they don't specify, suggest both options. In the same message, suggest compacting before the build, whichever path, in one line: `/compact-brief` writes the command and the brief (compact slot 1). The plan and decision document hold what brainstorm and review decided, so the build does not need this context; skipping it costs nothing.
 
 ### If the plan comes back revised
 

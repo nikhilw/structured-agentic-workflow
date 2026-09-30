@@ -38,6 +38,7 @@ flowchart TD
     Approve -- "revise" --> P1
     Approve -- "approved" --> MovePlan["Move plan<br/>new/ → plans/"]
     MovePlan --> ModelChoice{"Who builds?"}
+    MovePlan -. "suggested" .-> CB1["/compact-brief<br/>compact slot 1<br/>optional, you run it"]
 
     ModelChoice -- "same session" --> PR
     ModelChoice -- "hand off the plan file" --> X1
@@ -83,6 +84,8 @@ flowchart TD
 
     R5 --> HS["Emit build record<br/>/handoff-summary"]
     HS --> V1
+    HS -. "suggested" .-> CB2["/compact-brief<br/>compact slot 2<br/>optional, you run it"]
+    CB2 -.-> V1
 
     subgraph Verify ["5 · Verify — /verify-completion"]
         V1["Full suite - T4,<br/>or cite the sign-off run<br/>if nothing changed since"] --> V2["Line-by-line check<br/>against plan requirements<br/>always fresh"]
@@ -403,7 +406,15 @@ After all build phases, `/3p-review` runs on the **entire change set**.
 
 ## Step 5 — Verify and archive
 
-After `/3p-review` passes, run `/verify-completion` immediately. This is **not
+After `/3p-review` passes, `/verify-completion` runs next. On entry it suggests compacting first,
+in one line (**compact slot 2**): `/compact-brief` writes a one-line compact command and a brief
+to paste after it, carrying what the rest needs, including the handoff summary and sign-off that
+lived only in the chat and how you want the model to work. Skip it and nothing changes. Compact, and verification runs its own
+full suite, because a run from before a compaction is a summary and cannot be cited. The same
+suggestion comes at **compact slot 1**, when the plan is approved and before the build, whichever
+model builds it; `/compact-brief` also works any time you ask.
+
+`/verify-completion` is **not
 a second review**. `/3p-review` proved the *code* is sound; verification proves the *claim of
 "done" is true right now*. It adds three things review does not guarantee:
 
@@ -513,7 +524,8 @@ narrows it.
 hold: you made it yourself this session, it was the same command at the same rung, `git
 status`/`git diff` prove the tree has not changed since, and you write the citation down.
 This is what lets `/verify-completion` accept `/3p-review`'s sign-off run instead
-of repeating it. It is a *stricter* claim than re-running, not a looser one: re-running proves
+of repeating it, unless the context was compacted in between: a compaction ends "this session",
+and what survives of a run is a summary of it. It is a *stricter* claim than re-running, not a looser one: re-running proves
 the suite passes, while a citation also proves nothing has changed since it did.
 
 **What is never traded away.** Two full-suite runs per feature, both marked *always* in

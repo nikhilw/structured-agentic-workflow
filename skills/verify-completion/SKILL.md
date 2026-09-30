@@ -13,6 +13,12 @@ downstream checks your work. What you sign here is what ships.
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output
 > brevity to that level while preserving technical accuracy.
 
+> **Compact slot 2.** If `/3p-review` ran earlier in this same context, suggest compacting
+> first, in one line: `/compact-brief` writes the command and the brief. Then wait for the user to compact or to
+> say carry on. Skipping it costs nothing; compacting costs one full-suite run, because Part 1
+> cannot cite a run from before a compaction (`/test-scope`, citable-run rule). Do not suggest it
+> again once they have answered.
+
 > **Lineage:** the Iron Law, the gate function, the failure and rationalization tables, and the key
 > patterns below are adapted from `verification-before-completion` in
 > [superpowers](https://github.com/obra/superpowers) (MIT, Jesse Vincent). This skill **replaces**

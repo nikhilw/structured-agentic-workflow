@@ -108,6 +108,7 @@ globally and define the development lifecycle:
 - `/3p-review` — independent code review; the reviewer owns the code
 - `/handoff-summary` — emit the fixed-format Build Handoff Summary
 - `/verify-completion` — the final gate: fresh suite, requirements tick-off, plan-drift audit
+- `/compact-brief` : a one-line compact command and a resume brief to paste after it; suggested at the compact slots, any time
 - `test-scope` : how wide each test run must be, what a run may execute, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
 - `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief
@@ -169,6 +170,7 @@ One-time setup for both automated CLIs is in [agent-cli-setup.md](docs/extras/ag
 | `/3p-review` | Independent review that owns the code; loops until clean |
 | `/handoff-summary` | Emits the fixed-format Build Handoff Summary |
 | `/verify-completion` | The final gate: fresh suite, requirements tick-off, decision-to-code drift audit |
+| `/compact-brief` | Writes a one-line compact command and a resume brief to paste after it, so the session survives a compaction. Suggested before the build and before verify, or any time |
 | `test-scope` | The shared test-run ladder, the one boundary on what a run may execute, and the citable-run rule |
 | `existing-mechanisms` | The eight questions about what already exists, shared by brainstorm, plan, build and review |
 | `review-lenses` | The review perspectives (impact, removal, logic, behaviour, business sense, proof, coherence), which gate runs each, and the brief for an outside reviewer |
