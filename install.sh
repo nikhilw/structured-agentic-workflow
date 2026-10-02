@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
-# install.sh: development tool, Linux only. Users install with npx skills (docs/installation.md)
+# install.sh: install this workflow's skills into one project. Tested on Linux.
 #
 # Usage:
-#   ./install.sh                    # Pull superpowers + install for all agents
-#   ./install.sh --target claude    # Install for Claude Code only
-#   ./install.sh --target gemini    # Install for Gemini CLI only
-#   ./install.sh --target cursor    # Install for Cursor only
-#   ./install.sh --target copilot   # Install for GitHub Copilot only
-#   ./install.sh --remove           # Remove symlinks for all agents
-#   ./install.sh --remove --target claude  # Remove for specific agent
-#   ./install.sh --local            # Install without pulling superpowers
-#   ./install.sh --list             # Show supported agents and their paths
+#   ./install.sh <project-dir>            # pull superpowers, then install into that project
+#   ./install.sh --local <project-dir>    # install without pulling superpowers
+#   ./install.sh --remove <project-dir>   # remove what this script installed there
+#   ./install.sh                          # asks for the project directory
+#
+# Skills are copied into <project-dir>/.agents/skills/, the common directory, and
+# linked from <project-dir>/.claude/skills/. Global installs go through `npx skills`.
 
 set -euo pipefail
 
@@ -18,181 +16,121 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="${SCRIPT_DIR}/skills"
 PULL_SCRIPT="${SCRIPT_DIR}/pull-superpowers.sh"
 
-# Supported agents and their global skills directories
-declare -A AGENT_PATHS=(
-    [claude]="${HOME}/.claude/skills"
-    [cursor]="${HOME}/.cursor/skills"
-    [gemini]="${HOME}/.gemini/skills"
-    [copilot]="${HOME}/.config/github-copilot/skills"
-)
-
-ALL_AGENTS=(claude cursor gemini copilot)
-
-# Skills this project used to install and no longer does. A link left behind by an
-# earlier install is removed, but only when it is ours: a broken link, or one that
-# resolves back into this repo. A real skill the user installed some other way is
-# never touched.
+# Skills this project used to ship and no longer does. They are never installed,
+# and an installed copy is never removed: it may have come from another source.
 #
 # verification-before-completion: superseded by our own verify-completion.
 RETIRED_SKILLS=(
     verification-before-completion
 )
 
-remove_retired_links() {
-    local skills_dst="$1"
-    local skill target resolved
-    for skill in "${RETIRED_SKILLS[@]}"; do
-        target="${skills_dst}/${skill}"
-        [ -L "$target" ] || continue
-        resolved="$(cd "$(dirname "$target")" && readlink -f "$skill" 2>/dev/null || true)"
-        if [ -z "$resolved" ] || [ ! -e "$resolved" ]; then
-            rm "$target"
-            echo "    removed  ${skill} (retired — link was broken)"
-        elif [ "${resolved#${SKILLS_SRC}/}" != "$resolved" ]; then
-            rm "$target"
-            echo "    removed  ${skill} (retired — superseded by verify-completion)"
-        fi
-    done
-}
-
-# Discover all skills dynamically from the skills/ directory, minus anything
-# retired. A retired skill can still be sitting in skills/ from an older pull;
-# linking it and then unlinking it would clobber a copy the user installed
-# themselves, so it is never a candidate in the first place.
+# Every skill directory under skills/, minus anything retired. A retired skill can
+# still be sitting in skills/ from an older pull.
 discover_skills() {
-    local skills=() name retired
+    local name retired
     for dir in "${SKILLS_SRC}"/*/; do
         [ -d "$dir" ] || continue
         name="$(basename "$dir")"
         for retired in "${RETIRED_SKILLS[@]}"; do
             [ "$name" = "$retired" ] && continue 2
         done
-        skills+=("$name")
+        echo "$name"
     done
-    echo "${skills[@]}"
 }
 
-remove_links() {
-    local agent_name="$1"
-    local skills_dst="$2"
-    local skills
-    read -ra skills <<< "$(discover_skills)"
-
-    echo "  [${agent_name}] ${skills_dst}"
-    for skill in "${skills[@]}"; do
-        target="${skills_dst}/${skill}"
-        if [ -L "$target" ]; then
-            rm "$target"
-            echo "    removed  ${skill}"
-        elif [ -e "$target" ]; then
-            echo "    skipped  ${skill} (not a symlink — remove manually if intended)"
-        fi
-    done
-
-    remove_retired_links "$skills_dst"
+# The link target written into .claude/skills/<name>, relative so the project can move.
+link_target() {
+    echo "../../.agents/skills/$1"
 }
 
-install_links() {
-    local agent_name="$1"
-    local skills_dst="$2"
-    mkdir -p "$skills_dst"
+install_skills() {
+    local project="$1"
+    local common="${project}/.agents/skills"
+    local claude="${project}/.claude/skills"
+    local skill dst link count=0
+    mkdir -p "$common" "$claude"
 
-    local skills
-    read -ra skills <<< "$(discover_skills)"
+    while read -r skill; do
+        [ -n "$skill" ] || continue
+        dst="${common}/${skill}"
+        rm -rf -- "$dst"
+        cp -R -- "${SKILLS_SRC}/${skill}" "$dst"
+        count=$((count + 1))
 
-    echo "  [${agent_name}] ${skills_dst}"
-    for skill in "${skills[@]}"; do
-        src="${SKILLS_SRC}/${skill}"
-        target="${skills_dst}/${skill}"
-
-        if [ ! -d "$src" ]; then
-            echo "    missing  ${skill} — skipping"
-            continue
+        link="${claude}/${skill}"
+        if [ -L "$link" ] && [ "$(readlink -- "$link")" = "$(link_target "$skill")" ]; then
+            :
+        elif [ -e "$link" ] || [ -L "$link" ]; then
+            echo "  skipped link  .claude/skills/${skill} (something else is already there)"
+        else
+            ln -s -- "$(link_target "$skill")" "$link"
         fi
+    done < <(discover_skills)
 
-        if [ -L "$target" ]; then
-            rm "$target"
-        elif [ -e "$target" ]; then
-            echo "    exists   ${skill} (not a symlink — back up and remove to install)"
-            continue
-        fi
-
-        ln -s "$src" "$target"
-        echo "    linked   ${skill}"
-    done
-
-    remove_retired_links "$skills_dst"
-}
-
-list_agents() {
-    echo "Supported agents:"
     echo ""
-    for agent in "${ALL_AGENTS[@]}"; do
-        local path="${AGENT_PATHS[$agent]}"
-        local status="not installed"
-        if [ -d "$path" ]; then
-            status="installed"
-        fi
-        printf "  %-10s %s (%s)\n" "$agent" "$path" "$status"
-    done
+    echo "Installed ${count} skills to ${common}"
+    echo "  (the common .agents/ directory), symlinked from ${claude}."
+    echo "For another agent, symlink its skills directory entries to .agents/skills/<name>."
+    if ! command -v graphify >/dev/null 2>&1; then
+        echo ""
+        echo "Recommended: graphify powers codebase search in /brainstorm and /write-plan;"
+        echo "  without it both fall back to grep. Install: https://github.com/Graphify-Labs/graphify"
+    fi
 }
 
-# Parse arguments
+remove_skills() {
+    local project="$1"
+    local common="${project}/.agents/skills"
+    local claude="${project}/.claude/skills"
+    local skill link count=0
+
+    while read -r skill; do
+        [ -n "$skill" ] || continue
+        link="${claude}/${skill}"
+        if [ -L "$link" ] && [ "$(readlink -- "$link")" = "$(link_target "$skill")" ]; then
+            rm -- "$link"
+        fi
+        if [ -d "${common}/${skill}" ]; then
+            rm -rf -- "${common:?}/${skill}"
+            count=$((count + 1))
+        fi
+    done < <(discover_skills)
+
+    echo "Removed ${count} skills from ${common}, and their links in ${claude}."
+}
+
 ACTION="install"
-TARGET=""
 SKIP_PULL=false
+PROJECT=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --remove|-r)
-            ACTION="remove"
-            shift
-            ;;
-        --target|-t)
-            TARGET="$2"
-            if [[ -z "${AGENT_PATHS[$TARGET]+x}" ]]; then
-                echo "Error: unknown agent '$TARGET'"
-                echo "Supported agents: ${ALL_AGENTS[*]}"
-                exit 1
-            fi
-            shift 2
-            ;;
-        --local|-l)
-            SKIP_PULL=true
-            shift
-            ;;
-        --list)
-            list_agents
-            exit 0
-            ;;
-        --help|-h)
-            head -12 "$0" | tail -11 | sed 's/^# //' | sed 's/^#//'
-            exit 0
-            ;;
+        --remove|-r) ACTION="remove"; shift ;;
+        --local|-l)  SKIP_PULL=true; shift ;;
+        --help|-h)   sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        -*)          echo "Unknown option: $1 (see --help)"; exit 1 ;;
         *)
-            echo "Unknown option: $1"
-            echo "Run with --help for usage."
-            exit 1
-            ;;
+            if [ -n "$PROJECT" ]; then
+                echo "One project directory only (see --help)"; exit 1
+            fi
+            PROJECT="$1"; shift ;;
     esac
 done
 
-# Determine which agents to target
-if [ -n "$TARGET" ]; then
-    TARGETS=("$TARGET")
-else
-    TARGETS=("${ALL_AGENTS[@]}")
+if [ -z "$PROJECT" ]; then
+    if [ ! -t 0 ]; then
+        echo "No project directory given (see --help)"; exit 1
+    fi
+    read -r -p "Install into which project directory? " PROJECT
 fi
+if [ ! -d "$PROJECT" ]; then
+    echo "Not a directory: ${PROJECT}"; exit 1
+fi
+PROJECT="$(cd "$PROJECT" && pwd)"
 
-# Execute
 case "$ACTION" in
     remove)
-        echo "Removing skill symlinks..."
-        for agent in "${TARGETS[@]}"; do
-            remove_links "$agent" "${AGENT_PATHS[$agent]}"
-        done
-        echo ""
-        echo "Done."
+        remove_skills "$PROJECT"
         ;;
     install)
         if [ "$SKIP_PULL" = false ]; then
@@ -200,19 +138,6 @@ case "$ACTION" in
             bash "$PULL_SCRIPT"
             echo ""
         fi
-        echo "Installing workflow skills..."
-        for agent in "${TARGETS[@]}"; do
-            install_links "$agent" "${AGENT_PATHS[$agent]}"
-        done
-        echo ""
-        echo "Done. Skills are now available."
-        echo "Verify with:  ls -la ~/.claude/skills/  (or other agent paths)"
-        if ! command -v graphify >/dev/null 2>&1; then
-            echo ""
-            echo "Recommended: graphify powers codebase search in /brainstorm and /write-plan."
-            echo "  uv tool install graphifyy && graphify install"
-            echo "  (double-y is deliberate; 'graphify' on PyPI is an unrelated package)"
-            echo "  (the workflow runs without it — both skills fall back to grep)"
-        fi
+        install_skills "$PROJECT"
         ;;
 esac

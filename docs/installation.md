@@ -1,8 +1,8 @@
 # Installation Reference
 
 The [README](../README.md) covers the three-step setup. This file is the reference for
-everything else: per-agent targets, the full skill inventory, manual installation, and the
-development script for working on this repo.
+everything else: per-agent targets, the full skill inventory, manual installation, and
+`install.sh`, which installs into one project.
 
 ---
 
@@ -24,7 +24,7 @@ installed in *its* environment.
 
 A few skills ship supporting files alongside their `SKILL.md` (for example
 `3p-review/deep-audits.md`, loaded only when the change touches derived state, migrations, or
-third-party dependencies). Every install path symlinks the **whole skill directory**, so those
+third-party dependencies). Every install path links or copies the **whole skill directory**, so those
 files travel with the skill automatically. Supporting files always live inside the skill that
 uses them, never shared across skill directories — `npx skills` lets users install skills
 individually, and a cross-directory reference would break for anyone who does.
@@ -57,8 +57,8 @@ into your agent's skills directory.
 > tick-off and the drift audit. Installing both leaves two skills claiming one gate, and the agent
 > takes whichever it reads first. The name differs deliberately, since the install script copies
 > vendored skills into `skills/` and a same-named skill of ours would be clobbered on every pull.
-> If you already have the upstream one from an earlier install, `./install.sh` removes the link it
-> created; a copy you installed by another route stays, and `/verify-completion` is still the gate.
+> If you already have the upstream one, remove it yourself; `./install.sh` never installs it and
+> never deletes it, and `/verify-completion` is still the gate.
 
 ---
 
@@ -99,7 +99,7 @@ Installed, but not part of the workflow.
 
 | Skill | Why it is gone |
 |---|---|
-| `verification-before-completion` | Replaced by `verify-completion`, which does everything it did and adds the requirements tick-off and the drift audit. No longer pulled or linked; `./install.sh` removes a stale copy and the symlink it created. The one upstream reference to it, in `systematic-debugging`'s related-skills list, is rewritten to `/verify-completion` at pull time. |
+| `verification-before-completion` | Replaced by `verify-completion`, which does everything it did and adds the requirements tick-off and the drift audit. No longer pulled or installed; `pull-superpowers.sh` removes a stale copy from this repo, and an installed copy is yours to remove. The one upstream reference to it, in `systematic-debugging`'s related-skills list, is rewritten to `/verify-completion` at pull time. |
 
 ---
 
@@ -176,21 +176,21 @@ Each entry should be a symlink pointing back into this repo's `skills/` director
 
 ---
 
-## Developing this repo (Linux only)
+## Install into one project: `install.sh`
 
-`install.sh` is a tool for working on these skills, not an installer for users: it is tested on
-Linux only, and it replaces any same-named symlink in the global agent directories, including
-one another installer created. Users install with `npx skills` above.
+From a clone of this repo, `install.sh` installs into one project, never globally; global
+installs go through `npx skills` above. Tested on Linux.
 
 ```bash
-./install.sh --local                   # link skills/ into every agent dir, no superpowers pull
-./install.sh                           # pull superpowers first (pull-superpowers.sh), then link
-./install.sh --target claude           # one agent only: claude, cursor, gemini, copilot
-./install.sh --remove                  # remove the links
-./install.sh --list                    # show agents and install status
+./install.sh <project-dir>             # pull superpowers (pull-superpowers.sh), then install
+./install.sh --local <project-dir>     # install without pulling superpowers
+./install.sh --remove <project-dir>    # remove what it installed
+./install.sh                           # asks for the project directory
 ```
 
-It pulls the superpowers skills into `vendor/superpowers/` and copies them into `skills/` under
-their upstream names, symlinks every skill directory into each agent's global skills directory,
-and removes retired skills: a stale copy under `skills/`, and a leftover link only when it is
-broken or points back into this repo.
+It copies every skill directory into `<project-dir>/.agents/skills/`, the common directory, and
+links each from `<project-dir>/.claude/skills/` with a relative link. An entry already in
+`.claude/skills/` that is not its link is left alone and named. For another agent, symlink that
+agent's skills directory entries to `.agents/skills/<name>`. A retired skill is never installed,
+and an installed copy of one is never removed, because it may have come from superpowers. Re-run it
+after pulling a newer version of this repo; the copies do not follow it.

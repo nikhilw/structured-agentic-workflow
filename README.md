@@ -83,9 +83,9 @@ npx skills add nikhilw/structured-agentic-workflow
 npx skills add obra/superpowers -s test-driven-development -s systematic-debugging
 ```
 
-Install with `npx skills` only. The repo's `install.sh` is a development script for working on
-these skills, Linux only, and not an installer: it replaces any same-named skill link in your
-agent's global directory. Per-agent targets, manual steps, and the full skill inventory are in
+To install into a single project instead, run `./install.sh <project-dir>` from a clone of this
+repo: it copies the skills into that project's `.agents/skills/` and links them from
+`.claude/skills/`. Per-agent targets, manual steps, and the full skill inventory are in
 [installation.md](docs/installation.md).
 
 ### 3. Point your project's agent config at the workflow

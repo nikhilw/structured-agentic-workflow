@@ -6,8 +6,8 @@ Minimal project guide, read by every agent that works on this repo. Claude Code 
 ## Edit local files only
 
 - The source of truth is **this repo's `skills/`** directory. Edit and reference only files here.
-- Do **not** edit the installed copies under `~/.claude/skills/`, `~/.cursor/skills/`, etc. Those are install targets — on this machine the Claude symlinks resolve to `~/.agents/skills/` (a separate non-git copy), not to this repo. Editing them is editing the wrong file.
-- Changes here are **not live** until installed. `./install.sh --local` (Linux only, a development tool; users install with `npx skills`) symlinks every `skills/*/` dir into the agent skill dirs (it auto-discovers new skill folders). Re-run it after adding or changing a skill.
+- Do **not** edit the installed copies under `~/.claude/skills/`, `~/.cursor/skills/`, a project's `.agents/skills/` or `.claude/skills/`, etc. Those are install targets; on this machine the Claude symlinks resolve to `~/.agents/skills/` (a separate non-git copy), not to this repo. Editing them is editing the wrong file.
+- Changes here are **not live** until installed. `./install.sh --local <project-dir>` copies every `skills/*/` dir (it auto-discovers new skill folders) into that project's `.agents/skills/` and links each from its `.claude/skills/`. To try them in this repo, `./install.sh --local .`; both directories are gitignored here. Re-run it after adding or changing a skill: the copies do not follow the repo.
 
 ## Review your own change, every time, unprompted
 
@@ -137,8 +137,8 @@ Three things to know before touching the scripts:
   line, the rewrite is what to fix.
 - **Retirement is handled in two places.**
   `RETIRED_SKILLS` in `pull-superpowers.sh` deletes stale copies under `vendor/` and `skills/`;
-  `RETIRED_SKILLS` in `install.sh` removes the leftover agent symlink, but only when it is broken or
-  resolves back into this repo. A copy the user installed some other way is left alone.
+  `RETIRED_SKILLS` in `install.sh` keeps a retired skill out of an install, and never removes an
+  installed copy, because it may have come from superpowers or another source.
 
 ### External dependencies
 
@@ -212,7 +212,7 @@ update whichever of these it touches:
 | `docs/workflow.md` | The full lifecycle diagram and the phase-by-phase detail |
 | `docs/multi-model.md` | Planning/build/review model split, the two contracts, the model-split diagram |
 | `docs/agent-config.md` | What users put in their `CLAUDE.md` / `AGENTS.md` |
-| `docs/installation.md` | Agent paths, `npx skills`, full skill inventory, manual install, the Linux-only dev script |
+| `docs/installation.md` | Agent paths, `npx skills`, full skill inventory, manual install, `install.sh` (project scope) |
 | `docs/configuration.md` | `/workflow-config` preferences and memory keys |
 | `docs/practices.md` | Task selection, refactoring monoliths, "no surprises" |
 | `docs/philosophy.md` | The "why" — principles and trade-offs |

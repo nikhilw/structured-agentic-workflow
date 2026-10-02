@@ -21,3 +21,7 @@ skills/systematic-debugging/
 # Internal working notes (kept locally, not tracked)
 docs/superpowers-comparison.md
 docs/superpowers-learnings.md
+
+# Project-scope installs, from ./install.sh . while developing
+.agents/
+.claude/skills/
