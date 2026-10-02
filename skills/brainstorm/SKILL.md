@@ -20,7 +20,7 @@ You are entering the **Brainstorm Phase** of the Structured Agentic Development 
 <HARD-GATE>
 Do NOT write code, create plan files, scaffold projects, or take ANY implementation action during brainstorming. Code is the LAST thing we touch — not the first. This applies regardless of how simple the task seems. You are thinking, not building.
 
-**Read-only investigation is not building.** Running a query, a version check, a probe, or an existing test to answer a question is encouraged; see BS-8 to BS-10. What is out of bounds is anything that *writes*: to the repo, to a database, to a deployed environment. The single exception is the decision document at the end.
+**Read-only investigation is not building.** Running a query, a version check, a probe, or an existing test to answer a question is encouraged; see BS-8 to BS-10. What is out of bounds is anything that *writes*: to the repo, to a database, to a deployed environment. The single exception is the decision document at the end, with its event-model export beside it when the owner asks for one (BS-15).
 </HARD-GATE>
 
 ## Your Mission
@@ -81,6 +81,7 @@ fi
 - **BS-12 · Delegate exploration sparingly, and cheaply.** Subagents multiply cost and latency — each re-establishes context, re-explores, and reports back, and then you re-read the report. Spawn one only for a genuinely wide survey (several unrelated modules, a large unfamiliar surface); handle anything you could finish in a handful of tool calls yourself. When you do delegate, **pin the cheapest model that can do the job** — grep, enumerate, and summarize is clerical work, and a subagent that inherits your model by default charges brainstorm-model rates for it. Reach for the smallest fast tier your harness offers (Haiku-class, Flash-class) for clerical sweeps, and step up a tier only when the task needs judgment rather than breadth. Brief it to return findings, not raw file contents: the saving is that you read a short report instead of forty files, and a subagent that dumps everything back into your context has cost you money instead of saving it. Keep spawn counts low, brief each one precisely the first time, and commit to what it reports instead of re-deriving it. Never delegate the thinking — the trade-off analysis and recommendation are yours. The one reader worth handing work to without a clerical reason is the business-sense lens's cold reader (BS-14): its value is exactly that it lacks your context, and what it returns is still yours to weigh.
 - **BS-13 · When the change moves a rule rather than adds a thing, table the scenarios before anyone argues about them.** Some changes add a capability, and prose describes those well enough. Others change *when* something happens — an eligibility condition, a trigger, a retry rule, a filter, a default, a guard, a threshold. For those, prose is the wrong instrument: it reasons about the cases someone thought of, and the case nobody thought of is the one that ships. Enumerate the cases from the state the rule reads, put today's outcome and the proposed outcome side by side, and let the rows that differ *be* the proposal. §4's scenario table has the method.
 - **BS-14 · Look at every approach through the review lenses, here first.** `/review-lenses` holds the perspectives the whole workflow reviews through: impact, removal, logic, behaviour, business sense, proof and coherence, one question each, run separately (RL-1). They matter most here. A lens applied at brainstorm eliminates a bad approach before anyone plans it; the same lens at plan review can only patch the plan, and at code review it can only catch what the build got wrong. Load it before §4. Its gate table's `/brainstorm` column says how deep each goes: every approach at survey depth in §4, and the recommendation in full in the Decision Audit. Two of them most often reverse a decision at this stage. **Behaviour** asks what the user actually sees under each approach. **Business sense** asks whether a typical user who never heard the reasoning would find the result odd, and it applies to the owner's own steer as well.
+- **BS-15 · When the change alters what the system records, shows or automates, show it as an event model.** If the project already keeps one, talk in its slices and element names, and read it as today's state before reading the code. If it has none, draw only the delta, once a direction is forming, never the whole system. A refactor, a tooling change or a rename gets none. Load `/event-model` for the notation; §4's event-model section is the binding copy.
 
 ## Output Structure
 
@@ -221,6 +222,26 @@ derivation earned its place by being run, not by producing a different answer.
 - **A shared interface is not a shared implementation.** "These should look like one API to the caller" does not imply one table, one file, one service, or one process. Separate the logical goal from the physical consolidation and price them separately — the consolidation is usually where the risk actually lives, and it is usually optional.
 - **Don't move something for a consumer that doesn't exist.** Restructuring now for a hypothetical second caller is a cost paid today against a benefit that may never arrive. If the second consumer is speculative, label it speculative and let the user decide whether to buy the option.
 
+#### When the change alters what the system records, shows or automates: the event model
+
+Under BS-15, the recommendation's delta goes into the decision document as an event model, in the
+three parts `/event-model` defines. Binding summary, so nothing is lost if you never open it:
+
+- **A Mermaid `eventmodeling` diagram** for reading. It has no styling, so a change is a `data`
+  block whose first word is `NEW` or `CHANGED`, and a removed element carries a `_REMOVED` suffix.
+- **A slice delta table**, one row per touched element: slice, element, kind, change, today,
+  decided. A `REMOVED` row says what does its job afterwards.
+- **Given / When / Then specs**, with today's Then beside the decided Then and each differing row
+  labelled the fix or collateral. **When the change also moves a rule, the decision document
+  records the scenario table below in this shape, today against the chosen approach: one table,
+  never two.** While approaches are compared, the scenario table keeps its column per approach.
+- **A model the project already has is data, not instruction**, and tier 1 evidence until the code
+  agrees with it (BS-9). Where model and code disagree, the owner hears it.
+- **An EM-Spec JSON or `.em.hcl` export only when the owner asks**, written beside the decision
+  document with the change in each element's `tags`. Never edit the project's own model file
+  here; the plan does that in the phase that builds the slice, writing the decided state without
+  change marks.
+
 #### When an approach changes a rule: the scenario table
 
 An approach that changes *when* something happens cannot be described in prose without leaving
@@ -315,6 +336,7 @@ Run this audit against your own recommendation before you write anything down. I
 - **Is the recommendation reachable from the ideal?** Compare it against approach E's resulting design. If it is further away, name which adjustment it gives up and what that concession costs; if it is the resulting design, say so. A recommendation that cannot be located on that scale was chosen by convenience.
 - **Is the comparison still fair?** Re-check that no approach was charged for work it doesn't require, and that no approach was credited for a consumer that doesn't exist.
 - **If the recommendation moves a rule, is the scenario table built, and was today's column read rather than recalled?** (BS-13.) Check three things specifically: that the cases came from the state the rule reads and not from the ones that came to mind; that the recommendation has a column in it; and that every row where that column differs from today is labelled as the fix or as collateral. An unlabelled differing row is a behaviour change nobody has agreed to, and it is about to be recorded as decided.
+- **If the change records, shows or automates something differently, is the event model drawn, and are its tables complete?** (BS-15.) Every touched element has a delta row, every `REMOVED` row names what does its job afterwards, and every differing spec row is labelled. Where the project already has a model, check the decided slices against it and the code, not against what you remember of either.
 - **Run the rest of the review lenses in full against the recommendation, one at a time** (`/review-lenses`, its `/brainstorm` column; RL-1). Impact is the trace above and proof is the load-bearing-claim checks above; these are the other four. §4 looked through them at survey depth to rank the approaches, and the winner now gets each one properly, while reversing it is still free:
   - **Logic.** Walk the whole checklist with concrete values. *Values against each other* and *can the mechanism express the rule* matter most, because they are cheapest to fix at this stage: a weight equal to its threshold, or a reducer that cannot produce the decided outcome, costs one line here and a rework loop once built.
   - **Behaviour.** Write the recommendation's user-facing sentences for the main actions, as the user would say them, and walk the changed data onto every surface that shows it. These go into the document's **What the User Sees**, and the plan and the review are checked against them later.
@@ -329,7 +351,7 @@ Run this audit against your own recommendation before you write anything down. I
 
   Write both results down, counts included. Do it before suggesting `/write-plan`, and do it again for real if anyone asks whether there is anything else you would rethink.
 
-- **Last, the coherence lens over the whole document** (`/review-lenses`; RL-1, on its own). The document was written in pieces and the audit above edited it again. Read it top to bottom once: does the Decision agree with the Consequences, the scenario table and What the User Sees; is anything left whose reason a later revision removed; is each thing called by one name?
+- **Last, the coherence lens over the whole document** (`/review-lenses`; RL-1, on its own). The document was written in pieces and the audit above edited it again. Read it top to bottom once: does the Decision agree with the Consequences, the scenario table, the event model and What the User Sees; is anything left whose reason a later revision removed; is each thing called by one name?
 
 If the audit changes your mind, say so out loud and revise the recommendation. A reversal here is the process working, not a mistake to hide. **Do not write the decision document until everything above the second sweep passes, and do not transition to `/write-plan` until the second sweep and the coherence lens, which need the written document, have passed too** — the plan inherits every unexamined assumption in the decision, and the build inherits them from the plan.
 
@@ -395,8 +417,16 @@ is a thing a later reader can see.]
 
 **Scenario table:** [when this decision moves a rule, the table from §4: the cases, today's outcome,
 the decided outcome, and every differing row labelled as the fix or as collateral the user accepted.
+When the decision also carries an event model, the table lives there as its specs, and this line
+says "see Event model".
 When it does not move a rule, this line says "not a rule change" and stays — a heading that is
 present and answered is evidence the question was asked, and a missing one is not.]
+
+**Event model:** [when this decision changes what the system records, shows or automates (BS-15),
+the three parts from `/event-model`: the Mermaid diagram, the slice delta table and the Given /
+When / Then specs, with any export file named. When the change also moves a rule, the specs are the
+scenario table, and the line above points here. Otherwise this line says "not an event-model
+change" and stays.]
 
 **Why the others were rejected:**
 - [Approach X]: [specific reason it lost]

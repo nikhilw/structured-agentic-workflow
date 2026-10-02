@@ -113,6 +113,8 @@ globally and define the development lifecycle:
 - `test-scope` : how wide each test run must be, what a run may execute, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
 - `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief
+- `knowledge-graph` : how a graphify index is refreshed and queried, and what a graph answer is worth; loaded only when graphify is installed
+- `event-model` : reading a project's event model, and drawing a change as one when it records, shows or automates something new
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
@@ -175,6 +177,8 @@ One-time setup for both automated CLIs is in [agent-cli-setup.md](docs/extras/ag
 | `test-scope` | The shared test-run ladder, the one boundary on what a run may execute, and the citable-run rule |
 | `existing-mechanisms` | The eight questions about what already exists, shared by brainstorm, plan, build and review |
 | `review-lenses` | The review perspectives (impact, removal, logic, behaviour, business sense, proof, coherence), which gate runs each, and the brief for an outside reviewer |
+| `knowledge-graph` | How a graphify index is refreshed and queried, and the three limits on what a graph answer is worth. Loaded only when graphify is installed |
+| `event-model` | Reads a project's event model, or draws the change as one: a Mermaid diagram, a slice delta table and Given/When/Then specs, with EM-Spec JSON or `.em.hcl` on request |
 | `/triage` | Recommends the next task, minimizing context thrash |
 | `/github-backlog` | Maintains features and bugs as GitHub issues |
 | `/workflow-config` | Sets TDD/BDD, output brevity, and backlog source |

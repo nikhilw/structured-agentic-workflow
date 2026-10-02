@@ -48,6 +48,8 @@ globally and define the development lifecycle:
 - `test-scope` : how wide each test run must be, what a run may execute, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
 - `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief
+- `knowledge-graph` : how a graphify index is refreshed and queried, and what a graph answer is worth; loaded only when graphify is installed
+- `event-model` : reading a project's event model, and drawing a change as one when it records, shows or automates something new
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
@@ -145,6 +147,8 @@ globally and define the development lifecycle:
 - `test-scope` : how wide each test run must be, what a run may execute, and when a run can be cited instead of re-run
 - `existing-mechanisms` : the eight questions about what the codebase already does
 - `review-lenses` : the perspectives every review looks through, which gate runs which, and the outside-review brief
+- `knowledge-graph` : how a graphify index is refreshed and queried, and what a graph answer is worth; loaded only when graphify is installed
+- `event-model` : reading a project's event model, and drawing a change as one when it records, shows or automates something new
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.

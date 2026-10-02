@@ -215,12 +215,22 @@ plan does not describe, that absence *is* the finding. Write it that way.
 ### The scenario table, if the decision document has one
 
 A decision that moved a rule carries a table of cases with the outcome decided for each (BS-13),
-and it is the only part of the decision document that ticks off mechanically rather than being read
-for intent. Take each **differing** row, find what the code now does in that case, and compare. A
+and with the event model below it is the part of the decision document that ticks off mechanically
+rather than being read for intent. Take each **differing** row, find what the code now does in that case, and compare. A
 row labelled *collateral* is the one to check hardest: it was a behaviour change nobody asked for,
 the user accepted it explicitly, and it is the likeliest thing in the whole document to have been
 built as though it had never been decided. A row whose built behaviour does not match its decided
 outcome is a drift finding like any other, and it is reported with both cells quoted.
+
+### The event model, if the decision document has one
+
+A decision that changed what the system records, shows or automates carries an event model
+(BS-15): a slice delta table and Given / When / Then specs. Tick both off the same way. Each delta
+row: is the element there, changed as decided, or gone, and does whatever took over a `REMOVED`
+element's job do it? Each differing spec row: given that state and that command, does the code now
+produce the decided Then? Where the change also moved a rule, the specs are the scenario table
+above, so check them once. If the project keeps its own model file, it should now show the decided
+slices; a file still showing today's is a drift finding.
 
 ### What the User Sees, if the decision document has it
 
@@ -398,6 +408,9 @@ replacement never landed, and deletions no removal table named. Or "Nothing."]
 - **Scenario table:** [N] differing rows checked against the built behaviour, [N] matched; each
   mismatch is a row above. [Or: the decision document carries no table, or it records "not a rule
   change".]
+- **Event model:** [N] delta rows and [N] differing spec rows checked against the build, [N] matched;
+  each mismatch is a row above; the project's model file [updated / not updated / none kept]. [Or:
+  the decision document carries no event model, or it records "not an event-model change".]
 - **What the User Sees:** [N] expectation sentences checked against the built behaviour, [N] held;
   each broken one is a row above. [Or: the decision document has no such section.]
 - **DecisionDoc → Code:** [does the code solve the problem that was decided; did the document's

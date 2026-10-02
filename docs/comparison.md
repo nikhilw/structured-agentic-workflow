@@ -21,6 +21,10 @@ cell is out of date, open an issue and it gets fixed.*
 - **Seven review lenses, one question at a time, from first idea to finished code.** Impact,
   removal, logic, behaviour, business sense, proof and coherence, each run on its own, on the
   approaches, the plan and the built code.
+- **A change reads as an event model.** When work changes what a system records, shows or
+  automates, the brainstorm draws it as slices: what is new, changed or removed, and each case with
+  today's outcome beside the decided one. A project's existing event model is read in its own
+  terms, from EM-Spec JSON, `.em.hcl` or Mermaid.
 - **A rule change is a table, not a paragraph.** Every case the rule can meet, today's outcome beside
   each proposal's, with every changed row marked as the fix or as collateral nobody asked for.
 - **Nothing finishes smaller than it started.** Every removal names what replaces it and the test
@@ -42,6 +46,7 @@ cell is out of date, open an issue and it gets fixed.*
 | Separate single-question review passes, idea to code | ✅ | – | – | ◐ personas | ◐ two-stage | ◐ role reviews | ◐ multi-agent | – |
 | Business-sense review, owner's own decisions included | ✅ | – | – | ◐ PM persona | – | ✅ CEO review | – | – |
 | Rule changes tabled case by case, today against proposed | ✅ | ◐ scenarios | ◐ EARS criteria | – | – | – | – | – |
+| Change shown as an event model; reads EM-Spec, `.em.hcl`, Mermaid | ✅ | – | – | – | – | – | – | – |
 | Every removal audited, replacement named | ✅ | – | – | – | – | – | – | – |
 | Scoped test runs, full suite only where it counts | ✅ | – | – | – | – | – | – | – |
 | Test-first enforced | ✅ | ◐ via constitution | – | – | ✅ | ◐ | – | – |

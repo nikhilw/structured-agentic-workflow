@@ -18,7 +18,7 @@ flowchart TD
     subgraph Brainstorm ["1 · Brainstorm — /brainstorm · planning model"]
         B1["Refresh graphify index once, if installed,<br/>then explore the problem space"] --> B1a["existing-mechanisms<br/>all 8 questions answered"]
         B1a --> B2["Propose approaches<br/>minimal ↔ structural<br/>+ E: ideal, then adjusted<br/>each through the review lenses"]
-        B2 --> B2a["Scenario table<br/>if a rule moves"]
+        B2 --> B2a["Scenario table, if a rule moves<br/>Event model, if what is recorded,<br/>shown or automated changes"]
         B2a --> B3["Challenge the obvious solution"]
         B3 --> B4{"Human satisfied?"}
         B4 -- "refine / pivot" --> B1
@@ -161,6 +161,13 @@ The skill will:
   threshold), build a **scenario table**: every case from the state the rule reads, today's
   outcome beside each approach's, and every differing row labelled as the fix or as collateral.
   The differing rows become the plan's test cases
+- When the change alters what the system records, shows or automates, show it as an **event
+  model** (`event-model`): a Mermaid `eventmodeling` diagram with the change written on each
+  element, a slice delta table, and Given / When / Then specs with today's outcome beside the
+  decided one. If the project already keeps a model (EM-Spec JSON, `.em.hcl` or Mermaid), the
+  brainstorm talks in its slices; if not, it draws only the delta. On request it also writes the
+  delta as EM-Spec JSON or `.em.hcl`. The plan turns slices into phases and specs into test
+  criteria, and the final drift audit ticks both tables off
 - Look at every approach through the **review lenses** (`review-lenses`): impact, removal, logic,
   behaviour, business sense, proof and coherence, one question at a time. They matter most here,
   where a lens can still eliminate an approach instead of patching a plan. **Behaviour** writes down

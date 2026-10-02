@@ -82,6 +82,8 @@ into your agent's skills directory.
 | `test-scope` | this project | Shared reference: how wide each test run must be, what a run may execute, and when a recorded run can be cited. Not invoked directly |
 | `existing-mechanisms` | this project | Shared reference: the eight questions about what the codebase already does, and the self-duplication inventory that catches a change duplicating its own code. Not invoked directly |
 | `review-lenses` | this project | Shared reference: the review perspectives, which gate runs each, and the outside-review brief. Not invoked directly |
+| `knowledge-graph` | this project | Shared reference: refreshing and querying a graphify index, and the three limits on what a graph answer is worth. Loaded only when graphify is installed. Not invoked directly |
+| `event-model` | this project | Shared reference: reading a project's event model, and drawing a change as one (Mermaid diagram, slice delta table, Given/When/Then specs, EM-Spec JSON or `.em.hcl` on request). Not invoked directly |
 | `triage` | this project | Recommend the next task, minimizing context thrash |
 | `github-backlog` | this project | Maintain features and bugs on GitHub |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |

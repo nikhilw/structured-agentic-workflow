@@ -142,7 +142,7 @@ Each gate is a column. Depth is the gate's, and so is what happens to a finding.
 | behaviour | what the user sees under each approach; the recommendation's user-facing sentences go into the decision document's **What the User Sees** | the **behaviour pass**, checked against those sentences | the *Behaviour* section: drive the built thing on each surface and compare with the sentences |
 | business sense | every approach, and the owner's own steer, read cold | the **business-sense pass** | the *Business Sense* section: the plan does not matter on its own; the built thing has to work the way the business needs. A defect is graded and fixed like any finding; a question goes to the owner and does not hold the gate |
 | proof | for each load-bearing claim, what would prove it (BS-9, BS-10) | the **proof pass** | *Tests*, with the mutation checks run |
-| coherence | the decision document once written, before `/write-plan`: Decision against Consequences, the scenario table and What the User Sees | the **coherence pass** | not run on code; *Codebase Consistency* covers the equivalent |
+| coherence | the decision document once written, before `/write-plan`: Decision against Consequences, the scenario table, the event model and What the User Sees | the **coherence pass** | not run on code; *Codebase Consistency* covers the equivalent |
 
 ## Handing a review to an outside model
 
