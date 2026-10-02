@@ -409,7 +409,7 @@ After all build phases, `/3p-review` runs on the **entire change set**.
 After `/3p-review` passes, `/verify-completion` runs next. On entry it suggests compacting first,
 in one line (**compact slot 2**): `/compact-brief` writes a one-line compact command and a brief
 to paste after it, carrying what the rest needs, including the handoff summary and sign-off that
-lived only in the chat and how you want the model to work. Skip it and nothing changes. Compact, and verification runs its own
+lived only in the chat and how you want the model to work. After you paste the brief, the model names the next step and waits for your go. Skip it and nothing changes. Compact, and verification runs its own
 full suite, because a run from before a compaction is a summary and cannot be cited. The same
 suggestion comes at **compact slot 1**, when the plan is approved and before the build, whichever
 model builds it; `/compact-brief` also works any time you ask.

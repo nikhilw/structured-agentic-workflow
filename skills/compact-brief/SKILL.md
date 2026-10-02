@@ -103,5 +103,6 @@ Open asks: [question].
 From the chat, [who said it], claims not verified: [handoff and sign-off items].
 How to work with the owner: "[their words]"; [corrections they repeated].
 [Anything else the next step needs.]
-Before acting: re-read the plan and decision doc from disk, and load each skill and reference again when a step needs it; what was loaded before the compaction is gone or cut short. Runs listed here are claims; /verify-completion runs the full suite fresh.
+Before acting: re-read the plan and decision doc from disk, and load each skill and reference again when a step needs it; what was loaded before the compaction is gone or cut short. Where sources disagree, the files on disk win, then this brief, then the compaction summary. Runs listed here are claims; /verify-completion runs the full suite fresh.
+State the next step in one line and wait for the owner's go.
 ```
