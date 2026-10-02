@@ -4,11 +4,14 @@
 # Usage:
 #   ./install.sh <project-dir>            # pull superpowers, then install into that project
 #   ./install.sh --local <project-dir>    # install without pulling superpowers
+#   ./install.sh --link <project-dir>     # link to this repo instead of copying (for
+#                                         # working on the skills; not portable)
 #   ./install.sh --remove <project-dir>   # remove what this script installed there
 #   ./install.sh                          # asks for the project directory
 #
-# Skills are copied into <project-dir>/.agents/skills/, the common directory, and
-# linked from <project-dir>/.claude/skills/. Global installs go through `npx skills`.
+# Skills are copied (or with --link, linked) into <project-dir>/.agents/skills/, the
+# common directory, and linked from <project-dir>/.claude/skills/. Global installs go
+# through `npx skills`.
 
 set -euo pipefail
 
@@ -54,7 +57,11 @@ install_skills() {
         [ -n "$skill" ] || continue
         dst="${common}/${skill}"
         rm -rf -- "$dst"
-        cp -R -- "${SKILLS_SRC}/${skill}" "$dst"
+        if [ "$LINK" = true ]; then
+            ln -s -- "${SKILLS_SRC}/${skill}" "$dst"
+        else
+            cp -R -- "${SKILLS_SRC}/${skill}" "$dst"
+        fi
         count=$((count + 1))
 
         link="${claude}/${skill}"
@@ -68,8 +75,13 @@ install_skills() {
     done < <(discover_skills)
 
     echo ""
-    echo "Installed ${count} skills to ${common}"
-    echo "  (the common .agents/ directory), symlinked from ${claude}."
+    if [ "$LINK" = true ]; then
+        echo "Linked ${count} skills in ${common} to ${SKILLS_SRC}"
+        echo "  (edits there are live here), symlinked from ${claude}."
+    else
+        echo "Installed ${count} skills to ${common}"
+        echo "  (the common .agents/ directory), symlinked from ${claude}."
+    fi
     echo "For another agent, symlink its skills directory entries to .agents/skills/<name>."
     if ! command -v graphify >/dev/null 2>&1; then
         echo ""
@@ -101,13 +113,15 @@ remove_skills() {
 
 ACTION="install"
 SKIP_PULL=false
+LINK=false
 PROJECT=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --remove|-r) ACTION="remove"; shift ;;
         --local|-l)  SKIP_PULL=true; shift ;;
-        --help|-h)   sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        --link)      LINK=true; shift ;;
+        --help|-h)   sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
         -*)          echo "Unknown option: $1 (see --help)"; exit 1 ;;
         *)
             if [ -n "$PROJECT" ]; then

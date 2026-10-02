@@ -7,7 +7,7 @@ Minimal project guide, read by every agent that works on this repo. Claude Code 
 
 - The source of truth is **this repo's `skills/`** directory. Edit and reference only files here.
 - Do **not** edit the installed copies under `~/.claude/skills/`, `~/.cursor/skills/`, a project's `.agents/skills/` or `.claude/skills/`, etc. Those are install targets; on this machine the Claude symlinks resolve to `~/.agents/skills/` (a separate non-git copy), not to this repo. Editing them is editing the wrong file.
-- Changes here are **not live** until installed. `./install.sh --local <project-dir>` copies every `skills/*/` dir (it auto-discovers new skill folders) into that project's `.agents/skills/` and links each from its `.claude/skills/`. To try them in this repo, `./install.sh --local .`; both directories are gitignored here. Re-run it after adding or changing a skill: the copies do not follow the repo.
+- Changes here are **not live** until installed. `./install.sh --local <project-dir>` copies every `skills/*/` dir (it auto-discovers new skill folders) into that project's `.agents/skills/` and links each from its `.claude/skills/`. To work on them in this repo, `./install.sh --local --link .` links the copies back to `skills/`, so edits are live; both directories are gitignored here. Without `--link`, re-run it after adding or changing a skill: copies do not follow the repo.
 
 ## Review your own change, every time, unprompted
 

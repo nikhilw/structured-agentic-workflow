@@ -184,6 +184,7 @@ installs go through `npx skills` above. Tested on Linux.
 ```bash
 ./install.sh <project-dir>             # pull superpowers (pull-superpowers.sh), then install
 ./install.sh --local <project-dir>     # install without pulling superpowers
+./install.sh --link <project-dir>      # link to this repo instead of copying
 ./install.sh --remove <project-dir>    # remove what it installed
 ./install.sh                           # asks for the project directory
 ```
@@ -194,3 +195,9 @@ links each from `<project-dir>/.claude/skills/` with a relative link. An entry a
 agent's skills directory entries to `.agents/skills/<name>`. A retired skill is never installed,
 and an installed copy of one is never removed, because it may have come from superpowers. Re-run it
 after pulling a newer version of this repo; the copies do not follow it.
+
+`--link` points each `.agents/skills/<name>` at this repo's `skills/<name>` instead of copying it,
+so edits here are live in the project at once. It is for working on these skills: the links hold
+this machine's path, so they break for anyone else if the project commits them, and checking out
+another branch here changes the skills in every linked project. Running without `--link` turns
+the links back into copies.
