@@ -230,7 +230,8 @@ explicit."
   phases specify and groups the ones that do the same job, so a helper the plan would have had
   built twice becomes one extraction phase. When a round of passes changes what the plan contains,
   the passes run again over that change, until a round changes nothing; a third round still
-  changing it goes to the owner, because the change is bigger than the plan. Every pass records its findings on its own line
+  changing it goes to the owner, because the change is bigger than the plan, with a proposal to split
+  it into parts that are each reviewed and built on their own. Every pass records its findings on its own line
   of the plan's **Review Passes** block
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it. The contracts pass walks that mapping line by line. Before approval, a difference from the

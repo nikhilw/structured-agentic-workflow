@@ -184,6 +184,8 @@ and every consequence it recorded:
 | **Superseded** | the plan does something the decision ruled out | only with an Amendment Log entry naming the decision it supersedes |
 | **Dropped** | the decision is simply absent from the plan | **no**, this is the finding |
 
+A decision the plan's Decision Source lists as *Carried by another plan* is not dropped; it is audited with that plan.
+
 **Record both sides as you go, and quote them.** The disposition word is your judgment about a
 difference; it is not the difference. Write down the decided text in the words it was decided in,
 and what the plan or the code does instead, with the file and line where it does it. Do it while

@@ -78,6 +78,7 @@ You MUST follow this loop for every phase. Do not skip steps. Every step produce
 **The judgment half — is the plan buildable exactly as written?**
 
 - **Is every decision actually resolved?** "Choose an appropriate X", "consider using Y", a function described but never given a signature — each is a decision handed back to you. Filling one silently is precisely how a plan's gap becomes a code defect that passes every gate. Name it and halt.
+- **Does any step need a human, or leave a test red without naming its phase?** A step that says to ask someone or decide at build time is a decision handed back to you. A test the plan leaves failing must name the later phase that turns it green; one that does not is indistinguishable from a failure you caused.
 - **Is every test criterion a real command with a real expected result?** A criterion you cannot run, or whose expected output is "tests pass", gives the phase no objective stop condition.
 - **Do the phases run in a safe order?** Anything that could invalidate the plan — a load-bearing assumption, an external API that may not support what is needed, a migration that may not reverse — needs its gate *before* the work depending on it.
 - **Does anything fight the codebase?** A convention it breaks, a boundary it crosses without saying so, an invariant enforced at a layer that cannot actually enforce it.
@@ -190,7 +191,7 @@ Every command you run is bounded by `/test-scope`'s *What a run may execute*: th
 1. Run the exact commands in the plan's "Test criteria" for this phase. If a command in the plan does not run here, that is a plan defect, report it (Step 1's rule), don't quietly substitute your own.
 2. Widen to the rung your row names, using the command the plan's **Test Commands** block gives for that rung. If the plan has no such block, that is a plan defect worth reporting once, then fall back to `/test-scope`'s segment detection.
 3. **Check the escalation triggers before you accept a scoped run.** Touching a lockfile, a shared module, a migration, a cross-segment signature, or tooling config means this phase gets the full suite regardless of how small the diff looks. So does not being sure.
-4. **All tests must pass before proceeding.** If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
+4. **All tests must pass before proceeding**, except a test the plan names as red until a later phase, which you track for the handoff alongside the criteria left unproven. If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
 5. **Record which criterion you ran, at which rung, its exit code, and its counts** for every run. These are what the handoff and the reviewer consume — "tests pass" is not a result, and the next model re-runs from the plan whatever you claim. Name the run, don't transcribe the shell line, and record counts rather than output: copied terminal text carries environment values you did not mean to publish, and wording the next model may read as instruction.
 
 ### Step 4: Self-Review
