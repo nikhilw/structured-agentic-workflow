@@ -1,5 +1,5 @@
 # Driving a separate Claude CLI process as a reviewer
-*Tested with Claude Code 2.1 (`claude --version`). Covers the deep review (a Sonnet-class model) and
+*Tested with Claude Code 2.1 (`claude --version`). Covers the deep read (a Sonnet-class model) and
 the fix check (a Haiku-class model). Which one to use where: `review-levels-and-who-runs-them.md`.*
 
 A subagent inside a session is the simplest fresh reader, and the workflow's gates offer one. A
@@ -18,7 +18,7 @@ claude -p --model <model> --output-format json --disallowedTools "ReportFindings
 ```
 
 - **Pass the brief on stdin from a file.** Its first line is a short name for the run.
-- **Run it with your harness's background option and its maximum timeout.** A deep review can take
+- **Run it with your harness's background option and its maximum timeout.** A deep read can take
   a quarter of an hour, so a 10-minute timeout kills it partway through.
 - **`--allowedTools` is the fence.** The list above is meant for reading, for plan reviews, fix
   checks and code reviews that only read. Entries match by prefix, so even these can write in
@@ -40,7 +40,8 @@ claude -p --model <model> --output-format json --disallowedTools "ReportFindings
 
 ## Resuming, and when not to
 
-The JSON result carries `session_id`. `--resume <session_id>` with the same flags continues that
+The workflow's gates start a reviewer fresh each time (`review-lenses`); resuming is a choice you
+make outside them, knowing its cost. The JSON result carries `session_id`. `--resume <session_id>` with the same flags continues that
 reviewer with its history; a launch without it starts a fresh one.
 
 - **Resuming a long session is expensive**: every turn re-reads the whole history. Resume only while
@@ -61,7 +62,7 @@ and tell it to write scripts to one scratch folder and run them from there.
 **Keep a ledger of verified probes** for a long plan: claim, command, output, commit. Every reviewer
 reads it first and skips what it already proves; the planner adds entries after checking them.
 
-## The deep review
+## The deep read
 
 One per phase, after the build, on a capable model. Use the outside-review brief from the
 `review-lenses` skill. Cost grows with the diff and with every turn re-reading the history: from
@@ -74,7 +75,7 @@ The small review after a rework round: one commit range, the list of findings it
 a yes or no on each, and anything new it broke. A Haiku-class model does it for cents to tens of
 cents, and finds real gaps in most rounds (rows still read by position after a fix whose search
 pattern was too narrow; major defects in a rework). It checks what it is pointed at, so it never
-replaces the deep review. How often it raises a finding that does not hold has not been measured;
+replaces the deep read. How often it raises a finding that does not hold has not been measured;
 verify each one as with any reviewer.
 
 Every fix-check brief that worked had these parts, in order:

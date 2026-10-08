@@ -34,13 +34,13 @@ claude -p --model <model> --output-format json --max-budget-usd <cap> \
 ## Its prompt
 
 - **A reading list, in order:** the project's instructions (`CLAUDE.md` / `AGENTS.md`), the build's
-  state notes, the driver's checklist, the build model's launch recipe, then the plan sections and
+  state notes and the driver's checklist (files you write for your build), the build model's launch recipe, then the plan sections and
   the phase.
 - **Scope:** exactly which amendments and which phase, and what it must not touch.
 - **How to run things headless:** the build model with the harness's background option rather
   than `nohup` or `&`, which detach it and lose its result; bounded wait loops (`timeout 590 bash -c 'while pgrep -f "[c]odex exec" >/dev/null; do sleep 20; done'`);
   the test suite the same way, output to a file, the exit code read from the file.
-- **Which reviewers it may use**, by name: one outside model for the deep review, a small model for
+- **Which reviewers it may use**, by name: one outside model for the deep read, a small model for
   fix checks. The driver does not choose models; the prompt does.
 - **The hard rules:** commit by path; no push, reset, checkout, stash or rebase; kill by exact
   process id; a failing test is read and fixed, never re-run until it passes.

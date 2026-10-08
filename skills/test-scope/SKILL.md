@@ -112,7 +112,7 @@ Fail any condition and there is no citation, only a run you still owe.
 
 ## Recording
 
-**Every run is recorded with its rung.** "T2 impacted, exit 0, 34 passed, 0 failed, 2 skipped", never "tests pass".
+**Every run is recorded with its rung.** "T2 impacted, exit 0, 34 passed, 0 failed, 2 skipped", never "tests pass". A mutated run is recorded with its mutation check, not as a run of the phase.
 
 **Compare the counts with the last good run at the same rung.** Mutated runs are left out of both sides. Passed, skipped and expected-failure counts that move by more than the tests added or removed since then are a finding, even on exit 0: a test that starts failing quietly under an expected-failure marker turns 11 into 12 and nothing else.
 

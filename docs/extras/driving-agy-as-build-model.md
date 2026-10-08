@@ -1,8 +1,8 @@
 # Driving agy (Antigravity CLI) as the build model
 *Tested with agy 1.2.11. Setup first: `agent-cli-setup.md`.*
 
-These sections of `driving-cursor-as-build-model.md` apply to agy unchanged: *Never run it against
-a live app*, *After a killed run, check for unrestored mutations*, *Reported-done is not done*, *It
+These sections of `driving-cursor-as-build-model.md` apply to agy unchanged: *Safety before you launch* (never run it against
+a live app), *After a killed run, check for unrestored mutations*, *Reported-done is not done*, *It
 will sometimes work around a gap instead of halting*, *Long plans must be launched in phase
 batches*, *Test suites*. This file holds only what differs.
 

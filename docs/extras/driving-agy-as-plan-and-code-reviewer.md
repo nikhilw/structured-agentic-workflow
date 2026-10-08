@@ -9,7 +9,7 @@ against the code before acting on it.
 ## Launch
 
 Reviews are read-only, so launch **without** `--mode accept-edits`. A file write is then denied,
-which ends the run (see *A denied command ends the run* in the build file). Run the same `jq` check
+which ends the run (see *A denied command ends the run and still reports success* in the build file). Run the same `jq` check
 after each run.
 
 ```bash
@@ -26,8 +26,11 @@ cd <repo> && agy --conversation <conversation_id> --output-format json -p "<code
 Put the tracing tools the brief asks for on the allowlist (the language server or type checker,
 `graphify query`, the project's type-check target), or the first trace ends the run.
 
-A resumed reviewer remembers what it flagged and can check the build delivered it, but it can also
-anchor on its earlier view. Start a fresh conversation where a wrong assumption costs most.
+The workflow's gates start a reviewer fresh each time (`review-lenses`). Resuming one conversation
+across the plan and code review is a choice you make outside them: the reviewer remembers what it
+flagged and can check the build delivered it, but it can anchor on its earlier view. Start fresh
+where a wrong assumption costs most. Resuming after a network drop is different: it finishes the
+same review.
 
 ## The prompts
 

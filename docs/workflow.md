@@ -242,6 +242,9 @@ explicit."
   giving up, and that is the owner's call to make, not a detail to discover in the diff
 - An **Amendment Log**, empty at first, which is where every later change to the plan is recorded
 
+Before approval it offers an **outside review** in one line, as a fresh subagent on a model you
+name or as a brief to paste elsewhere.
+
 **On approval:** move the plan from `docs/plans/new/` to `docs/plans/` with plain `mv` — not
 `git mv`, since the plan file may not be tracked yet. That move is also what freezes the decision
 document: freely editable until it happens, append-only and user-amended-only afterwards (AW-27).
@@ -355,8 +358,8 @@ Then the loop closes on the planning side:
 2. **Classify it.** A plan defect or a reality defect is amended. A **decision-level** problem, one
    that undermines the approach rather than this phase of it, goes back to `/brainstorm`; absorbing
    one as a phase amendment is the single largest source of drift in this workflow. A builder error
-   gets a clarification, and an explicit note that the plan's substance is unchanged. Whatever the
-   class, a finding is a class, not a case: every later phase it reaches says how it applies there.
+   gets a clarification, and an explicit note that the plan's substance is unchanged. Every finding
+   that amends the plan is a class, not a case: every later phase it reaches says how it applies there.
 3. **Amend the plan and log it** in the plan's Amendment Log: trigger, what was reported, what
    changed, decision impact, scope impact. If it supersedes something in the decision document,
    name that decision here and put the change of intent to the user; the planning model does not
@@ -395,7 +398,8 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   dropped. If the harness can start fresh subagents, it asks once which models to use for a
   **deep read** (a reader with none of the build's context, in the first round, judging whether the
   code is right rather than whether it matches the plan) and a cheap **fix check** after each
-  round's fixes. Without a deep read, it offers an outside review at sign-off.
+  round's fixes. It offers an outside review at sign-off only when no deep read ran, you did not
+  answer "neither", and the change was not too small to ask about.
 - It lists every unit the diff adds and groups the ones that do the same job. Copies spread
   across files each read fine where they sit, so this is done by inventory, not by reading, and a
   duplicate the change created is a MAJOR finding.
@@ -406,8 +410,8 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   author.
 - **A brief is a plan, and gets a plan's review before it is handed over**: every name, file, line
   and command in it checked against the codebase, call sites counted rather than estimated, any
-  fix that is inert without a second one named as a pair, and the finished brief read back against
-  the decision document. A wrong line number does not produce a question from the build model; it
+  fix that is inert without a second one named as a pair, every search pattern tested against every
+  form of the defect, and the finished brief read back against the decision document. A wrong line number does not produce a question from the build model; it
   produces an invented implementation, and the round comes back green having moved nothing.
 - For a handed-off build, the main model runs `/3p-review` **again** on return — that second,
   independent review is the entire point of the handoff.

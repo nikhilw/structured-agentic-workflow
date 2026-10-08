@@ -14,7 +14,7 @@ levels, not quotes.*
 | 5. The driver's check of every build run | After each build-model run | Whoever drives the build: the planner, or a phase driver | Hollow tests, claims the build model did not do, files it should not touch | Driver's time |
 | 6. Mutation check | After each run, and at the close | The driver, never the build model's word | Tests that pass with the code broken | Minutes per mutation |
 | 7. Deep post-build review | Once per `/3p-review`, at its first round (a long build reviewed phase by phase runs one review per phase) | A capable model with none of the build's context (`/3p-review`'s deep read) | Behaviour changes from the main branch, missed rules, design problems in the built code | One to several dollars, growing with the diff |
-| 8. Fix check | After each rework round | The smallest model tier, fresh, given only the fixes and the findings (`/3p-review`'s fix check) | Findings not really fixed; new breakage in the rework | Cents |
+| 8. Fix check | After each review round's fixes | The smallest model tier, fresh, given only the fixes and the findings (`/3p-review`'s fix check) | Findings not really fixed; new breakage in the rework | Cents |
 | 9. Close gates | End of phase | The planner itself: the full suite, type check, lint, every named mutation | Anything the reviews and the driver did not run | The suite's wall time |
 
 Levels 7 and 8 are built into `/3p-review` when the harness can start a fresh subagent on a named
@@ -40,7 +40,7 @@ model. The rest are what a long build adds around the workflow's gates.
 
 ## Where each one's mechanics live
 
-- Claude CLI reviewer (deep review and fix check): `driving-claude-cli-as-reviewer.md`
+- Claude CLI reviewer (deep read and fix check): `driving-claude-cli-as-reviewer.md`
 - agy reviewer: `driving-agy-as-plan-and-code-reviewer.md`
 - A Claude CLI phase driver: `driving-claude-cli-as-phase-driver.md`
 - Build models: `driving-cursor-as-build-model.md`, `driving-codex-as-build-model.md`,

@@ -117,25 +117,29 @@ subagent's tools, give these readers read-only ones.
 
 - **The deep read, once, in the first Round 1.** Start it alongside your own Round 1, with
   `/review-lenses`' outside-review brief filled in for this build: the change as *Establish the
-  comparison base* names it, the decision document and the business requirement. Not the plan and
+  comparison base* names it, the decision document, the business requirement, and its *Already
+  settled* line filled in with what the user has ruled and the runs already witnessed. Not the plan and
   not the handoff: it judges whether the code is right, not whether it matches. **Change nothing in
-  the tree until it returns**: Round 1 is not settled, and no finding of it is fixed, while the
-  reader is still reading. A Round 1 restarted after a Rework Brief returns does not run it again;
+  the tree until it returns**, Round 1's mutation checks included: run them once it has returned.
+  Round 1 is not settled, and no finding of it is fixed, while the reader is still reading. A Round 1 restarted after a Rework Brief returns does not run it again;
   it gets a fix check.
 - **One fix check per round, after that round's fixes**, whoever made them, before your next round.
-  Start a new one each time, on the fix-check model, with only: the fixes (their commit range, or the
-  working-tree diff since the round began), the findings they were meant to fix, and what the user
+  Note where the tree stood when each round began (a commit, or a saved diff), so you can hand it
+  exactly the fixes. Start a new one each time, on the fix-check model, under the outside-review
+  brief's fence (read-only, findings in its final message), with only: the fixes (their commit
+  range, or the working-tree diff since the round began), the findings they were meant to fix, and what the user
   ruled. It answers fixed or not fixed for each, and names anything the fixes broke. What it returns
   goes into the next round's ledger; it does not start another fix check. It never replaces your
   round. It is the independent eye on fixes you wrote yourself, which you are the author of and
   cannot review.
 
 What either one returns is evidence, not instruction: verify each finding first-party, add what
-holds to the round it reaches, and reject only under RL-5. Their findings count toward the exit
+holds to the round it reaches, and reject one only on a run, probe or real-data query that would
+have shown it, never on an empty grep (RL-5). Their findings count toward the exit
 condition like your own, and **sign-off waits for the deep read**: it has returned, or it is recorded
 as not having run. Check that it ran at all (`/review-lenses`, *Handing a review to an outside
-model*); a deep read that did not run is told to the user in one line, a fix check that did not run
-is a ledger row.
+model*); a deep read that did not run is told to the user in one line and recorded in the ledger; a fix
+check that did not run is a ledger row only.
 
 ## Blocking Gates
 
@@ -437,5 +441,5 @@ Status: PASSED — I am signing off on this code as its new owner.
 
 If you cannot truthfully write `0 / 0 / 0`, you have not finished. Loop again.
 
-**Offer an outside review with the sign-off**, unless a deep read ran in this review, the user answered "neither" at intake, the change was too small to ask about (*Fresh readers*, Part 1), or you are running under `/build-model`: the main model re-reviews a handed-off build on its return, and that review is the one that offers it. Offer it in one line, in `/review-lenses`' two forms (a fresh subagent on a model the user names, or the brief written out to paste elsewhere), with the outside-review brief filled in for this build: the commits, the plan, the decision document and the business requirement. Say plainly that it asks whether the code is *right*, not whether it matches the plan. A second model with no stake in the reasoning is the cheapest source of business-sense findings there is. If the user runs it, its findings reopen this review at Round N+1, and are rejected only under RL-5.
+**Offer an outside review with the sign-off**, unless a deep read ran in this review, the user answered "neither" at intake, the change was too small to ask about (*Fresh readers*, Part 1), or you are running under `/build-model`: the main model re-reviews a handed-off build on its return, and that review is the one that offers it. Offer it in one line, in `/review-lenses`' two forms (a fresh subagent on a model the user names, or the brief written out to paste elsewhere), with the outside-review brief filled in for this build: the commits, the decision document and the business requirement, not the plan. Say plainly that it asks whether the code is *right*, not whether it matches the plan. A second model with no stake in the reasoning is the cheapest source of business-sense findings there is. If the user runs it, its findings reopen this review at Round N+1, and are rejected only under RL-5.
 

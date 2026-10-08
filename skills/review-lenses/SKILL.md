@@ -154,7 +154,8 @@ An outside reviewer, whether another vendor's model or a fresh-context agent, fi
 it does not know why anything was decided, so it sees the result the way a newcomer does. A
 different model from yours also misses different things. Every gate that finishes a reviewable
 artifact (a decision document, a plan, a build) offers the owner an outside review in one line,
-once per artifact, in one of two forms:
+once per artifact, in one of two forms. `/3p-review` skips the offer in the cases its *Fresh
+readers* section names, such as when its own deep read already ran.
 
 - **A reviewer started here**, when your harness can start a subagent with none of this
   conversation on a model you name. The offer asks which model; suggest one other than yours. The
