@@ -1,18 +1,15 @@
 # Driving agy as the plan reviewer and code reviewer
-*Prompts from the owner, 2026-09-26. Launch mechanics: [driving-agy-as-build-model.md](driving-agy-as-build-model.md).
-Setup: [agent-cli-setup.md](agent-cli-setup.md).
-The generic form of these prompts, for any outside model, is the outside-review brief in
-`skills/review-lenses/SKILL.md`, which every gate offers.*
+*Launch mechanics: `driving-agy-as-build-model.md`. Setup: `agent-cli-setup.md`.*
 
-agy reviews twice per plan, in one conversation: the plan review before the build model is launched
-(after our own plan reviews), and the code review after the build and its review, before
-`/verify-completion`. Its findings are input to weigh, not verdicts: confirm each one against the code
-before acting on it.
+agy can review twice per plan, in one conversation: the plan review before the build model is
+launched (after the workflow's own plan reviews), and the code review after the build and its
+review, before `/verify-completion`. Its findings are input to weigh, not verdicts: confirm each one
+against the code before acting on it.
 
 ## Launch
 
 Reviews are read-only, so launch **without** `--mode accept-edits`. A file write is then denied,
-which ends the run (see "A denied command ends the run" in the build file). Run the same `jq` check
+which ends the run (see *A denied command ends the run* in the build file). Run the same `jq` check
 after each run.
 
 ```bash
@@ -26,33 +23,57 @@ context:
 cd <repo> && agy --conversation <conversation_id> --output-format json -p "<code review prompt>" > <log>.json 2> <log>.err
 ```
 
-Tracing uses `graphify`, `uv run pyright` and `make typecheck`, all on the allowlist.
+Put the tracing tools the brief asks for on the allowlist (the language server or type checker,
+`graphify query`, the project's type-check target), or the first trace ends the run.
 
-## Plan review prompt
+A resumed reviewer remembers what it flagged and can check the build delivered it, but it can also
+anchor on its earlier view. Start a fresh conversation where a wrong assumption costs most.
 
-```
-<short unique name, e.g. r1a-1 plan review>
-This is a review-only task. I need you to review the given plan and its decision document. I am
-aligned with the decisions, but I don't know if the decision doc and the plan are fully aligned, and
-if the plan is correct on all fronts: logic, code references, impact, implementation logic, and
-whether it delivers what we intended. And if the delivery and plan are aligned with the business
-requirements and business logic. Also make sure we are precisely carving out what we don't need; we
-must use a scalpel, not a butcher's knife.
-Tell me only what is broken, or potentially broken, or doubtful. Tell me if there is a better
-approach than what is suggested in the plan. I don't need details on what is okay.
-Here is the plan: @<plan file path>
-```
+## The prompts
 
-## Code review prompt
-
-Sent into the same conversation as the plan review.
+Use the outside-review brief from the `review-lenses` skill (*Handing a review to an outside
+model*), filled in by `/write-plan` or `/3p-review` when you accept their offer. Start it with a
+short unique first line naming the run. Add these lines for agy, for the reasons below:
 
 ```
-<short unique name, e.g. r1a-1 code review>
-Your job is to review. Compare the code now with the plan. Trace it with graphify, mypy and pyright,
-fully and properly, forward and backward, to make sure we have covered it all and considered all the
-points: impacted code, all callers, all calls, all call sites and so on, and that the plan is sound
-on this code.
-Tell me only what is broken, or potentially broken, or doubtful. Tell me if there is a better
-approach than what is suggested in the plan. I don't need details on what is okay.
+Never start a background task.
+Read skill files with cat, not your file viewer.
+For every finding, quote the exact words you rely on, with file:line.
+Allowed commands, one per call, nothing else: <the exact read-only commands on your allowlist>.
+The checked-out branch is <branch>.
 ```
+
+## What stops a review run early
+
+- **Any command off the allowlist ends the run** with `"status":"SUCCESS"`, an empty `response` and
+  `denied_actions`. A reviewer reaches for commands you did not expect (`git branch --show-current`
+  to learn the branch), so list the allowed commands exactly in the prompt, and name the branch.
+- **Pipes, redirection, loops and heredocs are refused**, and some models use them even when the
+  prompt bans them by name. Gemini 3.1 Pro did in four of six pre-build reviews: writing the answer to a file with a heredoc, `> /dev/null; echo`, a `for`
+  loop, `git ls-tree ... | rg`. When it tried to write its review to a file, the full text is often
+  recoverable from its transcript (below). After two failed runs on one brief, move that review to
+  another reviewer (`driving-claude-cli-as-reviewer.md`).
+- **Skill files outside the workspace** are denied to its file viewer, which ends the run at once.
+  Tell it to read them with `cat`.
+- **It cannot `cd`**, so a command that needs another directory (`pnpm --prefix frontend ...`)
+  ends the run unless it is on the allowlist. Tell it not to run those, and run them yourself.
+- **Background tasks:** it starts long commands as background tasks and waits on them; a network
+  drop during that wait ends the run with `status: ERROR`. Resume the same conversation after a drop.
+- **Quota is per model family.** One family's quota can run out mid-review while another's is
+  untouched (`RESOURCE_EXHAUSTED ... Individual quota reached`); switch with `--model`.
+
+## It can invent its citations
+
+Asked to quote exact words with line numbers, it has quoted plan text, function names and line
+numbers that exist nowhere (a line 632 of a 238-line document), while being right on the substance.
+So require a verbatim quote plus `file:line` for every finding, and check each quote with `rg -F`
+before weighing the finding. Its business and logic instincts are worth reading; its citations are
+not evidence until checked.
+
+The transcript, for tracing a claim or finding a refused command:
+`$HOME/.gemini/antigravity-cli/brain/<conversation_id>/.system_generated/logs/transcript_full.jsonl`.
+
+## A review of a later phase reads today's code
+
+A reviewer checking a phase that is not built yet sees the code as it is now. Check each finding
+against what the earlier phases will have built (their plan text) before accepting it.

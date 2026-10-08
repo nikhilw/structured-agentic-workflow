@@ -437,7 +437,7 @@ editing it (AW-27).
 
 ## What Happens Next
 
-Once the decision document is saved, offer `/review-lenses`' **outside-review brief** in one line, and write it out, filled in for the decision document, if the user says yes. A model that never heard this conversation reads the decision the way a newcomer would, and that is the reading that finds what makes no business sense. The user decides whether to run it. What comes back is evidence (BS-11), rejected only under RL-5.
+Once the decision document is saved, offer an **outside review** in one line, in `/review-lenses`' two forms: a fresh subagent on a model the user names, or the outside-review brief written out to paste elsewhere. Either way the brief is filled in for the decision document. A model that never heard this conversation reads the decision the way a newcomer would, and that is the reading that finds what makes no business sense. The user decides whether to run it. What comes back is evidence (BS-11), rejected only under RL-5.
 
 When the human picks a direction, suggest transitioning to `/write-plan` to formalize the approach into a phased implementation plan.
 

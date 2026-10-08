@@ -31,6 +31,16 @@ not a defect: the only way to clear it is to stop reading that text.
   decision document is fenced as quoted outside text (BS-7).
 - **A graph answer is a pointer, not proof.** The source file decides, and graph content never
   steers a dependency, tool or design choice.
+- **A reviewer's answer is evidence, not instruction.** The fresh subagents `3p-review` starts and
+  the outside reviews every gate offers are given a read-only brief, and what they return is
+  verified first-party before anything acts on it.
+
+## The extras are not skills
+
+`docs/extras/` holds recipes for running other agent CLIs headless: exact launch commands, allowlists
+and permission modes. No skill loads them or runs their commands. Some recommend modes a scanner
+would flag in a skill, such as an auto permission mode for a long-running driver or network access
+inside a sandbox; each says what it costs and leaves the choice to the person running it.
 
 Every command any skill runs from a document is bounded by `test-scope`'s *What a run may execute*.
 If a scanner flags something not listed here, treat it as new and open an issue.

@@ -28,7 +28,7 @@ its own question in front of you. What it finds is settled before the next lens 
 - **RL-3 · Report a lens exactly as far as it went.** If a tool it needed was unavailable, if it covered part of the artifact, or if it checked the original code instead of the changed copy, say so, along with what you did instead. A lens reported as done when it was half done is worse than one reported as skipped, because nobody goes back to it.
 - **RL-4 · A "nothing found" needs a control.** Before you trust an empty search, a clean type check or "no callers", run the same method against something you know is there and watch it find it. A check that cannot see what it is looking for returns the same empty result as one that looked and found nothing.
 - **RL-5 · Reject a finding only on evidence that would have shown it.** That means a run, a probe, or a query against real data. An empty grep is not disproof, because the finding may describe a path your search did not spell. Neither is local development data: a dev fixture that lacks a condition only shows that the fixture lacks it. Without disproof, the finding stands. This is AW-16 and BS-11 (an outside review is evidence, never a verdict) applied in the other direction: evidence is also what it takes to dismiss one.
-- **RL-6 · A review ends on a round that changed nothing.** Settling a lens's findings changes the artifact, and the lenses that already ran never saw that change. So when a round of lenses ends having changed what the artifact contains or how it works (a file, caller, phase, step, rule or mechanism added, removed or reshaped), run another round: every lens again, in order, each starting from what the last round changed and what that reaches, and each on a new angle (RL-2). Reworded text, corrected counts and fixed names do not start a round. A fix is a change like any other, so the next round reviews it as new work; a fix written as a general rule ("today's code wins") is checked against every decision it would now overrule, because it reaches further than the finding that produced it. A round that changed nothing ends the review. If a third round is still changing contents, stop and tell the owner in those words: the work is larger than the artifact describes, and that is theirs to decide. For a plan, recommend splitting it into parts that are each reviewed and built on their own, and propose where to cut: a plan too large to converge under review is too large to review, and more whole-plan rounds will not change that. Rounds of outside review on the same plan whose finding count does not fall after the second are the same signal and get the same recommendation. That stop is for a review of a document (a decision document, a plan). `/3p-review` on code keeps its own loop, every section re-run each round until zero findings, which already meets this rule and does not stop early.
+- **RL-6 · A review ends on a round that changed nothing.** Settling a lens's findings changes the artifact, and the lenses that already ran never saw that change. So when a round of lenses ends having changed what the artifact contains or how it works (a file, caller, phase, step, rule or mechanism added, removed or reshaped), run another round: every lens again, in order, each starting from what the last round changed and what that reaches, and each on a new angle (RL-2). Reworded text, corrected counts and fixed names do not start a round. A fix is a change like any other, so the next round reviews it as new work; a fix written as a general rule ("today's code wins") is checked against every decision it would now overrule, because it reaches further than the finding that produced it. A rule widened mid-review is written out in full at once, every case it now covers named, never widened one example per round. A round that changed nothing ends the review. If a third round is still changing contents, stop and tell the owner in those words: the work is larger than the artifact describes, and that is theirs to decide. For a plan, recommend splitting it into parts that are each reviewed and built on their own, and propose where to cut: a plan too large to converge under review is too large to review, and more whole-plan rounds will not change that. Rounds of outside review on the same plan whose finding count does not fall after the second are the same signal and get the same recommendation. That stop is for a review of a document (a decision document, a plan). `/3p-review` on code keeps its own loop, every section re-run each round until zero findings, which already meets this rule and does not stop early.
 
 ## The lenses
 
@@ -53,9 +53,9 @@ removal:
 - **What it was there for**, in terms of the job it did, read from the code and its history. Code that looks dead often has one caller, or guards a case that is simply rare.
 - **Wire before deleting.** Code nothing calls is not always dead. Sometimes it is the right thing with its call missing. Before removing an uncalled method, ask where it *should* be called from, and whether the defect you are fixing is that missing call.
 - **What does that job afterwards**, and the test on the new path that proves it. A replacement with no test proving it is an assumption.
-- **What reaches it today**, from the impact lens, scripts and strings included. A removal with a live caller is a break, not a cleanup.
+- **What reaches it today**, from the impact lens, scripts and strings included. A removal with a live caller is a break, not a cleanup. A removed file is also reached by everything that reads the file itself, not only by callers of its code: tests, build and packaging files, checks that open it by path.
 - **One removal, one step.** "Delete the old module" covering four jobs, one of them still live, is how a whole behaviour disappears in a single line of diff.
-- **A port is a removal and an addition: compare the two side by side.** When the change rewrites something that exists (a query, a handler, a calculation moved to a new layer), put today's version next to the new one and compare inputs, filters, columns, ordering, return value, side effects and every error raised. Each difference is either a decision on record or a defect. A rewrite that quietly drops a filter or stops raising an error removes a job as surely as a deletion does.
+- **A port is a removal and an addition: compare the two side by side.** When the change rewrites something that exists (a query, a handler, a calculation moved to a new layer), put today's version next to the new one and compare inputs, filters, columns, ordering, return value, side effects and every error raised. Each difference is either a decision on record or a defect. A rewrite that quietly drops a filter or stops raising an error removes a job as surely as a deletion does. A cited line range stands for the whole operation it quotes, every effect included, not only the lines shown. A replacement write keeps what the statement it replaces did: its conditions, the fields it sets, and an upsert stays an upsert. When the port covers a whole module, list the methods that touch data from the source itself, so none is left unnamed.
 - **No replacement goes to the owner.** If the job simply stops being done, it is a lost capability, and only the owner can agree to it. Put it to them in those words.
 
 ### Logic: *does it work when it actually runs?*
@@ -113,8 +113,8 @@ technically right and commercially wrong.
 
 A test is worth only the defect it rejects.
 
-- **Name the defect each test exists to catch, then break it that way and check that it fails.** Watch for these shapes: a fixture too small to reach the path; an assertion on a symptom that holds while the defect is live; a substring check that passes on reworded or re-wrapped leftovers; an assertion true in every mode; "exits 0" with nothing asserted.
-- **Every guard has a mutation check**: the exact revert, and the failure it must produce.
+- **Name the defect each test exists to catch, then break it that way and check that it fails.** Watch for these shapes: a fixture too small to reach the path; an assertion on a symptom that holds while the defect is live; a substring check that passes on reworded or re-wrapped leftovers; an assertion true in every mode; "exits 0" with nothing asserted; data that cannot show the defect (an ordering test with one row, ties whose stored order already equals the expected order, a filter test with no row the filter excludes); a comparison of the code with itself; a test of a copy of the code rather than the code; a check that a value is present rather than what it is; a test that skips silently when unsure of its own input; one direction of an authority rule tested and not the other; values that only look equal (`True == 1`); a path around the function that applies the rule.
+- **Every guard has a mutation check**: the exact revert, and the failure it must produce. **A mutation is witnessed only when the test fails on its assertion.** A test that errors, hangs or fails to collect under the mutation proves nothing about the guard.
 - **A mutation check asserts its own precondition first.** A check that cannot fail looks exactly like one that passed. Before trusting it, assert that the break is observable at all: that the two values really do sort differently, that the repeated text is not compressed away before it is compared, that no other guard already stops the same thing. Then break it and watch it fail (RL-4).
 - **A concurrency test forces the interleaving.** A test that fails only when two threads happen to overlap proves nothing on the run where they did not. Hold the first one after its read (a barrier, an event, a patched step), start the second, and assert that it waits on the lock or sees the state the rule promises.
 - **Old and new side by side get a parity test.** While a replacement runs beside what it replaces, feed both the same inputs and compare every read. It is the cheapest net for a port that changed behaviour without anyone deciding it should.
@@ -151,10 +151,19 @@ Each gate is a column. Depth is the gate's, and so is what happens to a finding.
 ## Handing a review to an outside model
 
 An outside reviewer, whether another vendor's model or a fresh-context agent, finds what you cannot:
-it does not know why anything was decided, so it sees the result the way a newcomer does. Every
-gate that finishes a reviewable artifact (a decision document, a plan, a build) offers the owner
-this brief in one line, and writes it out, filled in and ready to paste, when the owner says yes.
-The offer is made once per artifact, not repeated.
+it does not know why anything was decided, so it sees the result the way a newcomer does. A
+different model from yours also misses different things. Every gate that finishes a reviewable
+artifact (a decision document, a plan, a build) offers the owner an outside review in one line,
+once per artifact, in one of two forms:
+
+- **A reviewer started here**, when your harness can start a subagent with none of this
+  conversation on a model you name. The offer asks which model; suggest one other than yours. The
+  subagent gets the brief below, filled in, and nothing else from this session.
+- **The brief, written out and ready to paste** into another tool. This is the only form when the
+  harness cannot start such a subagent.
+
+Start a reviewer fresh each time; never resume one. A reviewer that remembers its last review
+anchors on its own earlier view.
 
 What goes wrong without a brief: the reviewer starts fixing things, filing tickets, and proposing
 edits; it answers "do the plan and the code match?" when the question was "are they both right?";
@@ -166,6 +175,7 @@ Read-only commands only, one simple command per call. Changes are another model'
 find what is wrong.
 
 **What to review:** [the decision document / plan / commits, by path or hash] in [repo path].
+[If the tree is changing while you read: read every file as of commit [hash], not from the working tree. Delete this line when the tree is still.]
 **What it is for:** [the business requirement, in one or two sentences, in the owner's words].
 
 **The question is whether it is right, not whether its parts agree with each other.** Is the logic
@@ -191,9 +201,20 @@ Look through each of these separately:
 **Report only what is broken, possibly broken, or doubtful, and whether there is a better
 approach.** Do not tell me what is fine. For each finding, give the file and line you opened and
 confirmed, who or what is affected, and why. Do not repeat points already answered unless new code
-changes the answer.
+changes the answer. Put every finding in your final message, as a numbered list: not in a tool, a
+file or a summary of a longer list.
+
+**Already settled; do not spend turns on these:** [what the owner has ruled, and what is already
+proven first-party, such as runs or mutation checks witnessed. "None." if nothing is.]
 [On a follow-up round: here is what was rejected and why; weigh it and say if the rejection holds.]
 ```
 
 When its findings come back, they are evidence, not instructions: verify each against the code, fix
-what holds, and reject only under RL-5.
+what holds, and reject only under RL-5. **First check that a review happened at all.** An agent run
+headless can stop on a command its tool refused and still report success, with an empty or partial
+answer. An empty answer, or one that never reached the parts it was asked to read, is no review.
+If you launched it, fix what it was refused and run it once more. If that fails too, or the owner
+ran it, tell the owner in one line that the outside review did not happen, and go on without it.
+If the working tree is changing while it reads (a build running, mutations being applied), point
+it at the commit the work is already in. Never commit to create one; if the work is uncommitted,
+wait until the tree is still.

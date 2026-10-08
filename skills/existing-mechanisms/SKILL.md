@@ -106,7 +106,9 @@ is how the gap ships.
 
    - **Nothing is deleted because it "looks unused".** Prove the callers both ways, per question 1,
      including the inbound edges that never spell the name: tests, fixtures, DI registrations,
-     route and command tables, config keys, scheduled jobs, anything dispatched by string.
+     route and command tables, config keys, scheduled jobs, anything dispatched by string. A
+     removed file is also read as a file: by tests, build and packaging files, and checks that
+     open it by path. Name those readers too, not only the callers of its code.
    - **Ask what the code was load-bearing *for*, not only who calls it.** The dangerous removals
      are the ones that read as housekeeping. A checkpoint prune that looks like tidy-up can be the
      only thing bounding a database that is already at 100 MB, and no caller says so.

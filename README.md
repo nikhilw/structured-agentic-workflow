@@ -154,8 +154,10 @@ What I run day to day. Any capable model works in each seat; these are the ones 
 | Build | Composer 2.5 | Cursor CLI | [recipe](docs/extras/driving-cursor-as-build-model.md) |
 | Outside reviewer | Gemini Flash 3.8 | Antigravity CLI (agy) | [recipe](docs/extras/driving-agy-as-plan-and-code-reviewer.md) |
 
-The Codex CLI also works as the build model, but I run it by hand; it is not yet driven from
-Claude Code. agy can take the build seat too ([recipe](docs/extras/driving-agy-as-build-model.md)).
+The Codex CLI also works as the build model ([recipe](docs/extras/driving-codex-as-build-model.md)),
+and agy can take the build seat too ([recipe](docs/extras/driving-agy-as-build-model.md)).
+[Review levels](docs/extras/review-levels-and-who-runs-them.md) maps which model runs which review
+on a long build.
 One-time setup for both automated CLIs is in [agent-cli-setup.md](docs/extras/agent-cli-setup.md).
 
 ### The skills
@@ -203,6 +205,10 @@ Law and adds the requirements tick-off and the drift audit.
 | [extras/driving-agy-as-build-model.md](docs/extras/driving-agy-as-build-model.md) | The same for Google's Antigravity CLI (agy): what differs from Cursor |
 | [extras/driving-agy-as-plan-and-code-reviewer.md](docs/extras/driving-agy-as-plan-and-code-reviewer.md) | agy as the outside reviewer: one conversation, a plan review then a code review |
 | [extras/agent-cli-setup.md](docs/extras/agent-cli-setup.md) | One-time setup for cursor-agent and agy: skills, one allowlist in two formats, two probes |
+| [extras/driving-codex-as-build-model.md](docs/extras/driving-codex-as-build-model.md) | Codex as the build model: the sandbox, resuming, taking over from another build model |
+| [extras/driving-claude-cli-as-reviewer.md](docs/extras/driving-claude-cli-as-reviewer.md) | A separate `claude -p` process as the deep reviewer or the cheap fix checker |
+| [extras/driving-claude-cli-as-phase-driver.md](docs/extras/driving-claude-cli-as-phase-driver.md) | Experimental: a `claude -p` process driving the build model through one phase |
+| [extras/review-levels-and-who-runs-them.md](docs/extras/review-levels-and-who-runs-them.md) | The review levels of a long build, and which model runs each |
 
 ---
 

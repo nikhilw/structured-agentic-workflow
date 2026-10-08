@@ -90,6 +90,7 @@ This table is the only place rung assignments are written down. A skill that run
 | `/build-phase` Phase Completion | **T4, always** | The builder's own honesty gate. Never cited from anywhere. This is the run the handoff reports |
 | `/3p-review` re-deriving the builder's claims | **T4, always** | The builder's reported run is a claim, never a citable run. Holds even when you built this yourself minutes ago and the tree is provably clean: re-deriving is the whole reason the review is worth running |
 | `/3p-review` while fixing findings inside a round | T1, then T2 or T3 | The "widening circles" |
+| A mutation check, at any gate | T1: the test the check names, nothing wider | One run per mutation. A mutated run is evidence about one test, not a run of the phase: its counts are never the phase's counts, and never compared under *Recording* |
 | `/3p-review` sign-off | T4, or cite this review's own T4 when nothing changed since | |
 | `/verify-completion` | T4, or cite `/3p-review`'s sign-off run | The plan-requirements checklist is not a test run and is never cited. It always runs fresh |
 | Bug or quick-fix path, no plan | T2 or T3 by segment detection, then T4 at the completion claim | |
@@ -112,6 +113,8 @@ Fail any condition and there is no citation, only a run you still owe.
 ## Recording
 
 **Every run is recorded with its rung.** "T2 impacted, exit 0, 34 passed, 0 failed, 2 skipped", never "tests pass".
+
+**Compare the counts with the last good run at the same rung.** Mutated runs are left out of both sides. Passed, skipped and expected-failure counts that move by more than the tests added or removed since then are a finding, even on exit 0: a test that starts failing quietly under an expected-failure marker turns 11 into 12 and nothing else.
 
 **Take the exit code from the run itself, never from a pipeline.** `<runner> | tee out.txt` reports `tee`'s status, not the suite's, so a failing run reads as exit 0 to every gate downstream while the counts scroll past unread. Run the command on its own and read its status, or use your shell's pipeline-status mechanism. This is the one recording error that cannot be caught by reading the report, because the report is honest and the exit code is not.
 

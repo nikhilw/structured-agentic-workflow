@@ -35,6 +35,7 @@ Follow the template below: same headings, same order, same casing. Fill each sec
 
 ### Verification Runs
 - **[plan criterion, or a plain name for the run]** (rung [T1/T2/T3/T4]) → exit [code] — [N passed, M failed, K skipped]
+- **Mutation checks** → [N of M witnessed]; each one not witnessed is listed under Unproven Criteria. Omit this line when the plan names no mutation checks
 - (Name the run; do not write out the shell line. Every run carries its rung. The T4 full-suite run from Phase Completion is mandatory here. Report the counts the terminal printed, not what you expected.)
 
 ### Unproven Criteria

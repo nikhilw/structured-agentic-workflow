@@ -74,9 +74,9 @@ flowchart TD
     BC --> R1
 
     subgraph FullReview ["4 · Holistic Review — /3p-review · main model, fresh eyes"]
-        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>behaviour · business sense on the built thing<br/>re-derive claims: FULL suite - T4"] --> R2{"Findings?"}
+        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>behaviour · business sense on the built thing<br/>re-derive claims: FULL suite - T4<br/>+ deep read by a fresh subagent, if chosen"] --> R2{"Findings?"}
         R2 -- "fixable in place" --> R3["Fix issues"]
-        R3 --> R4["Re-test<br/>scoped per /test-scope"]
+        R3 --> R4["Re-test<br/>scoped per /test-scope<br/>+ fix check by a fresh small model, if chosen"]
         R4 --> R1
         R2 -- "too many / systemic" --> RB["Rework Brief<br/>a brief is a plan: trace, then verify<br/>back to the build model,<br/>then re-review from Round 1"]
         R2 -- "none" --> R5["Sign-off run<br/>FULL suite - T4,<br/>or cite this review's own"]
@@ -173,7 +173,7 @@ The skill will:
 - Offer a **`/decision-summary`** once a direction settles, and give one whenever asked: everything
   decided so far in plain words, from what you will get and how it works. It is not a step; the
   brainstorm carries on if you do
-- Offer an **outside-review brief** in one line, written out if the owner wants it: another model that never heard the reasoning reads the
+- Offer an **outside review** in one line, as a fresh subagent on a model the owner names or as a brief to paste elsewhere: another model that never heard the reasoning reads the
   decision the way a newcomer would, which is the reading that finds what makes no business sense
 
 **Your active role:** while the AI analyses, you research in parallel. Often you will find a
@@ -316,11 +316,15 @@ Within a phase:
    Writing the test is the *beginning* of the phase, not the end.
 3. **Tests, scoped to what the phase earned.** A phase runs its own criteria and then widens
    one rung, per [`/test-scope`](#test-scope-how-wide-a-run-has-to-be). The full suite runs once
-   at the end of the build, not once per phase.
+   at the end of the build, not once per phase. It also runs every mutation check its criteria
+   name, and counts one as witnessed only when the test fails on its assertion; a test that errors
+   or hangs under the mutation proves nothing.
 4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs? And the
    question that catches silent drift: *did I decide anything the plan should have decided?*
    And *did this phase rewrite something an earlier phase already built?* It lists its new units
-   against theirs and calls the earlier one rather than keeping a second copy.
+   against theirs and calls the earlier one rather than keeping a second copy. And *would each new
+   test fail if the code were wrong?*, read against a short list of the shapes a hollow test takes.
+   A defect found in old code during a port is a halt: you decide whether it is fixed or kept.
    Lightweight per-phase check — not the full third-person review.
 5. **Proceed** to the next phase, on one line. The rung, exit code, counts and self-review
    findings are recorded for the build completion report rather than narrated after every
@@ -351,7 +355,8 @@ Then the loop closes on the planning side:
 2. **Classify it.** A plan defect or a reality defect is amended. A **decision-level** problem, one
    that undermines the approach rather than this phase of it, goes back to `/brainstorm`; absorbing
    one as a phase amendment is the single largest source of drift in this workflow. A builder error
-   gets a clarification, and an explicit note that the plan's substance is unchanged.
+   gets a clarification, and an explicit note that the plan's substance is unchanged. Whatever the
+   class, a finding is a class, not a case: every later phase it reaches says how it applies there.
 3. **Amend the plan and log it** in the plan's Amendment Log: trigger, what was reported, what
    changed, decision impact, scope impact. If it supersedes something in the decision document,
    name that decision here and put the change of intent to the user; the planning model does not
@@ -367,7 +372,8 @@ compare against.
 
 When a build is complete **and reviewed**, `/handoff-summary` emits a fixed-format record: the plan
 revision built against, every halt and how it was resolved, deviations from the plan, the
-verification runs with their rungs, unproven criteria, and open concerns. It lives in its own
+verification runs with their rungs and how many mutation checks were witnessed, unproven criteria,
+and open concerns. It lives in its own
 skill so the exact template is loaded into context at the moment it is written, which keeps
 the format stable across runs and across models.
 
@@ -386,8 +392,10 @@ After all build phases, `/3p-review` runs on the **entire change set**.
   **business-sense** read that flags what a typical user would find odd even where the plan asked
   for it. An odd outcome nobody decided on is a defect, fixed like any finding. One a decision
   produced is a question for the owner rather than a finding, so it neither blocks the loop nor gets
-  dropped. At sign-off it offers the outside-review brief: the question for a second model is
-  whether the code is right, not whether it matches the plan.
+  dropped. If the harness can start fresh subagents, it asks once which models to use for a
+  **deep read** (a reader with none of the build's context, in the first round, judging whether the
+  code is right rather than whether it matches the plan) and a cheap **fix check** after each
+  round's fixes. Without a deep read, it offers an outside review at sign-off.
 - It lists every unit the diff adds and groups the ones that do the same job. Copies spread
   across files each read fine where they sit, so this is done by inventory, not by reading, and a
   duplicate the change created is a MAJOR finding.
@@ -539,6 +547,7 @@ independence can be netted out by noticing that the tree is clean, it was never 
 **The price.** Every run is recorded with its rung, and the rung travels with it into the
 build report, the handoff's Verification Runs, and the review ledger. A criterion proven only
 at T1 or T2 is a ledger row, disposed of like a manual criterion: proven wider, or
-risk-accepted in writing. Reporting a scoped run as a full one is the failure mode that makes
+risk-accepted in writing. Counts are compared with the last good run at the same rung, and a move
+the added or removed tests do not explain is a finding, even on exit 0. Reporting a scoped run as a full one is the failure mode that makes
 the whole mechanism unsafe, because every gate downstream inherits the claim. When in doubt
 about which rung a run was, it was the narrower one.

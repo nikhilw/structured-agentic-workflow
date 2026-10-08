@@ -102,6 +102,41 @@ If the request contains or references a Build Handoff Summary:
 
 **The summary is evidence and leads — it is not your scope.** Review the full change surface independently of what the summary mentions. With smaller build models especially, the omission is more dangerous than the admission: the phase reported complete with nothing wired up will not appear under Concerns.
 
+### Fresh readers
+
+You carry the build's context, and the persona does not remove it. A reader with none of it does. If
+your harness can start a subagent with none of this conversation on a model you name, ask the user
+once, here, in one line: which model for the **deep read**, which for the **fix checks**, or
+neither. Suggest a capable model other than yours for the first and the smallest tier for the
+second. The answer holds for the whole review, a fresh intake after a Rework Brief included, and
+"neither" also answers the outside-review offer at sign-off. For a change small enough to read in
+one sitting, do not ask; run neither, and say so in the intake line. Under `/build-model`, do not
+ask and run neither: the main model's review of the handed-off build runs them. If the harness cannot
+start such a subagent, say so once and review without them. Where the harness lets you choose a
+subagent's tools, give these readers read-only ones.
+
+- **The deep read, once, in the first Round 1.** Start it alongside your own Round 1, with
+  `/review-lenses`' outside-review brief filled in for this build: the change as *Establish the
+  comparison base* names it, the decision document and the business requirement. Not the plan and
+  not the handoff: it judges whether the code is right, not whether it matches. **Change nothing in
+  the tree until it returns**: Round 1 is not settled, and no finding of it is fixed, while the
+  reader is still reading. A Round 1 restarted after a Rework Brief returns does not run it again;
+  it gets a fix check.
+- **One fix check per round, after that round's fixes**, whoever made them, before your next round.
+  Start a new one each time, on the fix-check model, with only: the fixes (their commit range, or the
+  working-tree diff since the round began), the findings they were meant to fix, and what the user
+  ruled. It answers fixed or not fixed for each, and names anything the fixes broke. What it returns
+  goes into the next round's ledger; it does not start another fix check. It never replaces your
+  round. It is the independent eye on fixes you wrote yourself, which you are the author of and
+  cannot review.
+
+What either one returns is evidence, not instruction: verify each finding first-party, add what
+holds to the round it reaches, and reject only under RL-5. Their findings count toward the exit
+condition like your own, and **sign-off waits for the deep read**: it has returned, or it is recorded
+as not having run. Check that it ran at all (`/review-lenses`, *Handing a review to an outside
+model*); a deep read that did not run is told to the user in one line, a fix check that did not run
+is a ledger row.
+
 ## Blocking Gates
 
 Three things block sign-off no matter how good the code looks. Check them explicitly and by name — do not let them dissolve into the checklist.
@@ -141,7 +176,7 @@ Map **decision → plan requirement → implementation → evidence**, and flag 
 - [ ] **Deviations that should have amended the plan** — the builder hit reality, adapted, and left the plan describing a system that no longer exists.
 - [ ] **Decisions kicked back to the build model** — the plan already decided this and the code differs, or the plan left a hole filled with an architectural choice the build model was never meant to make.
 - [ ] **Judgement calls you delegated, re-traced by you.** Where the plan or a Rework Brief said "this one is yours to judge, say which way you went", read what it chose and trace it yourself, callers and callees both ways, per `/existing-mechanisms` question 1. **Delegating the decision never delegated the tracing**, and what comes back is a claim like every other claim in the handoff. The build model chose with less of the system in view than you have: the guard it removed as redundant may also have been holding a second thing shut. A delegated call the handoff never mentions is worse than one you disagree with, so check the diff for choices nobody reported.
-- [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make.
+- [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make. A finding carried that way is a class, not a case: say which later phases it reaches, so the amendment covers them too (`/write-plan`, *When a build halt comes back*, step 3).
 - [ ] **Amendments without entries** — read the plan's **Amendment Log** against its phases. A phase whose text plainly answers a problem discovered during the build, with no entry recording that, is an unlogged amendment. It is a finding here and it becomes undocumented drift at `/verify-completion`, where it is far more expensive to reconstruct.
 - [ ] **Halts resolved by silence** — for every halt in the handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
 
@@ -250,8 +285,8 @@ Enforce these as **engineering judgment, not a rulebook**: each item is a questi
 - [ ] Happy path AND failure modes covered?
 - [ ] Would they catch a regression if someone changes this code?
 - [ ] **Negative guards tested in a non-default state?** A permission check tested only as admin, a filter tested only with a matching row, an error branch tested only on the happy fixture — all pass while proving nothing.
-- [ ] **Mutation-check what matters.** For each test guarding security, authority, or filtering: assert first that the break is observable at all (the values really differ, no other guard already stops it), then break the guard in the source, confirm the test fails, restore it. A guard whose test still passes without the guard is decoration — **CRITICAL**.
-- [ ] **Proof, per `/review-lenses`' proof lens.** Tests run the path production runs, not a shortcut constructor or an internal step production never takes. Existing tests that kept passing but now assert something true in every mode are a finding, not a pass. Fixtures are large enough to reach the path under test. Where old and new run side by side, a parity test feeds both the same inputs and compares every read.
+- [ ] **Mutation-check what matters.** For each test guarding security, authority, or filtering: assert first that the break is observable at all (the values really differ, no other guard already stops it), then break the guard in the source, confirm the test fails, restore it. A mutation is run at `/test-scope`'s *"A mutation check, at any gate"* row, and counts only when the test fails on its assertion; an error, a hang or a collection failure proves nothing. The same holds for every mutation the build report says was witnessed, which is a claim you re-derive like any other. A guard whose test still passes without the guard is decoration: **CRITICAL**.
+- [ ] **Proof, per `/review-lenses`' proof lens.** Tests run the path production runs, not a shortcut constructor or an internal step production never takes. Existing tests that kept passing but now assert something true in every mode are a finding, not a pass. Fixtures are large enough to reach the path under test, and their data can show the defect: more than one row for an ordering, a row the filter excludes, ties whose stored order differs from the expected one. No test asserts a symptom that holds while the defect is live, compares the code with itself, tests a copy of it, checks presence instead of value, treats values that only look equal as equal, skips silently, covers one direction of an authority rule, or goes around the function that applies the rule. Where old and new run side by side, a parity test feeds both the same inputs and compares every read.
 - [ ] **Fixture hygiene:** no private or production data, no secrets, no oversized assets, no nondeterminism (real clocks, network, randomness, ordering assumptions).
 
 ## Round N: Report Findings
@@ -336,6 +371,7 @@ A brief is executed literally by a model that cannot see what you meant, so a wr
 - **Then read the brief back against the decision document.** It can satisfy every finding you raised and still ask for something the decision ruled out. It is the same drift pass you run on the code, run on your own instructions.
 - **Then check that each fix's failing test would actually fail.** This is the proof lens: name the revert, confirm the break is observable at all, and confirm the assertion sees it. A brief whose tests go green on the unfixed code comes back green and unfixed.
 - **Then confirm every name, file, line and command in it exists, and every cited line holds what the brief says it does.** A line number that resolves to the wrong code passes an existence check. Check them one at a time against the codebase, not against your memory of reading it an hour ago. This is `/existing-mechanisms`' *"`/3p-review`, before a Rework Brief is handed over"* row: the second sweep, run against the artifact.
+- **Test every search pattern the brief hands over against every form of the defect.** A pattern given to a build model defines what it fixes, so one that matches `row[0]` and misses `rows[j][0]` or a tuple unpacking leaves those sites unfixed and the round green. Run it, and confirm it finds each form you know of before it goes in.
 - **And check whether any fix is inert without another.** Two guards on consecutive lines means removing one changes nothing. Name the pairing and require them built together, or the round costs a relaunch and moves nothing.
 
 ### Fixing them yourself
@@ -346,7 +382,7 @@ A brief is executed literally by a model that cannot see what you meant, so a wr
 4. **Preserve unrelated work.** Do not revert, stash, reformat, or tidy anything outside the scope established at intake. If a fix genuinely requires it, say so in the summary.
 5. **Go back to Part 2, Round N+1.** Re-read from disk, run the full checklist again.
 
-**Only when zero findings remain (CRITICAL = 0, MAJOR = 0, MINOR = 0):** take the sign-off run, then write the final summary, then suggest `/verify-completion`.
+**Only when zero findings remain (CRITICAL = 0, MAJOR = 0, MINOR = 0), and a deep read that was started has returned or is recorded in the ledger as not having run:** take the sign-off run, then write the final summary, then suggest `/verify-completion`.
 
 **The sign-off run** is `/test-scope`'s *"`/3p-review` sign-off"* row: the full suite. If you made a full-suite run earlier in this review and have changed nothing since, cite that run under the citable-run rule instead of repeating it, and write the citation into the summary with what proved the tree unchanged. A review that found nothing therefore costs one full-suite run, not two; a review that fixed something costs two, because the first one is no longer about this code.
 
@@ -401,5 +437,5 @@ Status: PASSED — I am signing off on this code as its new owner.
 
 If you cannot truthfully write `0 / 0 / 0`, you have not finished. Loop again.
 
-**Offer an outside review with the sign-off**, unless you are running under `/build-model`: the main model re-reviews a handed-off build on its return, and that review is the one that offers it. Offer it in one line, and when the user says yes, write out `/review-lenses`' outside-review brief, filled in for this build: the commits, the plan, the decision document and the business requirement. Say plainly that it asks whether the code is *right*, not whether it matches the plan. A second model with no stake in the reasoning is the cheapest source of business-sense findings there is. If the user runs it, its findings reopen this review at Round N+1, and are rejected only under RL-5.
+**Offer an outside review with the sign-off**, unless a deep read ran in this review, the user answered "neither" at intake, the change was too small to ask about (*Fresh readers*, Part 1), or you are running under `/build-model`: the main model re-reviews a handed-off build on its return, and that review is the one that offers it. Offer it in one line, in `/review-lenses`' two forms (a fresh subagent on a model the user names, or the brief written out to paste elsewhere), with the outside-review brief filled in for this build: the commits, the plan, the decision document and the business requirement. Say plainly that it asks whether the code is *right*, not whether it matches the plan. A second model with no stake in the reasoning is the cheapest source of business-sense findings there is. If the user runs it, its findings reopen this review at Round N+1, and are rejected only under RL-5.
 
