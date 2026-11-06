@@ -290,7 +290,8 @@ itself). `/brainstorm` looks through them at every approach, where a lens can st
 `/write-plan` runs them as its passes; `/3p-review` runs them on the built code. Every fix is a
 change the earlier lenses never saw, so a review runs in rounds. Code review ends only at zero
 findings; a decision or plan ends on a round that changed nothing or, from the third round, one with
-no new kind of finding or nothing major. What the user will
+no new kind of finding or nothing major. A finding is settled as a kind: every site of it across the
+whole body of work, fixed once, so the next review does not find it at one more site. What the user will
 see is written into the decision document and checked at every later gate, and each gate can hand a
 filled-in brief to another model, because the reader who never heard the reasoning is the one who
 spots what makes no business sense.

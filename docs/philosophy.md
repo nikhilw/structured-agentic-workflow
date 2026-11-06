@@ -157,7 +157,9 @@ can still rule an approach out instead of patching it. And a review runs in roun
 change the lenses before it never saw, so the review ends on a round that changed nothing, not on
 the last lens. Code review ends only at zero findings. A document can be reviewed forever, because
 each fix adds something new to find, so from the third round a decision or plan also closes on a
-round with no new kind of finding or nothing major.
+round with no new kind of finding or nothing major. And a finding is a kind, not a site: it is
+looked for across the whole body of work and fixed once with a shared mechanism, because a fix made
+site by site leaves the next review one more site and a new duplication to find.
 
 Two of them need a different reader. What the user sees is judged from the user's seat, not the
 builder's. Business sense is judged best by someone who never heard the reasoning, because every

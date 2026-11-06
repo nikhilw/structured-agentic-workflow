@@ -181,7 +181,7 @@ Map **decision → plan requirement → implementation → evidence**, and flag 
 - [ ] **Deviations that should have amended the plan** — the builder hit reality, adapted, and left the plan describing a system that no longer exists.
 - [ ] **Decisions kicked back to the build model** — the plan already decided this and the code differs, or the plan left a hole filled with an architectural choice the build model was never meant to make.
 - [ ] **Judgement calls you delegated, re-traced by you.** Where the plan or a Rework Brief said "this one is yours to judge, say which way you went", read what it chose and trace it yourself, callers and callees both ways, per `/existing-mechanisms` question 1. **Delegating the decision never delegated the tracing**, and what comes back is a claim like every other claim in the handoff. The build model chose with less of the system in view than you have: the guard it removed as redundant may also have been holding a second thing shut. A delegated call the handoff never mentions is worse than one you disagree with, so check the diff for choices nobody reported.
-- [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make. A finding carried that way is a class, not a case: say which later phases it reaches, so the amendment covers them too (`/write-plan`, *When a build halt comes back*, step 3).
+- [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make. A finding carried that way is a kind, not a case (RL-8): say which later phases it reaches, so the amendment covers them too (`/write-plan`, *When a build halt comes back*, step 3).
 - [ ] **Amendments without entries** — read the plan's **Amendment Log** against its phases. A phase whose text plainly answers a problem discovered during the build, with no entry recording that, is an unlogged amendment. It is a finding here and it becomes undocumented drift at `/verify-completion`, where it is far more expensive to reconstruct.
 - [ ] **Halts resolved by silence** — for every halt in the handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
 
@@ -329,6 +329,18 @@ means changing the fix's approach, or when it is the second such defect in this 
 what it broke, and whether to fix it again or change the approach. Their answer decides how it gets
 fixed, never whether: the exit stays zero findings.
 
+**Settle each finding as a kind, across the whole change, before the next round (RL-8).** Name the
+kind. List the set it can live in from the code or the schema, never from the plan or the diff's
+own list, and search with a method that can see it. Where the sites repeat the same logic, the fix is
+one shared mechanism the sites call, plus a guard that refuses the old shape where a cheap one can,
+never each site by hand. Sites that only share a slip are corrected together, with no abstraction.
+Record the kind, the search and its count in the ledger. A site outside this change is a Follow-up
+unless the change depends on it or exposes it; when in doubt it is a Finding (*Findings vs.
+Follow-ups*). Sites inside the change that repeat the same logic count toward the send-back test
+below: at three or more, the brief's *Systemic* section decides the mechanism and the builder writes
+it, so you stay the reviewer. Under `/build-model` there is no one to send it to,
+so you write it here.
+
 Fixing them yourself is the default. Send the work back to the build model when any of these hold:
 
 - more than roughly **8 open findings**, or findings spanning more than half the phases;
@@ -360,7 +372,9 @@ must be reported back: which way you went, and what you traced to check it]
 ### R2 — ...
 
 ### Systemic
-[A defect repeating across sites — state the pattern once, list every site, fix as one thing.]
+[Each kind whose sites repeat the same logic: the pattern once, the search that found its sites and
+the count, every site, and the one shared mechanism and guard that fix it. The sites only call it
+(RL-8).]
 
 ### Standing criteria
 [Every general criterion the owner stated during this review, verbatim. They apply to every item

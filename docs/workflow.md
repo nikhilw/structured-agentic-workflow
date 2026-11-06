@@ -361,7 +361,7 @@ Then the loop closes on the planning side:
    that undermines the approach rather than this phase of it, goes back to `/brainstorm`; absorbing
    one as a phase amendment is the single largest source of drift in this workflow. A builder error
    gets a clarification, and an explicit note that the plan's substance is unchanged. Every finding
-   that amends the plan is a class, not a case: every later phase it reaches says how it applies there.
+   that amends the plan is a kind, not a case: every later phase it reaches says how it applies there.
 3. **Amend the plan and log it** in the plan's Amendment Log: trigger, what was reported, what
    changed, decision impact, scope impact. If it supersedes something in the decision document,
    name that decision here and put the change of intent to the user; the planning model does not
