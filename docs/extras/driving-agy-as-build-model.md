@@ -44,7 +44,7 @@ permission it needed. Do not treat it as done.
 
 ## Resuming and batching
 
-Save `conversation_id` and pass it back with `--conversation <id>` for the next batch. `--continue`
+Save `conversation_id` and pass it back with `--conversation <id>` for that batch's reworks; the next batch starts fresh. `--continue`
 resumes the most recent conversation in the workspace, which may be someone else's; never use it.
 
 ## Conversation naming

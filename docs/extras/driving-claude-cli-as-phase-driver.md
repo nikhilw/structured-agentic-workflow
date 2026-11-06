@@ -33,20 +33,19 @@ claude -p --model <model> --output-format json --max-budget-usd <cap> \
   model's launch recipe, then the plan sections and the phase.
 - **Scope:** exactly which amendments and which phase, and what it must not touch.
 - **How to run things headless:** the build model with the harness's background option rather than `nohup` or `&`, which
-  detach it and lose its result; bounded wait loops (`timeout 590 bash -c 'while pgrep -f "[c]odex exec" >/dev/null; do sleep 20; done'`);
+  detach it and lose its result; bounded wait loops (`timeout 590 bash -c 'while pgrep -f "<pattern unique to this run>" >/dev/null; do sleep 20; done'`, first letter of the pattern in brackets so it does not match itself; exit 124 means still running, so loop again);
   the test suite the same way, output to a file, the exit code read from the file.
 - **Which reviewers it may use**, by name: one outside model for the deep read, a small model for fix checks. The prompt
   chooses models, not the driver.
 - **The hard rules:** commit by path; no push, reset, checkout, stash or rebase; kill by exact process id; a failing test
-  is read and fixed, never re-run until it passes.
+  is read and fixed, never re-run unchanged in the hope it passes.
 - **When to stop and ask:** write the question to a file the planner watches, then end the run. And when to stop at the
   close without writing the close entry.
 - **A report file it rewrites as it goes, and a decisions file** for every call it made without asking.
 
 ## Watching it
 
-Watch its commits, its questions file and its process (`pgrep -f "[c]laude -p --resume <id>"`; the brackets stop the
-pattern matching itself). Do not touch the tree while it runs mutations, and point any reviewer you launch yourself at
+Watch its commits, its questions file and its process (`pgrep -f` on a pattern unique to this run, bracketed the same way). Do not touch the tree while it runs mutations, and point any reviewer you launch yourself at
 committed code only.
 
 ## What to expect

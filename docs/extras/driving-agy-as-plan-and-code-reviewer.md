@@ -6,7 +6,7 @@ Its findings are input to weigh, not verdicts: confirm each one against the code
 
 ## Launch
 
-Reviews are read-only, so launch **without** `--mode accept-edits`. A file write is then denied, which
+Launch **without** `--mode accept-edits`, on a clean clone: the shell permissions from setup still apply, so this denies file edits and does not make the run read-only. A file write is then denied, which
 ends the run (see *A denied command ends the run and still reports success* in the build file). Run the
 same `jq` check after each run.
 

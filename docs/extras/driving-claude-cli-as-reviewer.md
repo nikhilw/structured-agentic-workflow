@@ -19,7 +19,7 @@ claude -p --model <model> --output-format json --disallowedTools "ReportFindings
 - **Pass the brief on stdin from a file.** Its first line is a short name for the run.
 - **Run it with your harness's background option and its maximum timeout.** A deep read can take a quarter of
   an hour.
-- **`--allowedTools` pre-approves; it does not restrict.** What your settings already allow still runs. For a hard limit, also pass `--tools` with the same tools. The list above is for reading. Entries match by prefix, so even these can
+- **`--allowedTools` pre-approves; it does not restrict.** What your settings already allow still runs. For a limit on which tools exist, also pass `--tools` with the bare names (`Read Grep Glob Bash`); it takes tool names, not command patterns, so it does not limit what Bash runs. The list above is for reading. Entries match by prefix, so even these can
   write in corners (`git diff --output=`, `sed`'s `w` command); keep the list short and the tree committed. A
   review that runs tests or mutation checks also needs your test runner and the Edit tool, and its brief must
   say to restore each mutation by copying the file back, never with git.
@@ -27,11 +27,11 @@ claude -p --model <model> --output-format json --disallowedTools "ReportFindings
   `result`. The brief says findings go in the final message.
 - **Read the answer** with `jq -r .result <run>.json`, and the cost with `.total_cost_usd` and `.num_turns`. If
   `result` summarises ("10 of 19 findings"), resume the session and ask for the full numbered list.
-- **A command off the list is refused and the run carries on**; `permission_denials` lists each one. Compound
+- **A command neither on the list nor allowed by your settings is refused and the run carries on**; `permission_denials` lists each one. Compound
   commands are checked part by part, so `cd x && ...`, pipes, heredocs and redirection are refused unless every
   part is allowed.
 - **Your Bash hooks apply to it too.**
-- **A review that hits the session limit** ends with an API error and no findings; relaunch after the reset.
+- **A review that hits the session limit** ends with an API error and no findings. Switch to another reviewer (RL-9); relaunch after the reset only if there is none.
 
 ## Resuming, and when not to
 

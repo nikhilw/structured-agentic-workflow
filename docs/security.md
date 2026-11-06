@@ -44,8 +44,7 @@ ahead of time, and a prompt on each one would stop an unattended build.
 
 What contains it is written, so it binds the model and the harness does not enforce it. Each gate
 that runs the plan's commands carries a binding copy of `test-scope`'s *What a run may execute*, and
-`brainstorm` allows read-only investigation only. To be asked every time, remove the entry from the
-installed copy. The references hold no shell entry, and `github-backlog` and `triage` pre-approve one
+`brainstorm` allows read-only investigation, plus its decision document and the graph index refresh. The references hold no shell entry, and `github-backlog` and `triage` pre-approve one
 command.
 
 ## The extras are not skills
