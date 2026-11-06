@@ -12,10 +12,10 @@ levels, not quotes.*
 | 3. Pre-build review of a phase group | Just before that group is built | An outside model; a small model when it fails twice on one brief | Drift between the plan and code that moved since; findings from earlier phases not yet applied | Cents to a dollar |
 | 4. Re-review of closed phases | After rules change mid-plan | An outside model, against the new rules | Closed phases that break a rule added later | As level 2 |
 | 5. The driver's check of every build run | After each build-model run | Whoever drives the build: the planner, or a phase driver | Hollow tests, claims the build model did not do, files it should not touch | Driver's time |
-| 6. Mutation check | After each run, and at the close | The driver, never the build model's word | Tests that pass with the code broken | Minutes per mutation |
+| 6. Mutation check | Once, after the run that wrote the test; again only if that test or its code changes | The driver, never the build model's word | Tests that pass with the code broken | Minutes per mutation |
 | 7. Deep post-build review | Once per `/3p-review`, at its first round (a long build reviewed phase by phase runs one review per phase) | A capable model with none of the build's context (`/3p-review`'s deep read) | Behaviour changes from the main branch, missed rules, design problems in the built code | One to several dollars, growing with the diff |
 | 8. Fix check | After each review round's fixes | The smallest model tier, fresh, given only the fixes and the findings (`/3p-review`'s fix check) | Findings not really fixed; new breakage in the rework | Cents |
-| 9. Close gates | End of phase | The planner itself: the full suite, type check, lint, every named mutation | Anything the reviews and the driver did not run | The suite's wall time |
+| 9. Close gates | End of phase | The planner itself: the full suite, type check, lint, and any mutation nothing first-party has witnessed | Anything the reviews and the driver did not run | The suite's wall time |
 
 Levels 7 and 8 are built into `/3p-review` when the harness can start a fresh subagent on a named
 model. The rest are what a long build adds around the workflow's gates.

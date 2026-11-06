@@ -5,7 +5,7 @@ can drive as well as the planner is still open.*
 The phase driver does the planner's build-time job for one phase: it writes the build model's
 briefs, launches and watches it, checks every run itself (the diff, every new test, the mutations),
 runs the reviews, amends the plan, and stops before the phase is closed. The planner then closes the
-phase: it re-runs the mutations, runs the gates, and reads the driver's reviews and decisions. The
+phase: it runs, once, any mutation nothing first-party has witnessed, runs the gates, and reads the driver's reviews and decisions. The
 question a trial answers is whether a cheaper model can sit in the architect's seat.
 
 ## Launch
@@ -66,8 +66,8 @@ any reviewer you launch yourself at committed code only.
 
 ## What it missed or cost
 
-- It committed tie tests whose mutations survived, before it reworked them. The planner's own
-  mutation re-run at the close is not optional.
+- It committed tie tests whose mutations survived, before it reworked them. A first-party
+  run of each mutation, once, is not optional; repeating one whose test and code have not changed is waste.
 - Rework is heavy: close to half of the build model's runs were reworks. Each rework was a defect it
   caught, but its briefs did not prevent them.
 - Wall time is dominated by the build model's round trips, not by the machine.

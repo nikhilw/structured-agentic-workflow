@@ -220,7 +220,7 @@ proof it does not have: a mutation "witnessed" that survived, a "tie" test that 
 guard test that compared a list with itself, a cost test that timed a copy of the fixture.
 
 Give it an acceptance command that is not the test suite, and run that command yourself; a grep
-that must return nothing is usually the right shape. Re-run every mutation it names, and read every
+that must return nothing is usually the right shape. Re-run every mutation it names, once, and read every
 new test.
 
 ### After a killed run, check for unrestored mutations

@@ -1,6 +1,6 @@
 ---
 name: review-lenses
-description: The perspectives every review in this workflow looks through, one question each (impact, removal, logic, behaviour, business sense, proof, coherence), the checklist each lens walks, the table of which gate runs which lens at what depth, and the brief for handing a review to an outside model. Shared reference loaded by brainstorm, write-plan and 3p-review. It is a reference, not a step of its own.
+description: The perspectives every review in this workflow looks through, one question each (impact, removal, logic, behaviour, business sense, proof, coherence), the checklist each lens walks, the defect kinds that keep coming back, the table of which gate runs which lens at what depth, and the brief for handing a review to an outside model. Shared reference loaded by brainstorm, write-plan and 3p-review. It is a reference, not a step of its own.
 user-invocable: false
 allowed-tools: Read, Grep, Glob, Bash
 ---
@@ -115,13 +115,17 @@ technically right and commercially wrong.
 
 A test is worth only the defect it rejects.
 
-- **Name the defect each test exists to catch, then break it that way and check that it fails.** Watch for these shapes: a fixture too small to reach the path; an assertion on a symptom that holds while the defect is live; a substring check that passes on reworded or re-wrapped leftovers; an assertion true in every mode; "exits 0" with nothing asserted; data that cannot show the defect (an ordering test with one row, ties whose stored order already equals the expected order, a filter test with no row the filter excludes); a comparison of the code with itself; a test of a copy of the code rather than the code; a check that a value is present rather than what it is; a test that skips silently when unsure of its own input; one direction of an authority rule tested and not the other; values that only look equal (`True == 1`); a path around the function that applies the rule.
+- **Name the defect each test exists to catch, then break it that way and check that it fails.** Watch for these shapes: a fixture too small to reach the path; an assertion on a symptom that holds while the defect is live; a substring check that passes on reworded or re-wrapped leftovers; an assertion true in every mode; "exits 0" with nothing asserted; data that cannot show the defect (an ordering test with one row, ties whose stored order already equals the expected order, a filter test with no row the filter excludes); a comparison of the code with itself; a test of a copy of the code rather than the code; a check that a value is present rather than what it is; a test that skips silently when unsure of its own input; one direction of an authority rule tested and not the other; values that only look equal (`True == 1`); a path around the function that applies the rule; a fake the real path never calls; a filter on what the test observes that drops exactly the regression; a guard checked twice, so breaking one changes nothing; a partial match on a body a client sends.
 - **Every guard has a mutation check**: the exact revert, and the failure it must produce. **A mutation is witnessed only when the test fails on its assertion.** A test that errors, hangs or fails to collect under the mutation proves nothing about the guard.
+- **A red run is the first proof; a mutation is for what red cannot show.** A test that went red on its assertion, one test at a time, with only enough code written to pass it, has shown it can fail, and every line behind it exists because a test demanded it. A mutation is required for what that cannot prove: an absence or negative assertion, which can pass when its subject never existed; an authority or filtering check; a test that could not go red because the behaviour already existed, as in a port or a refactor; and anything the plan names. It is made once, when the test is written: break what it guards, watch it fail on its assertion, restore. From then on the regular suite is the guarantee. Run one again only when that test or the code it guards changes. Never sweep past work again: a re-run proves nothing new, it grows into hours, and its specs go stale as the code moves.
 - **A mutation check asserts its own precondition first.** A check that cannot fail looks exactly like one that passed. Before trusting it, assert that the break is observable at all: that the two values really do sort differently, that the repeated text is not compressed away before it is compared, that no other guard already stops the same thing. Then break it and watch it fail (RL-4).
 - **A concurrency test forces the interleaving.** A test that fails only when two threads happen to overlap proves nothing on the run where they did not. Hold the first one after its read (a barrier, an event, a patched step), start the second, and assert that it waits on the lock or sees the state the rule promises.
 - **Old and new side by side get a parity test.** While a replacement runs beside what it replaces, feed both the same inputs and compare every read. It is the cheapest net for a port that changed behaviour without anyone deciding it should.
 - **Existing tests, in three kinds.** Tests that will break are updated to assert the new truth, never loosened to accept it. Tests that keep passing and stop meaning anything are rewritten or retired. Tests that reach the code indirectly (patched factories, captured arguments, module mocks) are named, because they break in ways that look nothing like the cause.
 - **Tests run the path production runs.** A test that builds through a shortcut, calls an internal step production never takes, or stubs the layer the defect lives in proves the shortcut.
+- **Test what the code owns.** The code owns that a lookup can use an index, how many statements a read issues, and that its results are right. It does not own a query planner's choice on given data, physical row order, or timing. Force the choice, then check the code's part. A test that needs huge seeds or an hour to run is fighting something it does not own: read what it is doing rather than waiting.
+- **A check that runs beats a check that reads.** A guard that parses source text sees the cases its author thought of. One that observes real behaviour (counting the statements actually issued, refusing a wrong call when it is built) sees every real case. A "before" count comes from the code before the step, never from mutating the new code. A guard's allow-list entry stays while the defect it lists remains.
+- **A test of what a client sends** asserts the whole body, waits for the save before asserting that nothing was sent, and stubs only data the real server produces.
 - **Anything held constant and relied on gets a pin**: a byte-identity fixture or a golden output, because prose does not stop a reword.
 
 ### Coherence: *does the document still agree with itself?*
@@ -135,6 +139,23 @@ bottom, as the next reader will.
 - **One name per thing**, and no new name that collides with an existing one.
 - **Sequence**: if it is built in order, does each step stand on what came before?
 - **One story**: would someone who did only the steps end up where the summary says?
+
+## Kinds of defect that keep coming back
+
+Mined from reviews of finished builds. A lens is a way of looking; this is what it most often finds. The builder looks first: `/build-phase`'s self-review keeps a copy of those its other checks do not cover.
+
+- **Screen truth:** what a screen shows is not what is stored or what would be sent.
+- **A bad value:** one malformed or hostile value is accepted, or breaks a whole read rather than failing alone.
+- **One value, several shapes:** stored, shown and sent forms disagree, and no document says which is which.
+- **Stale edit state:** a refetch overwrites an edit, a second save differs from the first, unsaved edits follow you to another record.
+- **A storage contract:** the writer and the reader of a value disagree on what it means.
+- **Half a batch:** one failure leaves part of a batch applied, with nothing saying which part.
+- **After the commit:** an error once the write has landed, so the user is told it failed, and a retry does it twice.
+- **Cleanup:** what a failure or a delete leaves behind.
+- **Cost:** one query per row, or a whole set held in memory.
+- **A silence filled:** something the plan left open that the build decided without saying.
+- **Duplication:** the second way to do a job, or the same logic at several sites.
+- **Tests that cannot fail:** the shapes in the proof lens.
 
 ## Which gate runs which lens
 

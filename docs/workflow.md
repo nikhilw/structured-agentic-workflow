@@ -317,14 +317,18 @@ Within a phase:
    redesign, re-brainstorm, or guess.
    The review reads the plan against *your* code, so it says nothing about third-party runtime
    behaviour — that is what the plan's gate phase is for.
-2. **TDD, mandatory.** Failing test first (red), minimum code to pass (green), then refactor.
+2. **TDD, mandatory, one test at a time.** Failing test first (red), only enough code to pass that test (green), then refactor, then the next test. Each cycle runs just its one test.
    Writing the test is the *beginning* of the phase, not the end.
 3. **Tests, scoped to what the phase earned.** A phase runs its own criteria and then widens
    one rung, per [`/test-scope`](#test-scope-how-wide-a-run-has-to-be). The full suite runs once
    at the end of the build, not once per phase. It also runs every mutation check its criteria
-   name, and counts one as witnessed only when the test fails on its assertion; a test that errors
-   or hangs under the mutation proves nothing.
-4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs? And the
+   name, and one for any other new test a red run cannot prove (an absence check, an authority or filtering check, a test of behaviour that already existed), once, when the test is written, and counts one as
+   witnessed only when the test fails on its assertion; a test that errors or hangs under the
+   mutation proves nothing. After that the suite is the guarantee, and a mutation runs again only
+   when that test or the code it guards changes.
+4. **Self-review.** Does the code match the plan, follow conventions, have obvious bugs? Does every
+   named test exist, has the builder tried hostile values and a load, save, save again, and is any of
+   the defect kinds reviews keep finding here? And the
    question that catches silent drift: *did I decide anything the plan should have decided?*
    And *did this phase rewrite something an earlier phase already built?* It lists its new units
    against theirs and calls the earlier one rather than keeping a second copy. And *would each new
