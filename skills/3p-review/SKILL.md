@@ -11,9 +11,10 @@ allowed-tools: Read, Grep, Glob, Edit, Bash
 
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
-> **How much of a review reaches the user.** Three things are emitted in full, and they are the
-> three they have to rule on: a Rework Brief going back, a finding that changes the plan or the
-> decision document, and the Part 3 sign-off, whose *For the owner* line carries the business-sense
+> **How much of a review reaches the user.** Four things are emitted in full, and they are the
+> four they have to rule on: a Rework Brief going back, a finding that changes the plan or the
+> decision document, a fix that needs rethinking (RL-7), and the
+> Part 3 sign-off, whose *For the owner* line carries the business-sense
 > questions. The outside-review brief is written out too, but only when they ask for it. Everything else is **one line** (AW-28): intake done,
 > a round finished, findings you are fixing yourself, a suite gone green. All of it is *said, not
 > saved* (AW-29). The ledger below is your working record, not a document on disk and not a
@@ -319,7 +320,14 @@ Severity sets *priority*, not whether it gets fixed — everything gets fixed:
 **Findings you are fixing yourself go to the ledger; the user gets one line** (AW-28): the counts by
 severity, who is fixing them, and that nothing is needed from them. The full round goes to them when
 they have to rule, which is when a Rework Brief goes back, when a finding changes the plan or the
-decision document, or when the review exits.
+decision document, when a fix needs rethinking, or when the review exits.
+
+**A fix that needs rethinking goes to the user before the next round (RL-7).** The fix check's
+"anything the fixes broke" and this round's findings show when a fix created a CRITICAL or MAJOR. A
+slip put right within the fix's own approach is an ordinary finding. Stop and ask when fixing it
+means changing the fix's approach, or when it is the second such defect in this review: the fix,
+what it broke, and whether to fix it again or change the approach. Their answer decides how it gets
+fixed, never whether: the exit stays zero findings.
 
 Fixing them yourself is the default. Send the work back to the build model when any of these hold:
 

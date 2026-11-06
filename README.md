@@ -248,7 +248,7 @@ A small build model fills every silence with the happy path. So `/write-plan` fo
 expensive model to write the foresight *down*: failure modes, lifetimes, error codes and
 their owners, concurrency and aliasing, named seam tests per value path, and exact
 command-plus-expected-output test criteria. Every name in the plan must be verified to exist,
-or marked new. Then ten review passes before it is saved, one question each (see 7), repeated until a round changes nothing, and the
+or marked new. Then ten review passes before it is saved, one question each (see 7), repeated until a round changes nothing or, from the third round, none brings a new kind of finding or anything major, and the
 first starts from the codebase rather than the document: a caller that breaks the build is never in
 the plan, so checking the plan's own names will not find it.
 
@@ -288,8 +288,9 @@ cases, crashes and concurrent runs), **behaviour** (what the user actually sees,
 the tests fail if it were built wrong) and **coherence** (does the document still agree with
 itself). `/brainstorm` looks through them at every approach, where a lens can still rule one out;
 `/write-plan` runs them as its passes; `/3p-review` runs them on the built code. Every fix is a
-change the earlier lenses never saw, so a review runs in rounds and ends only on one that changed
-nothing. What the user will
+change the earlier lenses never saw, so a review runs in rounds. Code review ends only at zero
+findings; a decision or plan ends on a round that changed nothing or, from the third round, one with
+no new kind of finding or nothing major. What the user will
 see is written into the decision document and checked at every later gate, and each gate can hand a
 filled-in brief to another model, because the reader who never heard the reasoning is the one who
 spots what makes no business sense.

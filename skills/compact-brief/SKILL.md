@@ -42,8 +42,8 @@ any other time.
 
 1. **Where the work stands.** The stack, per AW-25: the original goal, the level you are at, what
    each level above still owes. Then the one next step, named as the skill to run and its argument.
-2. **The files, by path.** Decision document (or none), plan (its current directory), amendment IDs
-   applied so far. Never copy their content: the gates re-read them from disk, and a copy would be
+2. **The files, by path.** Decision document (or none), plan (its current directory), `WORKING-MEMORY.md`
+   if the build keeps one (AW-29), amendment IDs applied so far. Never copy their content: the gates re-read them from disk, and a copy would be
    a second, staler version.
 3. **The owner's rulings, verbatim.** Standing criteria (AW-24), a risk accepted, a deviation
    accepted but not yet appended, an answer to a business-sense question. A paraphrase is a
@@ -97,12 +97,12 @@ The brief is a sketch, not a template; use the labels that fit and drop the ones
 RESUME BRIEF (pasted after a compaction)
 Stack: [goal] > [level] > [here]. Still owed: [per level].
 Next: [skill and argument], then [what follows].
-Files: decision doc [path]; plan [path]; amendments [IDs].
+Files: decision doc [path]; plan [path]; working memory [path]; amendments [IDs].
 Rulings (verbatim): "[ruling]" ([what it governs]).
 Open asks: [question].
 From the chat, [who said it], claims not verified: [handoff and sign-off items].
 How to work with the owner: "[their words]"; [corrections they repeated].
 [Anything else the next step needs.]
-Before acting: re-read the plan and decision doc from disk, and load each skill and reference again when a step needs it; what was loaded before the compaction is gone or cut short. Where sources disagree, the files on disk win, then this brief, then the compaction summary. Runs listed here are claims; /verify-completion runs the full suite fresh.
+Before acting: re-read the working memory, plan and decision doc from disk, and load each skill and reference again when a step needs it; what was loaded before the compaction is gone or cut short. Where sources disagree, the files on disk win, then this brief, then the compaction summary. Runs listed here are claims; /verify-completion runs the full suite fresh.
 State the next step in one line and wait for the owner's go.
 ```

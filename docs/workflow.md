@@ -229,8 +229,9 @@ explicit."
   whether this unifies, reuses and extracts or builds in parallel, and it lists every unit the plan's
   phases specify and groups the ones that do the same job, so a helper the plan would have had
   built twice becomes one extraction phase. When a round of passes changes what the plan contains,
-  the passes run again over that change, until a round changes nothing; a third round still
-  changing it goes to the owner, because the change is bigger than the plan, with a proposal to split
+  the passes run again over that change, until a round changes nothing, or from the third round on
+  the first with no new kind of finding or nothing major or worse. A third round meeting neither
+  goes to the owner, because the change is bigger than the plan, with a proposal to split
   it into parts that are each reviewed and built on their own. Every pass records its findings on its own line
   of the plan's **Review Passes** block
 - A **Decision Source** section mapping every decision in the decision document to the phase that
@@ -275,7 +276,8 @@ produces — the Build Halt Report, the build completion report, the review ledg
 Rework Brief, the handoff summary, the completion report — is a format for what a model *says*, to
 you or to the next model, and is emitted into the conversation rather than saved. A gate that
 invents a report file invents its path too, and what it leaves behind is a document no gate reads
-and nobody can later date or trust (AW-29).
+and nobody can later date or trust (AW-29). The one exception is a build that will span compactions:
+it keeps its state and your rulings in `WORKING-MEMORY.md` at the project root, out of commits.
 
 **How much of one gets emitted follows the same discipline.** A report is for a moment where you
 have to rule on something. A phase that finished, a review round that came back clean, a suite that
