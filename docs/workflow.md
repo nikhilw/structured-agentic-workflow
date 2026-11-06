@@ -177,7 +177,8 @@ The skill will:
   decision the way a newcomer would, which is the reading that finds what makes no business sense
 
 **Your active role:** while the AI analyses, you research in parallel. Often you will find a
-library or approach it missed — say so and pivot. That is the phase working.
+library or approach it missed — say so and pivot. That is the phase working. The AI has to look too:
+each approach says what it would hand-build and which library could do that job instead.
 
 **Decision documents.** When a direction is chosen, `/brainstorm` offers to save
 `docs/discussions/YYYY-MM-DD-<topic>.md` — the mechanism ledger, what was considered, what won,
@@ -234,6 +235,9 @@ explicit."
   goes to the owner, because the change is bigger than the plan, with a proposal to split
   it into parts that are each reviewed and built on their own. Every pass records its findings on its own line
   of the plan's **Review Passes** block
+- A **hand-built or library** line: each mechanism the plan hand-builds, the library that could do it,
+  and why it was or was not used. The logic pass also walks the exact bodies sent and answered, a load,
+  save, save again, and the defect kinds reviews keep finding, before any code exists.
 - A **Decision Source** section mapping every decision in the decision document to the phase that
   carries it. The contracts pass walks that mapping line by line. Before approval, a difference from the
   decision document is a question for the owner rather than a departure — departures are only what

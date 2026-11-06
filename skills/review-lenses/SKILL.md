@@ -77,7 +77,8 @@ it does. Walk every one of these:
 - **Can the mechanism express the rule?** Read the rule as decided, then the reducer, scorer, key or query meant to implement it. Averaging can never let a second reason raise a score. A unique key on name alone can never express "same name, different type".
 - **Where each promise is enforced.** Name the layer that makes each rule impossible to break. A rule enforced only by the UI, a prompt or a comment is not enforced. When something is deleted, ask what it was the *only* enforcement of.
 - **Reuse across a contract.** A helper built for unpaged, ordered, single-threaded or trusted input, reused where those do not hold, spreads its defect to the new caller.
-- **Hostile input.** None, empty, unicode, a budget of 0 or -1, a duplicate. Does it terminate, is it idempotent, does it leave the caller's data alone?
+- **Hostile input.** None, empty, unicode, a budget of 0 or -1, a duplicate. Does it terminate, is it idempotent, does it leave the caller's data alone? Does one bad value fail alone, or break a whole read?
+- **The round trip.** State the exact body a request sends and the server's answer to it. For each value a user can edit: load, save, save again, and it holds. This is the concrete form, so a plan and a build walk it; a brainstorm, having decided what the user does and sees, asks it only where it decides the approach.
 
 **Probe it rather than reasoning about it.** When a conclusion rests on how existing code behaves at
 runtime, and a read-only local probe costs minutes, run the probe. A table worked out by reading can
@@ -142,7 +143,7 @@ bottom, as the next reader will.
 
 ## Kinds of defect that keep coming back
 
-Mined from reviews of finished builds. A lens is a way of looking; this is what it most often finds. The builder looks first: `/build-phase`'s self-review keeps a copy of those its other checks do not cover.
+Mined from reviews of finished builds. A lens is a way of looking; this is what it most often finds. Nobody should wait for review to look. `/write-plan`'s logic pass reads them against the design, and `/build-phase`'s self-review keeps a copy of those its other checks do not cover.
 
 - **Screen truth:** what a screen shows is not what is stored or what would be sent.
 - **A bad value:** one malformed or hostile value is accepted, or breaks a whole read rather than failing alone.
@@ -171,7 +172,7 @@ Each gate is a column. Depth is the gate's, and so is what happens to a finding.
 | proof | for each load-bearing claim, what would prove it (BS-9, BS-10) | the **proof pass** | *Tests*, with the mutation checks run |
 | coherence | the decision document once written, before `/write-plan`: Decision against Consequences, the scenario table and What the User Sees | the **coherence pass** | not run on code; *Codebase Consistency* covers the equivalent |
 
-**A decision-document review stays above the implementation.** It judges the problem, the approaches, the decision and its consequences: whether the direction is right, what it breaks, what the user gets. Code is evidence there. A review opens it to check a claim the document makes about today's system, or to find a caller or flow the decision breaks, and cites it for that. How the decision would be built (method names, signatures, file layout, which class holds what) belongs to the plan and is not a finding against a decision document. A plan review does go down to those names, and its executability pass confirms each one.
+**A decision-document review stays above the implementation.** It judges the business decisions, the functional behaviour, the approach and the consequences: whether the direction is right, what it breaks, what the user gets. Those are what a brainstorm decides, and the plan makes them concrete. Code is evidence there. A review opens it to check a claim the document makes about today's system, or to find a caller or flow the decision breaks, and cites it for that. Code-level form (method names, signatures, file layout, which class holds what) belongs to the plan and is not a finding against a decision document. A plan review does go down to those names, and its executability pass confirms each one.
 
 ## Handing a review to an outside model
 
@@ -209,9 +210,10 @@ correct? Does it deliver the business requirement? Does it make business sense? 
 agree and both be wrong, so agreement alone is never the answer.
 [For a plan: also check that it implements every decision in the decision document; a decision
 with no phase is a finding. For code: do not check that it matches the plan; check that it works.
-For a decision document: judge the problem, the approaches, the decision and its consequences. Code
-is evidence for or against what the document claims, or for a caller or flow it breaks. How it would
-be built (method names, signatures, file layout) is the plan's job, not a finding here.]
+For a decision document: judge the business decisions, the functional behaviour, the approach and
+the consequences. Code is evidence for or against what the document claims, or for a caller or flow
+it breaks. Code-level form (method names, signatures, file layout) is the plan's job, not a finding
+here.]
 
 Look through each of these separately:
 1. Impact: trace callers, call sites and dependants both ways. Count them with the type checker
