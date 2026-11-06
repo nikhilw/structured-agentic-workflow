@@ -118,7 +118,7 @@ ask and run neither: the main model's review of the handed-off build runs them. 
 start such a subagent, say so once and review without them. Where the harness lets you choose a
 subagent's tools, give these readers read-only ones.
 
-- **The deep read, once, in the first Round 1.** Start it alongside your own Round 1, with
+- **The deep read, once, in the first Round 1.** Only one reviewer runs at a time (RL-9). Start it alongside your own Round 1, with
   `/review-lenses`' outside-review brief filled in for this build: the change as *Establish the
   comparison base* names it, the decision document, the business requirement, and its *Already
   settled* line filled in with what the user has ruled and the runs already witnessed. Not the plan and
