@@ -166,6 +166,18 @@ builder's. Business sense is judged best by someone who never heard the reasonin
 odd choice looks sensible to the person who knows why it was made. That is why each gate can hand
 its work to another model with a brief.
 
+### 10. Brainstorm Decides; the Plan Makes It Concrete
+
+Brainstorm is where you decide what gets built and how: the business decisions first, then the
+exact behaviour (what each user action does, what the user sees), then the approach, library choice
+included. The plan turns those decisions into code-level form: method names, file layout, exact
+request bodies. A plan never settles a business or behaviour question alone; a difference goes back
+to you, because a decision made while writing the implementation is one nobody chose.
+
+For now, brainstorm also keeps its full impact trace on the winning approach, even though the plan
+traces again. A caller missed at brainstorm can make the wrong approach win, and that costs more
+than a second trace. This one is open to revisiting.
+
 ## The Trade-offs
 
 **What you gain:**
