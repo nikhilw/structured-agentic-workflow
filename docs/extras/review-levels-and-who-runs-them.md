@@ -29,6 +29,15 @@ model. The rest are what a long build adds around the workflow's gates.
   starts (`/write-plan`, *When a build halt comes back*, step 3).
 - **Reviewers read committed code** whenever a build or mutations are running in the tree.
 - **Each brief lists what is already known or ruled**, so the reviewer spends on new problems.
+- **One reviewer at a time** (`review-lenses`, RL-9). Start the next only when the last has reported
+  and its findings are read. Parallel reviews hit their limits together and can burn the budget with
+  nothing to show. Leave about five minutes between reviewers on one quota; stop at the first quota
+  error and switch reviewer.
+- **An outside reviewer reads a clean clone, not your working tree,** when the tree holds anything
+  that should not go to another vendor: `git clone --no-hardlinks <repo> <scratch>` (`--local` fails
+  across filesystems). Chain the setup with `&&` so a failed clone cannot start the reviewer in the
+  wrong place, and confirm with `readlink /proc/<pid>/cwd` before saying where it runs.
+- **Other providers' models first** where they find as much, so the planner's own credit goes further.
 
 ## Who not to use
 
@@ -43,5 +52,6 @@ model. The rest are what a long build adds around the workflow's gates.
 - Claude CLI reviewer (deep read and fix check): `driving-claude-cli-as-reviewer.md`
 - agy reviewer: `driving-agy-as-plan-and-code-reviewer.md`
 - A Claude CLI phase driver: `driving-claude-cli-as-phase-driver.md`
+- Codex reviewer, on its higher model: `driving-codex-as-build-model.md`, *As a reviewer*
 - Build models: `driving-cursor-as-build-model.md`, `driving-codex-as-build-model.md`,
   `driving-agy-as-build-model.md`

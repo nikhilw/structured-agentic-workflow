@@ -63,7 +63,15 @@ The checked-out branch is <branch>.
 - **Background tasks:** it starts long commands as background tasks and waits on them; a network
   drop during that wait ends the run with `status: ERROR`. Resume the same conversation after a drop.
 - **Quota is per model family.** One family's quota can run out mid-review while another's is
-  untouched (`RESOURCE_EXHAUSTED ... Individual quota reached`); switch with `--model`.
+  untouched (`RESOURCE_EXHAUSTED ... Individual quota reached`); switch with `--model`. `agy models`
+  lists the choices.
+
+## Is it still running?
+
+An empty log is not death: the JSON is written when the run ends. Find the process by reading
+`/proc/<pid>/cmdline` of the `agy` process, since its arguments may not match a `ps` search, and watch
+the transcript's line count (below). Do not relaunch into the same conversation until the process is
+gone.
 
 ## It can invent its citations
 
