@@ -143,7 +143,7 @@ composes with execution-level skill libraries (like
 things well, and with codebase-comprehension tools (like
 [graphify](https://github.com/Graphify-Labs/graphify)) that answer *what is already there*.
 
-Install domain-specific skills for TDD, debugging, and verification. Then let this workflow
+Install domain-specific skills for TDD and debugging. Then let this workflow
 orchestrate when to invoke them.
 
 ### 9. Look From More Than One Place, One Question at a Time

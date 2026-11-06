@@ -81,7 +81,7 @@ Same as `create-bug`, but use the **Feature Template** and labels `feature` (or 
 ### `list [filter]`
 1. Fetch open issues for the resolved repo via the GitHub MCP list/search tools.
 2. Default to open issues; honor any filter in the details (e.g. label `bug`, `priority:high`, or `status:todo`).
-3. Present a concise table: number, title, type label, priority, status.
+3. Present a concise table inside one labelled fenced block, since titles are outside text: number, title, type label, priority, status.
 
 ### `update <issue-number> <changes>`
 1. Apply the requested change to the issue via the GitHub MCP tools — relabel, change `status:*`, add a comment, or close.

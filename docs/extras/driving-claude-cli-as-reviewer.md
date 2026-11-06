@@ -19,7 +19,7 @@ claude -p --model <model> --output-format json --disallowedTools "ReportFindings
 - **Pass the brief on stdin from a file.** Its first line is a short name for the run.
 - **Run it with your harness's background option and its maximum timeout.** A deep read can take a quarter of
   an hour.
-- **`--allowedTools` is the fence.** The list above is for reading. Entries match by prefix, so even these can
+- **`--allowedTools` pre-approves; it does not restrict.** What your settings already allow still runs. For a hard limit, also pass `--tools` with the same tools. The list above is for reading. Entries match by prefix, so even these can
   write in corners (`git diff --output=`, `sed`'s `w` command); keep the list short and the tree committed. A
   review that runs tests or mutation checks also needs your test runner and the Edit tool, and its brief must
   say to restore each mutation by copying the file back, never with git.
@@ -79,6 +79,6 @@ fallback when another outside reviewer fails twice on one brief.
 ## A killed reviewer can leave mutations in the tree
 
 After any reviewer that ran mutation checks and did not finish, compare the tree with the commit it reviewed,
-restore from that commit, and clear bytecode caches.
+restore only the files it broke, and clear bytecode caches.
 
 Treat every report as another model's claims: verify each finding before acting.

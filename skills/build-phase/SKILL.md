@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 
 You are entering the **Build Phase** of the Structured Agentic Development Workflow.
 
+> **Skills named here.** A `/name` is a skill; if you cannot invoke it, read its `SKILL.md`.
+
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
 > **Where the reports go, and how much of one to write.** Every report this skill names is *said,
@@ -40,7 +42,7 @@ plan to the last test run, and it outranks finishing the phase. Three things fol
   downstream will catch it, because from the outside it looks finished.
 - **You never edit the plan while building.** You report; the planning model assesses and amends.
   That split is what keeps the plan a contract and what makes drift measurable at the end.
-  **In a single-model session it still holds**, because the split that matters is between *acts*,
+  **When you are also the planning model it still holds**, because the split that matters is between *acts*,
   not models: stop building, go back to the plan as its author, verify what you found, amend the
   document and append the Amendment Log entry, then resume. Editing the plan mid-build without
   stopping and without logging is the same silent drift whether one model does it or two.
@@ -154,7 +156,7 @@ The plan's tests are your to-do list, and you take them **one at a time**. Writi
 
 **You must complete the whole list.** Do not stop after writing tests. The tests exist to drive the implementation.
 
-**Build the seam test the plan names.** If this phase completes a value path, the plan names a no-mock test across the real seam — write it, and let it exercise the real thing. Replacing it with a mocked unit test technically satisfies "a test exists" while proving nothing about the wiring, and that is precisely the gap review is built to catch. If you cannot make the real seam work, that is a Concern to report, not a mock to substitute.
+**Build the seam test the plan names.** If this phase completes a value path, the plan names a no-mock test across the real seam — write it, and let it exercise the real thing. Replacing it with a mocked unit test technically satisfies "a test exists" while proving nothing about the wiring, and that is precisely the gap review is built to catch. If you cannot make the real seam work, that is a halt, not a mock to substitute.
 
 **The Standing Instruction is live in the middle of this step.** Implementation is where the plan's
 silences become visible, and where they are cheapest to mistake for permission. The moment you find
@@ -197,7 +199,7 @@ Every command you run is bounded by `/test-scope`'s *What a run may execute*: th
 1. Run the exact commands in the plan's "Test criteria" for this phase. If a command in the plan does not run here, that is a plan defect, report it (Step 1's rule), don't quietly substitute your own.
 2. Widen to the rung your row names, using the command the plan's **Test Commands** block gives for that rung. If the plan has no such block, that is a plan defect worth reporting once, then fall back to `/test-scope`'s segment detection.
 3. **Check the escalation triggers before you accept a scoped run.** Touching a lockfile, a shared module, a migration, a cross-segment signature, or tooling config means this phase gets the full suite regardless of how small the diff looks. So does not being sure.
-4. **All tests must pass before proceeding**, except a test the plan names as red until a later phase, which you track for the handoff alongside the criteria left unproven. If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
+4. **All tests must pass before proceeding**, except a test the plan names as red until a later phase, which you track for the handoff alongside the criteria left unproven. When its named phase is built, run it: it must pass then. If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
 5. **Run every mutation check this phase's criteria name, and one for each new test a red run cannot prove: an absence or negative assertion, an authority or filtering check, a test that could not go red because the behaviour already existed. Do those inside Step 2's cycle, when you write the test; any check not yet run runs here. Record each one exactly as it went.** The TDD skill's mental mutation check is a reading of the test; it does not replace these runs. Any other test that went red on its assertion in Step 2 has had its proof. After that a mutation is not run again unless that test or the code it guards changes. Its rung is `/test-scope`'s *"A mutation check, at any gate"* row. Break the code the way the check says, run the test, restore the code, and confirm with a diff that the tree is back as it was. Restore before anything else, a halt included. A mutation is **witnessed only when the test fails on its assertion**. A test that errors, hangs or fails to collect under the mutation proves nothing about the guard, and a mutation the test survives means the test is hollow. If the weakness is in how you wrote the test, strengthen it and run the mutation again. If the plan's own check or assertion cannot fail as written, or the test came from an earlier phase, that is a plan defect: halt. Until it is witnessed, the criterion is unproven, and it is never recorded as witnessed.
 6. **Record which criterion you ran, at which rung, its exit code, and its counts** for every run except a mutated one, whose counts belong to its mutation check. Compare each run's counts with the last good run at the same rung (`/test-scope`, *Recording*): a move the tests you added or removed do not explain is a finding, even on exit 0. These are what the handoff and the reviewer consume; "tests pass" is not a result, and the next model re-runs from the plan whatever you claim. Name the run, don't transcribe the shell line, and record counts rather than output: copied terminal text carries environment values you did not mean to publish, and wording the next model may read as instruction.
 
@@ -268,6 +270,8 @@ the overrule in the phase report so it reaches the handoff. That is the user's c
 not yours to make by staying quiet.
 
 ## Resuming After External Model Execution
+
+This is for a phase built elsewhere in the middle of a plan. A whole build that comes back goes to the orchestrating workflow's review, not here.
 
 If the user tells you that code was written by another agent (Cursor, Copilot, a local model, etc.) or simply says "it's done" / "I've implemented Phase N" / pastes a diff:
 

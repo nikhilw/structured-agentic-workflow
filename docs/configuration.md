@@ -24,7 +24,7 @@ Only one is active at a time. The core rule — **test first, always** — appli
 ## Output style: caveman brevity
 
 The workflow integrates with the [caveman](https://github.com/JuliusBrussee/caveman)
-brevity style. Each workflow skill that reports checks memory for the configured level and adapts
+brevity style. Each workflow skill that reports, `/decision-summary` aside, checks memory for the configured level and adapts
 its own output; the vendored superpowers skills do not.
 
 | Level | Style |

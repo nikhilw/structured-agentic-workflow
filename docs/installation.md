@@ -82,6 +82,7 @@ into your agent's skills directory.
 | `test-scope` | this project | Shared reference: how wide each test run must be, what a run may execute, and when a recorded run can be cited. Not invoked directly |
 | `existing-mechanisms` | this project | Shared reference: the eight questions about what the codebase already does, and the self-duplication inventory that catches a change duplicating its own code. Not invoked directly |
 | `review-lenses` | this project | Shared reference: the review perspectives, which gate runs each, and the outside-review brief. Not invoked directly |
+| `knowledge-graph` | this project | Shared reference: how to query a graphify index and what an answer is worth; loaded only when graphify is installed |
 | `triage` | this project | Recommend the next task, minimizing context thrash |
 | `github-backlog` | this project | Maintain features and bugs on GitHub |
 | `test-driven-development` | [superpowers](https://github.com/obra/superpowers) | RED-GREEN-REFACTOR discipline |
@@ -185,7 +186,7 @@ installs go through `npx skills` above. Tested on Linux.
 ./install.sh <project-dir>             # pull superpowers (pull-superpowers.sh), then install
 ./install.sh --local <project-dir>     # install without pulling superpowers
 ./install.sh --link <project-dir>      # link to this repo instead of copying
-./install.sh --remove <project-dir>    # remove what it installed
+./install.sh --remove <project-dir>    # remove this workflow's skills, by name, from that directory
 ./install.sh                           # asks for the project directory
 ```
 

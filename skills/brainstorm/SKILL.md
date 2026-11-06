@@ -9,6 +9,8 @@ allowed-tools: Read, Grep, Glob, Agent, Write, Bash
 
 You are entering the **Brainstorm Phase** of the Structured Agentic Development Workflow.
 
+> **Skills named here.** A `/name` is a skill; if you cannot invoke it, read its `SKILL.md`.
+
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
 > **How much of this reaches the user.** The approaches, the recommendation, its scenario table and
@@ -21,7 +23,7 @@ You are entering the **Brainstorm Phase** of the Structured Agentic Development 
 <HARD-GATE>
 Do NOT write code, create plan files, scaffold projects, or take ANY implementation action during brainstorming. Code is the LAST thing we touch — not the first. This applies regardless of how simple the task seems. You are thinking, not building.
 
-**Read-only investigation is not building.** Running a query, a version check, a probe, or an existing test to answer a question is encouraged; see BS-8 to BS-10. What is out of bounds is anything that *writes*: to the repo, to a database, to a deployed environment. The single exception is the decision document at the end.
+**Read-only investigation is not building.** Running a query, a version check, a probe, or an existing test to answer a question is encouraged; see BS-8 to BS-10. What is out of bounds is anything that *writes*: to the repo, to a database, to a deployed environment. The exceptions are the decision document at the end and the graph index Step 0 refreshes, a generated artifact.
 </HARD-GATE>
 
 ## Your Mission
@@ -373,7 +375,7 @@ Once the user has picked a direction (or the discussion has reached a natural co
 
 Say why when you ask, because the reason has changed: the document is the baseline `/verify-completion` audits the finished feature against. Without it, drift between what was decided and what shipped has nothing to be measured against, and the only remaining record is the plan, which is the thing that drifted.
 
-If the user agrees, write a decision document to `docs/discussions/YYYY-MM-DD-<topic>.md` with this structure:
+If the user declines, run the second sweep and the coherence lens against the recommendation as you stated it, and say there is no baseline to audit against. If the user agrees, write a decision document to `docs/discussions/YYYY-MM-DD-<topic>.md` with this structure:
 
 ```markdown
 # Decision: [Topic]
@@ -453,6 +455,9 @@ them, and `/verify-completion` checks them again as part of the drift audit.)*
 - [What this decision makes harder or rules out]
 - [What gets retired by this decision, and what becomes dead code once it lands]
 - [What to watch for / revisit if assumptions change]
+
+## Open Questions
+[Each one: answered, with the answer, or still open and who carries it. Or "none".]
 
 ## Amendments
 *(Empty at the time of writing, and it stays empty while this document is still live: until the

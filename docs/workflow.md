@@ -23,7 +23,7 @@ flowchart TD
         B3 --> B4{"Human satisfied?"}
         B4 -- "refine / pivot" --> B1
         B4 -. "any time" .-> DS["/decision-summary<br/>plain-words recap<br/>changes nothing"]
-        B4 -- "direction chosen" --> B5["Decision audit, lenses in full,<br/>then save docs/discussions/<br/>with What the User Sees"]
+        B4 -- "direction chosen" --> B5["Decision audit, lenses in full,<br/>then save docs/discussions/<br/>with What the User Sees,<br/>then second sweep · coherence"]
     end
 
     B5 --> P1
@@ -49,7 +49,7 @@ flowchart TD
         I --> Impl["Implement to green"]
         Impl --> T["Run tests<br/>scoped per /test-scope"]
         T -- "fail" --> Impl
-        T -- "pass" --> SR["Self-review<br/>agent + human"]
+        T -- "pass" --> SR["Self-review<br/>agent"]
         SR -- "issues found" --> Impl
         SR -- "clean" --> Next{"More phases?"}
         Next -- "yes" --> PR
@@ -74,7 +74,7 @@ flowchart TD
     BC --> R1
 
     subgraph FullReview ["4 · Holistic Review — /3p-review · main model, fresh eyes"]
-        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>behaviour · business sense on the built thing<br/>re-derive claims: FULL suite - T4<br/>+ deep read by a fresh subagent, if chosen"] --> R2{"Findings?"}
+        R1["Senior Architect persona, fresh eyes<br/>read decision doc → plan → diff<br/>walk the removal table<br/>behaviour · business sense on the built thing<br/>at intake, once: re-derive claims, FULL suite - T4<br/>+ deep read by a fresh subagent, if chosen"] --> R2{"Findings?"}
         R2 -- "fixable in place" --> R3["Fix issues"]
         R3 --> R4["Re-test<br/>scoped per /test-scope<br/>+ fix check by a fresh small model, if chosen"]
         R4 --> R1

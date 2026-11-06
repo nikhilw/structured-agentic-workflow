@@ -34,7 +34,7 @@ the agent prove it?"
 - **A rule change is a table, not a paragraph.** Every case the rule can meet, today's outcome beside each proposal's; the rows that differ are the change, and they become the plan's test cases.
 - **One set of review lenses, from first idea to finished code.** Impact, removal, logic, behaviour, business sense, proof and coherence, one question each, on the approaches, the plan and the built code.
 - **A review that owns the code.** `/3p-review` loops to zero findings at every severity, minors included.
-- **No mock on the value path.** A path with no test across the real seam cannot pass review.
+- **No mock on the value path.** A path with neither a test across the real seam nor evidenced manual proof cannot pass review.
 - **Nothing finishes smaller than it started.** Every removal is audited with its replacement named.
 - **Evidence before claims.** No "done" without a run you made yourself this session.
 - **Works with any agent.** Claude Code, Cursor, Gemini CLI, Copilot, and 40+ others.
@@ -233,7 +233,8 @@ for typing. → [multi-model.md](docs/multi-model.md)
 **2 · A review gate that takes ownership.**
 `/3p-review` reviews as an independent Senior Architect who *owns the code on
 sign-off*, loops until **zero findings of any severity** (minors get fixed, not waved), and
-cannot pass without a no-mock test across the real integration seam. Past a volume threshold
+cannot pass without a no-mock test across the real integration seam, or evidenced manual proof where no
+harness exists. Past a volume threshold
 it refuses to fix things itself and emits a **Rework Brief** instead — a reviewer who rewrites
 half the feature has become its author.
 
@@ -311,23 +312,23 @@ flowchart LR
 
     subgraph P ["1 · Planning model — frontier, high reasoning"]
         direction TB
-        P1["/brainstorm"] --> P2["/write-plan"]
+        P1["/brainstorm<br/>explore · challenge · decide"] --> P2["/write-plan<br/>resolve every decision"]
     end
 
     P -->|"plan file<br/>the forward contract"| B
 
     subgraph B ["2 · Build model — cheap and fast, or another tool"]
         direction TB
-        B1["/build-model"] --> B2["/build-phase × N"]
-        B2 --> B3["/3p-review"]
+        B1["/build-model"] --> B2["/build-phase × N<br/>TDD · test · self-review"]
+        B2 --> B3["/3p-review<br/>loop until clean"]
         B3 --> B4["/handoff-summary"]
     end
 
     B -->|"handoff summary<br/>the return contract"| R
 
-    subgraph R ["3 · Review model — fresh eyes, planning model by default"]
+    subgraph R ["3 · Review model: fresh eyes (planning model by default)"]
         direction TB
-        R1["/3p-review"] --> R2["/verify-completion<br/>suite · requirements · drift"]
+        R1["/3p-review<br/>independent re-review"] --> R2["/verify-completion<br/>suite · requirements · drift"]
     end
 
     R --> Done([Feature complete])

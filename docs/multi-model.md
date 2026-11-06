@@ -92,7 +92,7 @@ flowchart LR
 
     B -->|"handoff summary<br/>the return contract"| R
 
-    subgraph R ["3 · Review model — fresh eyes (planning model by default)"]
+    subgraph R ["3 · Review model: fresh eyes (planning model by default)"]
         direction TB
         R1["/3p-review<br/>independent re-review"] --> R2["/verify-completion<br/>suite · requirements · drift"]
     end
