@@ -51,7 +51,7 @@ Run these steps **in order**. Each step has a clear owner; do not collapse them 
 
 3. **Hand off — `/handoff-summary`.** Emit the Build Handoff Summary in its exact format. Review is a gate, not content — the summary does not restate the `/3p-review` result.
 
-4. **Pause.** Present the handoff summary and **STOP**. Do not run `/verify-completion`, do not archive the plan, do not start new work. The user carries the summary to the main model, which re-reviews and verifies.
+4. **Pause.** Present the handoff summary and **STOP**. Do not run `/verify-completion`, do not archive the plan, do not start new work. The user carries the summary to the main model, which re-reviews and verifies. Say in one line that the work is not done until it has: this session never claims done (AW-30).
 
 ## If you halt
 

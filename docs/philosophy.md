@@ -91,7 +91,7 @@ AI conversations have a finite context window, and loading new context is expens
 in tokens and in the agent's ability to stay coherent. The triage strategy exists to respect
 this:
 
-- When context is thin, pick **bugs** — small, self-contained, no full-cycle overhead
+- When context is thin, pick **bugs** — small, self-contained, no brainstorm or plan, though review and verification are still owed
 - When context is rich, pick work that **leverages what's already loaded** — even if
   something else is technically higher priority
 - Let plans accumulate — with AI-assisted development, "later" means minutes or hours, not

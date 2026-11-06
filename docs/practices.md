@@ -14,7 +14,8 @@ implements it.
 **When tokens or context are low → pick bugs.** Bug fixes are small, well-scoped, and
 self-contained. They need minimal brainstorming and usually fit in one conversation. When
 your budget is thin or your window is short, bugs are the highest-value work available: they
-improve the product without the planning overhead of a feature.
+improve the product without the planning overhead of a feature. Review and verification are still
+owed; only the planning is lighter.
 
 **When resources are plentiful → work on features and plans.** The full Brainstorm → Plan →
 Build cycle consumes real tokens and demands sustained attention as a reviewer. Save it for

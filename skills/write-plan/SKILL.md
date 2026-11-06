@@ -14,7 +14,7 @@ You are entering the **Planning Phase** of the Structured Agentic Development Wo
 > **How much of this reaches the user.** The plan goes in the file, and each review pass's result
 > goes in its Review Passes block. The user hears what they must rule on, and it comes first: a
 > difference from the decision document, a business-sense question, a removal with no replacement,
-> a plan that outgrew the size they agreed to. Everything else is one line (AW-28), such as
+> a plan that outgrew the size they agreed to, a fix that needs rethinking (RL-7). Everything else is one line (AW-28), such as
 > "ten passes, two rounds, 14 found and fixed, nothing needs you". Passes are worked, not narrated one by
 > one. Everything you emit is *said, not saved*, except the plan and, for a build that will span compactions, `WORKING-MEMORY.md` (AW-29).
 

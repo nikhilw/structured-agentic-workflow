@@ -51,7 +51,7 @@ Resolve the target repository the same way `/github-backlog` does — use `workf
 ## Step 3: Apply the Selection Strategy
 
 ### When context is thin (fresh conversation, few files loaded):
-→ **Pick bugs.** They are small, self-contained, and don't require the full Brainstorm → Plan → Build cycle. They warm up the context efficiently.
+→ **Pick bugs.** They are small, self-contained, and don't require Brainstorm → Plan, though they still owe `/3p-review` and `/verify-completion` (AW-30). They warm up the context efficiently.
 
 ### When context is rich (mid-session, modules loaded, domain established):
 → **Pick work that leverages what's already loaded.** If you've been working in the entity extraction module, recommend tasks in that same area — even if a task in a different module is technically higher priority.

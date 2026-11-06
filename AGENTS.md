@@ -198,6 +198,7 @@ is the whole point of the independence the review is paid for.
   near the top, `verify-completion` and `handoff-summary` at their templates. A new gate that reports gets one
   too. And when writing a template, mandate a report **per ruling, not per step**: a step that
   reports because it finished is what makes the model chatty, and AW-28 outranks it.
+- **A gate has run only when its skill ran and produced its output (AW-30).** A rule inside a skill binds only a model that loaded it, so the rule's copies sit where a skipping model still reads them: `verify-completion`, the "Not done" line at the end of `build-phase`'s report and `3p-review`'s sign-off, `build-model`'s pause, `compact-brief`'s resume brief, and the block in `docs/agent-config.md`, which is reloaded after a compaction.
 - Commit only when asked.
 - NEVER use em-dash(—) when writing. Use commas or semicolons to join sentences. Or just simply break them with fullstops.  
 

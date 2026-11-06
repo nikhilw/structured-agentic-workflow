@@ -36,7 +36,7 @@ This workflow orchestrates *when* things happen; it composes with skills that de
 
 ## The Workflow Phases
 
-Every significant change follows this cycle: **Brainstorm → Plan → Build → 3rd-Person Review → Verify**. You must never skip phases or collapse them together.
+Every significant change follows this cycle: **Brainstorm → Plan → Build → 3rd-Person Review → Verify**. You must never skip phases or collapse them together. A smaller code change, a bug or quick fix, has no plan to write and still owes the last two, and you do not judge which changes are exempt (AW-30).
 
 ### Phase Transitions
 
@@ -56,8 +56,8 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 | Dedicated build model session | User launched the session to build a plan with a smaller/faster model | This is not your workflow — use `/build-model`, which drives `/build-phase` → `/3p-review` → `/handoff-summary` → STOP |
 | User returns with handoff summary | Build was done by a different model (e.g. a dedicated build model) | → `/3p-review` **with the handoff summary as argument** (review the full output and address all concerns from the summary), then `/verify-completion` |
 | 3p-review found too much to fix in place | >~8 findings, findings across most phases, a repeated systemic defect, or a missing/unwired phase | `/3p-review` emits a **Rework Brief** → user carries it back to the build model → on return, re-review from Round 1 |
-| Code written (any context) | User wants quality assurance | → `/3p-review` |
-| 3p-review passed | Review clean, zero open findings | → `/verify-completion`, suggesting compaction first (compact slot 2, AW-13) — the FINAL fresh-evidence gate, **not a re-review**, and **never optional**. Tick the plan's requirements line by line and audit drift from the decision doc through the plan to the code, both always fresh; for the suite, take `/test-scope`'s *"`/verify-completion`"* row, which is the full suite or a citation of `/3p-review`'s sign-off run under the citable-run rule. Do not skip the gate itself on the grounds that review already ran tests. |
+| Code written outside a plan (a bug fix, a quick fix, any context) | The change is ready | → `/3p-review` → `/verify-completion` (AW-30) |
+| 3p-review passed | Review clean, zero open findings | → `/verify-completion`, suggesting compaction first (compact slot 2, AW-13) — the FINAL fresh-evidence gate, **not a re-review**, and **never optional** unless the owner waives it by name or the change is prose docs only (AW-30). Tick the plan's requirements line by line and audit drift from the decision doc through the plan to the code, both always fresh; for the suite, take `/test-scope`'s *"`/verify-completion`"* row, which is the full suite or a citation of `/3p-review`'s sign-off run under the citable-run rule. Do not skip the gate itself on the grounds that review already ran tests. |
 | Verification reports UNDOCUMENTED DRIFT | Something shipped that no decision doc, plan, or Amendment Log records | **Report it and stop; the human rules on it.** If they accept the departure, the record is closed by *appending* a dated amendment under the original text, never by editing it. If they reject it, the gap is in the work and it goes back to build. Status stays NOT COMPLETE until one of those happens (AW-21) |
 | Bug, test failure, unexpected behavior | Something is broken | → `/systematic-debugging` (investigate before fixing) |
 | Verify passed | Evidence confirms feature works | Move plan from `docs/plans/` to `docs/plans/done/` with `mv` (plain shell — not `git mv`; the plan may not be tracked yet). Feature complete. |
@@ -76,7 +76,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 - **AW-5 · Test first, always.** No production code without a failing test first. Use `/test-driven-development` by default, or BDD-style specifications if configured.
 - **AW-6 · 3rd-person review is a mindset, not a checkbox.** The reviewer owns the code now — it must meet world-class standards.
 - **AW-7 · Debug systematically, not randomly.** Use `/systematic-debugging` — investigate root cause before proposing fixes.
-- **AW-8 · Evidence before claims.** Use `/verify-completion` before any "done" claim, commit, or PR — **this step itself is never optional and is never skipped**, regardless of model, time pressure, or confidence. It is **not a second review** — it is the honesty gate on the final claim. It adds three things `/3p-review` does not guarantee: (a) a full-suite result that is **true at the actual moment of completion** — review may have passed several edits ago; (b) a **line-by-line check against the plan's requirements** — review judges completeness only qualitatively; and (c) a **drift audit** reading the decision document against the plan and the plan against the code, which is the only place the whole chain is compared end to end. Only (a) can ever be met by citation, under `/test-scope`'s citable-run rule, which is a four-condition test and not a judgment call. (b) and (c) are document comparisons, not runs, and always run fresh. This rule also covers the bug / quick-fix path, which skips full review. If `/verify-completion`'s Iron Law reads as though it forbids the citation this rule grants, it does not, and it says so itself at the point where the two meet; its wording governs there.
+- **AW-8 · Evidence before claims.** Use `/verify-completion` before any "done" claim, and before the commit or PR that closes the work — **this step itself is never optional and is never skipped**, regardless of model, time pressure, or confidence, unless the owner waives it by name or the change is prose docs only (AW-30). It is **not a second review** — it is the honesty gate on the final claim. It adds three things `/3p-review` does not guarantee: (a) a full-suite result that is **true at the actual moment of completion** — review may have passed several edits ago; (b) a **line-by-line check against the plan's requirements** — review judges completeness only qualitatively; and (c) a **drift audit** reading the decision document against the plan and the plan against the code, which is the only place the whole chain is compared end to end. Only (a) can ever be met by citation, under `/test-scope`'s citable-run rule, which is a four-condition test and not a judgment call. (b) and (c) are document comparisons, not runs, and always run fresh. This rule also covers the bug / quick-fix path, which has no plan to check against and still owes `/3p-review` (AW-30). If `/verify-completion`'s Iron Law reads as though it forbids the citation this rule grants, it does not, and it says so itself at the point where the two meet; its wording governs there.
 - **AW-9 · Triage minimizes context thrash.** When recommending work, factor in what is already loaded in the current conversation context — don't suggest work that requires loading entirely different modules.
 - **AW-10 · Resume automatically after external execution.** When the user returns after handing build to an external model (with a handoff summary or simply saying "it's done"), immediately pick up the workflow: run `/3p-review` **passing the handoff summary as argument** so it reviews the full feature AND addresses every concern from the summary. Then `/verify-completion`, then archive the plan. Do not wait to be told.
 - **AW-11 · The review loop is a loop.** After `/3p-review` finds issues and they are fixed, re-review from scratch. Repeat until zero findings; that is its only end rule, and RL-6's closing conditions are for document reviews. Do not stop after one round.
@@ -150,7 +150,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
   - **The asks this workflow does have are real and are not suppressed by this rule:** a build halt,
     a Rework Brief handed back, a decision-document departure (AW-27), a capability being removed
     (AW-26), a fix that needs rethinking (RL-7), a gate verdict that blocks completion, the level you are returning to (AW-25), a
-    business-sense question about a decision, a plan that has outgrown the size the user agreed to,
+    business-sense question about a decision, a plan that has outgrown the size the user agreed to, a document review that will not close (RL-6),
     a compact suggestion at a compact slot.
     Those exist because the human must rule. Progress does not; a review pass that found and fixed
     things on its own is progress, and it gets the one line.
@@ -189,6 +189,23 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
     trace too large to re-read in chat, a finding the owner wants to keep — those are real reasons
     for a durable file. Say what you would write and where, in one sentence, and let them answer
     before it exists. A file you were asked for once was one file, not a standing habit.
+- **AW-30 · A gate has run only when its skill ran and produced its output.** For `/3p-review`
+  that output is its sign-off; for `/verify-completion`, its completion report.
+  Reading the diff, self-review, an inline check, a green suite or a subagent's summary is not the
+  gate, however thorough.
+
+  - **Every code change owes both, planned or not, whatever its size.** A code change is anything
+    that changes what runs or gets built: source, tests, schemas, migrations, runtime config, build
+    files. Prose docs owe neither. You never decide a change is too small; `/3p-review` scales its
+    depth to what the change touches. Only the owner can waive a gate, for that change, and a waiver
+    names the gate. "Go ahead", "commit" or accepting a run, a deviation or a risk waives nothing.
+  - **A checkpoint commit is not a claim of done.** One the owner asks for, or one a build makes
+    between phases, needs no gate first and clears none.
+  - **"Done", "complete" and "fixed" belong to `/verify-completion`'s report.** Before offering to
+    close the work (a completion report, archiving the plan, a final commit or PR), name each
+    gate's output. If one is owed, the next step is that gate, not the offer.
+  - **If the owner asks whether a gate ran,** answer from its output: which ran, which did not. Then
+    run what is owed, without explaining what you did instead.
 
 ## Plan Directory Lifecycle
 
@@ -200,7 +217,7 @@ Plans accumulate in `new/` — this is intentional. With AI-assisted development
 
 ## Task Selection Strategy
 
-When tokens or context are constrained, pick **bugs** — they are small, self-contained, and don't require the full Brainstorm → Plan → Build cycle.
+When tokens or context are constrained, pick **bugs** — they are small, self-contained, and don't require Brainstorm → Plan, though they still owe `/3p-review` and `/verify-completion` (AW-30).
 
 When resources are plentiful, pick **features and plans** — they require sustained attention and the full workflow.
 

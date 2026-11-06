@@ -14,7 +14,8 @@ You are entering the **Brainstorm Phase** of the Structured Agentic Development 
 > **How much of this reaches the user.** The approaches, the recommendation and the questions they
 > must answer are the brainstorm; say those in full. The audit and the lenses are worked, not
 > narrated: each result changes the recommendation, becomes an Open Question, or goes into the
-> decision document, and the user hears one line about what changed (AW-28). Everything you emit is
+> decision document, and the user hears one line about what changed (AW-28). A review that will not
+> close (RL-6) or a fix that needs rethinking (RL-7) is a question for them, in full. Everything you emit is
 > *said, not saved*, except the decision document (AW-29).
 
 <HARD-GATE>

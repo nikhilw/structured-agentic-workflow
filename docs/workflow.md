@@ -444,7 +444,7 @@ Only the first can be satisfied without running anything, by citing `/3p-review`
 run under the citable-run rule below. The checklist and the drift audit are document comparisons,
 not test runs, and always happen fresh.
 
-It also covers the bug / quick-fix path, which skips full review. "Review already ran the
+It also covers the bug / quick-fix path, which has no plan to check against and still owes `/3p-review`: every change to what runs or gets built owes both gates, and only you can waive one, by name, for that change (AW-30). "Review already ran the
 tests" is never grounds to skip the gate.
 
 And it reports what the work **removed**. A capability that was reachable before the change and is

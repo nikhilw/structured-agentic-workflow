@@ -93,7 +93,7 @@ This table is the only place rung assignments are written down. A skill that run
 | A mutation check, at any gate | T1: the test the check names, nothing wider | One run per mutation. A mutated run is evidence about one test, not a run of the phase: its counts are never the phase's counts, and never compared under *Recording* |
 | `/3p-review` sign-off | T4, or cite this review's own T4 when nothing changed since | |
 | `/verify-completion` | T4, or cite `/3p-review`'s sign-off run | The plan-requirements checklist is not a test run and is never cited. It always runs fresh |
-| Bug or quick-fix path, no plan | T2 or T3 by segment detection, then T4 at the completion claim | |
+| Bug or quick-fix path, no plan | T2 or T3 by segment detection while fixing, then T4 at the completion claim, citing `/3p-review`'s sign-off run where the citable-run rule allows | This path still owes `/3p-review` and `/verify-completion` (AW-30) |
 
 Two full-suite runs per feature are mandatory and cannot be traded away: the builder's at Phase Completion, and the reviewer's first-party one. Everything else is either scoped or cited.
 
@@ -111,6 +111,8 @@ Fail any condition and there is no citation, only a run you still owe.
 **A row marked "always" in the table above takes no citation, under any conditions.** Those two runs are not redundancy to be optimized away; they are the only two points where the suite is proven against a tree nobody is still editing. A single session that both builds and reviews (the `/build-model` path) owns both of them and pays for both. Condition 1 would let that session cite itself, which is exactly why the table overrides it.
 
 ## Recording
+
+**Accepting a run settles that run and nothing else.** When a suite fails and the owner accepts the result, record their ruling; `/3p-review` and `/verify-completion` are still owed if they have not produced their output (AW-30). Do not offer an accepted run as the way to close the work.
 
 **Every run is recorded with its rung.** "T2 impacted, exit 0, 34 passed, 0 failed, 2 skipped", never "tests pass". A mutated run is recorded with its mutation check, not as a run of the phase.
 

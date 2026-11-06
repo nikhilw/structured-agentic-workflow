@@ -1,6 +1,6 @@
 ---
 name: verify-completion
-description: The final gate before any claim of "done", "fixed", or "passing", and before any commit or PR. Runs three checks that nothing earlier in the workflow guarantees, a fresh full-suite result, a line-by-line tick-off of the plan's requirements, and a plan-drift audit from the decision document through the plan to the code. Evidence before assertions, always.
+description: The final gate before any claim of "done", "fixed", or "passing", and before the commit or PR that closes the work. Runs three checks that nothing earlier in the workflow guarantees, a fresh full-suite result, a line-by-line tick-off of the plan's requirements, and a plan-drift audit from the decision document through the plan to the code. Evidence before assertions, always.
 argument-hint: "[plan file path, or what is being claimed complete]"
 allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 ---
@@ -69,6 +69,13 @@ passed and that nothing has changed since. Anything less than that, a run someon
 a run from before an edit, a narrower run described in wider words, is not evidence.
 
 **Violating the letter of this rule is violating the spirit of this rule.**
+
+**This gate has one in front of it (AW-30).** If anything changed that runs or gets built, `/3p-review`
+must have signed off on it, in its own output: reading the diff or an inline check is not that gate.
+If it has not, and the owner has not waived it by name for this change, it comes first. Every such
+change owes it, whatever its size. "Go ahead", "commit" or accepting a test run waives nothing. A
+sign-off carried past a compaction in the resume brief counts as having run; the review is not owed
+again, and this gate still takes its own run.
 
 ## The Gate Function
 
@@ -436,7 +443,7 @@ COMPLETE** until the record is closed or the human accepts the gap in writing.
 
 - "Should", "probably", "seems to"
 - Satisfaction expressed before evidence ("Great!", "Perfect!", "Done!")
-- About to commit, push, or open a PR without running this gate
+- About to make the commit, push or PR that closes the work without running this gate
 - Trusting an agent's or another model's success report
 - Relying on a partial run, or on a scoped rung described in full-suite words
 - Writing "narrowed", "partial", "widened" or "half-implemented" without the decided text and the
@@ -519,11 +526,11 @@ claim about the tree. The tree is the evidence.
 ## When to apply
 
 **Always, before:** any claim of completion, correctness, or success, in any wording; any
-expression of satisfaction with the work; committing, pushing, or opening a PR; moving to the next
-task; archiving the plan.
+expression of satisfaction with the work; the commit, push or PR that closes the work; moving to the
+next task; archiving the plan.
 
 This gate is never optional and is never skipped, regardless of model, time pressure, or
-confidence. It also covers the bug and quick-fix path, which skips full review entirely: there the
+confidence, unless the owner waives it by name or the change is prose docs only (AW-30). It also covers the bug and quick-fix path, which has no plan: there the
 suite comes from `/test-scope`'s no-plan row, Part 2 runs against the reported symptom instead of a
 plan, and Part 3 says explicitly that there was no decision document.
 

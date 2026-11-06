@@ -41,7 +41,7 @@ any other time.
 **The core, always:**
 
 1. **Where the work stands.** The stack, per AW-25: the original goal, the level you are at, what
-   each level above still owes. Then the one next step, named as the skill to run and its argument.
+   each level above still owes, and which gates this work still owes (AW-30). Then the one next step, named as the skill to run and its argument.
 2. **The files, by path.** Decision document (or none), plan (its current directory), `WORKING-MEMORY.md`
    if the build keeps one (AW-29), amendment IDs applied so far. Never copy their content: the gates re-read them from disk, and a copy would be
    a second, staler version.
@@ -96,6 +96,7 @@ The brief is a sketch, not a template; use the labels that fit and drop the ones
 ```text
 RESUME BRIEF (pasted after a compaction)
 Stack: [goal] > [level] > [here]. Still owed: [per level].
+Gates owed: [/3p-review, /verify-completion, whichever has not produced its output. A /build-model session runs only /3p-review, before its handoff; the main model runs the rest].
 Next: [skill and argument], then [what follows].
 Files: decision doc [path]; plan [path]; working memory [path]; amendments [IDs].
 Rulings (verbatim): "[ruling]" ([what it governs]).
@@ -103,6 +104,6 @@ Open asks: [question].
 From the chat, [who said it], claims not verified: [handoff and sign-off items].
 How to work with the owner: "[their words]"; [corrections they repeated].
 [Anything else the next step needs.]
-Before acting: re-read the working memory, plan and decision doc from disk, and load each skill and reference again when a step needs it; what was loaded before the compaction is gone or cut short. Where sources disagree, the files on disk win, then this brief, then the compaction summary. Runs listed here are claims; /verify-completion runs the full suite fresh.
+Before acting: re-read the working memory, plan and decision doc from disk, load this session's workflow skill again (`build-model` in a build session, otherwise `agentic-workflow`), and load each other skill and reference when a step needs it; what was loaded before the compaction is gone or cut short. Where sources disagree, the files on disk win, then this brief, then the compaction summary. Runs listed here are claims; /verify-completion runs the full suite fresh. A /3p-review sign-off quoted here clears that gate; it is not run again.
 State the next step in one line and wait for the owner's go.
 ```

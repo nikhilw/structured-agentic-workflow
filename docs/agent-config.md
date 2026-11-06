@@ -51,7 +51,19 @@ globally and define the development lifecycle:
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
+
+A gate has run only when its skill ran and produced its output: `/3p-review`'s sign-off,
+`/verify-completion`'s completion report. Reading the diff or an inline check is not the gate.
+Every change to what runs or gets built owes both, whatever its size. Only the owner can waive one,
+for that change, by name; "go ahead", "commit" or accepting a run waives nothing. "Done" belongs to
+`/verify-completion`'s report. Before offering to close or archive anything, name each gate's output.
+A `/build-model` session runs only `/3p-review`, ends at its handoff, and the main model runs the rest.
+After a compaction, load this session's workflow skill again: `build-model` for a build session,
+`agentic-workflow` otherwise.
 ```
+
+The gate lines are in this block on purpose. A rule inside a skill binds only a model that loaded
+that skill, and this file is what comes back after a compaction.
 
 > **Do not** add "use graphify" instructions here. `/brainstorm` and `/write-plan` build and
 > query the index themselves. Repeating it in the config file just spends context on
@@ -148,6 +160,15 @@ globally and define the development lifecycle:
 - `/triage` — recommend the next task, minimizing context thrash
 
 Startup default: load `agentic-workflow` at startup.
+
+A gate has run only when its skill ran and produced its output: `/3p-review`'s sign-off,
+`/verify-completion`'s completion report. Reading the diff or an inline check is not the gate.
+Every change to what runs or gets built owes both, whatever its size. Only the owner can waive one,
+for that change, by name; "go ahead", "commit" or accepting a run waives nothing. "Done" belongs to
+`/verify-completion`'s report. Before offering to close or archive anything, name each gate's output.
+A `/build-model` session runs only `/3p-review`, ends at its handoff, and the main model runs the rest.
+After a compaction, load this session's workflow skill again: `build-model` for a build session,
+`agentic-workflow` otherwise.
 
 ## Standing Instructions
 
