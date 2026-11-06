@@ -2,7 +2,7 @@
 name: existing-mechanisms
 description: The eight questions that must be answered about what a codebase already does before anything new is proposed, planned, or built, and the self-duplication inventory that catches a change duplicating its own code. Shared reference loaded by brainstorm, write-plan, build-phase and 3p-review. It is a reference, not a step of its own.
 user-invocable: false
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob
 ---
 
 # Existing Mechanisms

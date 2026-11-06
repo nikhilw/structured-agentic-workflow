@@ -2,7 +2,7 @@
 name: knowledge-graph
 description: "How this workflow uses a graphify index: refreshing it, querying it, and the three limits on what a graph answer is worth, including why in typed code the count comes from the type checker, not the graph. Shared reference loaded by brainstorm and write-plan, and only when graphify is actually installed. It is a reference, not a step of its own."
 user-invocable: false
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob
 ---
 
 # Knowledge Graph

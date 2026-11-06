@@ -82,9 +82,8 @@ flowchart TD
         R2 -- "none" --> R5["Sign-off run<br/>FULL suite - T4,<br/>or cite this review's own"]
     end
 
-    R5 --> HS["Emit build record<br/>/handoff-summary"]
-    HS --> V1
-    HS -. "suggested" .-> CB2["/compact-brief<br/>compact slot 2<br/>optional, you run it"]
+    R5 --> V1
+    R5 -. "suggested" .-> CB2["/compact-brief<br/>compact slot 2<br/>optional, you run it"]
     CB2 -.-> V1
 
     subgraph Verify ["5 · Verify — /verify-completion"]
@@ -305,7 +304,7 @@ There are two entry points, and **which one you launch decides who drives review
 handoff** — there is no "am I the build model?" guesswork inside the skills:
 
 - **Same model:** the `agentic-workflow` orchestrator drives `/build-phase` through each
-  phase, then `/3p-review`, `/handoff-summary`, and `/verify-completion`.
+  phase, then `/3p-review` and `/verify-completion`. There is no handoff, so no handoff summary.
 - **Dedicated build model:** launch the session with `/build-model`. It is a self-contained
   mini-workflow — `/build-phase` across all phases, then `/3p-review` looping until clean,
   then `/handoff-summary`, then **stop**. It does not verify. You carry the summary back to
@@ -390,7 +389,7 @@ compare against.
 
 ### The Build Handoff Summary
 
-When a build is complete **and reviewed**, `/handoff-summary` emits a fixed-format record: the plan
+When a dedicated build model's build is complete **and reviewed**, `/handoff-summary` emits a fixed-format record: the plan
 revision built against, every halt and how it was resolved, deviations from the plan, the
 verification runs with their rungs and how many mutation checks were witnessed, unproven criteria,
 and open concerns. It lives in its own
@@ -438,7 +437,7 @@ After all build phases, `/3p-review` runs on the **entire change set**.
 
 After `/3p-review` passes, `/verify-completion` runs next. On entry it suggests compacting first,
 in one line (**compact slot 2**): `/compact-brief` writes a one-line compact command and a brief
-to paste after it, carrying what the rest needs, including the handoff summary and sign-off that
+to paste after it, carrying what the rest needs, including the build report or handoff summary and the sign-off that
 lived only in the chat and how you want the model to work. After you paste the brief, the model names the next step and waits for your go. Skip it and nothing changes. Compact, and verification runs its own
 full suite, because a run from before a compaction is a summary and cannot be cited. The same
 suggestion comes at **compact slot 1**, when the plan is approved and before the build, whichever

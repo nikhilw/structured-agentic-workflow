@@ -2,7 +2,7 @@
 name: review-lenses
 description: The perspectives every review in this workflow looks through, one question each (impact, removal, logic, behaviour, business sense, proof, coherence), the checklist each lens walks, the defect kinds that keep coming back, the table of which gate runs which lens at what depth, and the brief for handing a review to an outside model. Shared reference loaded by brainstorm, write-plan and 3p-review. It is a reference, not a step of its own.
 user-invocable: false
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob
 ---
 
 # Review Lenses

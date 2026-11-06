@@ -2,7 +2,7 @@
 name: test-scope
 description: How wide a test run must be at each gate of the workflow, what a run may execute, and when a run already made can be cited instead of re-run. Shared definition loaded by build-phase, 3p-review, build-model, verify-completion and agentic-workflow. It is a reference, not a step of its own.
 user-invocable: false
-allowed-tools: Read, Grep, Glob, Bash
+allowed-tools: Read, Grep, Glob
 ---
 
 # Test Scope
@@ -88,7 +88,7 @@ This table is the only place rung assignments are written down. A skill that run
 | Gate | Rung | Notes |
 |---|---|---|
 | `/build-phase` Step 3, per phase | T1, then T2 (T3 if the plan lists no T2) | The common case. T4 here, once per phase, is the waste this table exists to remove |
-| `/build-phase` Phase Completion | **T4, always** | The builder's own honesty gate. Never cited from anywhere. This is the run the handoff reports |
+| `/build-phase` Phase Completion | **T4, always** | The builder's own honesty gate. Never cited from anywhere. This is the run the completion report carries |
 | `/3p-review` re-deriving the builder's claims | **T4, always** | The builder's reported run is a claim, never a citable run. Holds even when you built this yourself minutes ago and the tree is provably clean: re-deriving is the whole reason the review is worth running |
 | `/3p-review` while fixing findings inside a round | T1, then T2 or T3 | The "widening circles" |
 | `/build-phase` Step 2, each test in the cycle | T1: that one test, red then green | One test, not the suite. If the runner is slow to start, keep it alive between cycles; if it cannot select one test, the smallest group it can. Wider runs belong to Step 3 |

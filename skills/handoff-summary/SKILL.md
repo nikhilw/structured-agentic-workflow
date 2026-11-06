@@ -1,6 +1,6 @@
 ---
 name: handoff-summary
-description: Emit the Build Handoff Summary artifact in its fixed format. Use at the end of a build, immediately after /3p-review passes — invoked by the build-model workflow (dedicated build model) or by the main model after all build phases. Produces the fixed handoff template the reviewing model consumes.
+description: Emit the Build Handoff Summary artifact in its fixed format. Use at the end of a /build-model session, immediately after /3p-review passes. Produces the fixed handoff template the reviewing model consumes.
 argument-hint: "[plan-file-path]"
 allowed-tools: Read, Glob
 ---
@@ -66,5 +66,4 @@ next model. It is this skill's one report, emitted in full because the next read
 it; nothing around it is narrated (AW-28). It is not a file, and inventing a path for it is how a handoff ends up somewhere the
 reviewing model never looks.
 
-- **Dedicated build model** (launched via `/build-model`): present the summary, then **STOP**. The user carries it to the main model.
-- **Main model**: present the summary as the build record, then continue the workflow → `/verify-completion` → archive the plan.
+Present the summary, then **STOP**. The user carries it to the main model.

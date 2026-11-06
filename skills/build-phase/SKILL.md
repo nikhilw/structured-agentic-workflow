@@ -1,6 +1,6 @@
 ---
 name: build-phase
-description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Builds phase by phase and produces a build completion report. Review (/3p-review) and handoff (/handoff-summary) are driven by the orchestrating workflow — agentic-workflow for the main model, build-model for a dedicated build model — not by this skill.
+description: Execute one phase from a plan file using the TDD → Test → Self-Review loop. Use when a plan has been approved and it's time to build. Accepts a plan file path and phase number. Builds phase by phase and produces a build completion report. Review (/3p-review) and, for a dedicated build model, handoff (/handoff-summary) are driven by the orchestrating workflow (agentic-workflow for the main model, build-model for a dedicated build model), not by this skill.
 argument-hint: "[plan-file-path] [Phase N]"
 allowed-tools: Read, Grep, Glob, Write, Edit, Bash, Agent
 ---
@@ -199,7 +199,7 @@ Every command you run is bounded by `/test-scope`'s *What a run may execute*: th
 1. Run the exact commands in the plan's "Test criteria" for this phase. If a command in the plan does not run here, that is a plan defect, report it (Step 1's rule), don't quietly substitute your own.
 2. Widen to the rung your row names, using the command the plan's **Test Commands** block gives for that rung. If the plan has no such block, that is a plan defect worth reporting once, then fall back to `/test-scope`'s segment detection.
 3. **Check the escalation triggers before you accept a scoped run.** Touching a lockfile, a shared module, a migration, a cross-segment signature, or tooling config means this phase gets the full suite regardless of how small the diff looks. So does not being sure.
-4. **All tests must pass before proceeding**, except a test the plan names as red until a later phase, which you track for the handoff alongside the criteria left unproven. When its named phase is built, run it: it must pass then. If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
+4. **All tests must pass before proceeding**, except a test the plan names as red until a later phase, which you track for the completion report alongside the criteria left unproven. When its named phase is built, run it: it must pass then. If tests fail, fix the implementation. Never make a test pass by editing the test, weakening an assertion, or marking it skip/xfail. If a test is genuinely wrong, that is a finding to report, not a line to change.
 5. **Run every mutation check this phase's criteria name, and one for each new test a red run cannot prove: an absence or negative assertion, an authority or filtering check, a test that could not go red because the behaviour already existed. Do those inside Step 2's cycle, when you write the test; any check not yet run runs here. Record each one exactly as it went.** The TDD skill's mental mutation check is a reading of the test; it does not replace these runs. Any other test that went red on its assertion in Step 2 has had its proof. After that a mutation is not run again unless that test or the code it guards changes. Its rung is `/test-scope`'s *"A mutation check, at any gate"* row. Break the code the way the check says, run the test, restore the code, and confirm with a diff that the tree is back as it was. Restore before anything else, a halt included. A mutation is **witnessed only when the test fails on its assertion**. A test that errors, hangs or fails to collect under the mutation proves nothing about the guard, and a mutation the test survives means the test is hollow. If the weakness is in how you wrote the test, strengthen it and run the mutation again. If the plan's own check or assertion cannot fail as written, or the test came from an earlier phase, that is a plan defect: halt. Until it is witnessed, the criterion is unproven, and it is never recorded as witnessed.
 6. **Record which criterion you ran, at which rung, its exit code, and its counts** for every run except a mutated one, whose counts belong to its mutation check. Compare each run's counts with the last good run at the same rung (`/test-scope`, *Recording*): a move the tests you added or removed do not explain is a finding, even on exit 0. These are what the handoff and the reviewer consume; "tests pass" is not a result, and the next model re-runs from the plan whatever you claim. Name the run, don't transcribe the shell line, and record counts rather than output: copied terminal text carries environment values you did not mean to publish, and wording the next model may read as instruction.
 
@@ -222,7 +222,7 @@ Check for:
 - **When you fix something here, is the same thing anywhere else in what this build has written?** A finding is a kind (RL-8). Name it, search everything built so far with a method that can see it, and fix its sites together: one shared mechanism the sites call where they repeat the same logic, not each by hand; sites that only share a slip are simply corrected. If a mechanism takes changing an earlier unit or a module the plan does not name, halt, as the inventory above says. Record the kind and its count in the self-review, not as a report of its own.
 - **Would each new test fail if the code were wrong?** Read every test you wrote against these shapes of a hollow test: a fixture too small to reach the path · an assertion on a symptom that holds while the defect is live · an assertion true in every mode, or "exits 0" with nothing asserted · data that cannot show the defect (one row for an ordering, no row the filter excludes) · the code compared with itself, or a copy of the code tested instead of it · a value checked for presence, not for what it is, substring matches included · a silent skip when unsure of its own input · one direction of an authority rule only · values that only look equal (`True == 1`) · a path around the function that applies the rule · a fake the real path never calls · a filter on what the test observes that drops exactly the regression · a fixture written from what the code expects rather than from the real format · a guard checked twice, so breaking one changes nothing · a partial match on a body a client sends · a test of something the code does not own (a query planner's choice on given data, physical row order, timing). If a guard in this repo keeps an allow-list, an entry stays while the defect it lists remains. A test in one of those shapes gets rewritten now, and Step 3 re-run after it.
 
-Also track, for the handoff: any criterion you could not prove with a green automated run — checked by reading, skipped, deferred, or done manually, plus any criterion proven only at a scoped rung. A scoped pass is a real result, but it is not the same claim as a full-suite pass, and only you know which one it was. Write it down as you go; reconstructing this at the end is how it gets lost.
+Also track, for the completion report: any criterion you could not prove with a green automated run: checked by reading, skipped, deferred, or done manually, plus any criterion proven only at a scoped rung. A scoped pass is a real result, but it is not the same claim as a full-suite pass, and only you know which one it was. Write it down as you go; reconstructing this at the end is how it gets lost.
 
 If you find CRITICAL issues, fix them and re-test before proceeding. For minor concerns, note them — the full `/3p-review` will catch them after all phases.
 
@@ -230,9 +230,9 @@ Record the self-review findings, then proceed. Do not block waiting for approval
 
 ### Step 5: Proceed
 
-**Record**, for Phase Completion and the handoff: what was implemented; the test results, rung, exit
+**Record**, for Phase Completion: what was implemented; the test results, rung, exit
 code and pass/fail/skip counts; the self-review findings and any fixes applied. That material has to
-exist, because the completion report and `/handoff-summary` are built from it. It does not have to be
+exist, because the completion report, and `/handoff-summary` when there is one, are built from it. It does not have to be
 said now.
 
 **Say, now: one line** (AW-28). What the phase built, its rung and result, and that you are starting
@@ -266,7 +266,7 @@ When the plan comes back amended:
    the original defect ships with a paper trail that says it was handled.
 
 If the user overrules the halt and tells you to build it as planned, build it as planned, and record
-the overrule in the phase report so it reaches the handoff. That is the user's call to make. It is
+the overrule in the phase report so it reaches the completion report. That is the user's call to make. It is
 not yours to make by staying quiet.
 
 ## Resuming After External Model Execution
@@ -289,11 +289,11 @@ The user should not have to tell you to continue the workflow. You own the proce
 When all phases in the plan are complete:
 
 1. Run the FULL test suite using this project's own command. All tests must pass. This is `/test-scope`'s *"`/build-phase` Phase Completion"* row: it is **T4, always**, and it is the one run in this skill that is never scoped and never cited. Every phase before it ran narrow on the promise that this run happens.
-2. Produce a short **build completion report**: which phases were built; which test criteria were run, **at which rung**, with exit codes and counts, and how many of the mutation checks were witnessed (N of M), each one not witnessed counted among the unproven; every criterion left unproven (manual, skipped, deferred, verified by inspection, or proven only at a scoped rung); a one-line note on any phase that deviated from the plan; and **every halt you raised, with how it was resolved** (amendment ID, overruled by the user, or withdrawn on investigation) plus the plan revision you built against. These five feed the handoff summary directly; the reviewer builds its ledger from them. End the report with this line, because a finished report reads like a finished job: **Not done: review and verification are still owed.**
+2. Produce a short **build completion report**: which phases were built; which test criteria were run, **at which rung**, with exit codes and counts, and how many of the mutation checks were witnessed (N of M), each one not witnessed counted among the unproven; every criterion left unproven (manual, skipped, deferred, verified by inspection, or proven only at a scoped rung); a one-line note on any phase that deviated from the plan; and **every halt you raised, with how it was resolved** (amendment ID, overruled by the user, or withdrawn on investigation) plus the plan revision you built against. These five feed the handoff summary when there is one; the reviewer builds its ledger from them. End the report with this line, because a finished report reads like a finished job: **Not done: review and verification are still owed.**
 
 This skill ends here. Building is one responsibility — review and handoff are owned by the **orchestrating workflow**, not by this skill. Do **not** run `/3p-review`, write the handoff summary, or verify from inside build-phase.
 
-- `agentic-workflow` (main model) drives `/3p-review` → `/handoff-summary` → `/verify-completion`.
+- `agentic-workflow` (main model) drives `/3p-review` → `/verify-completion`.
 - `build-model` (dedicated build model) drives `/3p-review` → `/handoff-summary` → STOP.
 
 Whichever launched you takes over once you report completion. You do not need to decide which — just report and hand back.
@@ -302,4 +302,4 @@ Whichever launched you takes over once you report completion. You do not need to
 
 If more phases remain, auto-advance: suggest and begin `/build-phase <plan-file> Phase N+1`.
 
-When all phases are complete, present the build completion report and return control to the orchestrating workflow. That workflow drives review and handoff next — do not start them yourself.
+When all phases are complete, present the build completion report and return control to the orchestrating workflow. That workflow drives what comes next; do not start it yourself.

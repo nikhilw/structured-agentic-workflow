@@ -1,6 +1,6 @@
 ---
 name: agentic-workflow
-description: The Structured Agentic Development Workflow — orchestrates brainstorm, write-plan, build-phase, 3p-review, handoff-summary, triage, test-driven-development, systematic-debugging, and verify-completion skills. Use when starting new work, switching between development phases, or when the user asks about the workflow. A dedicated build model uses the build-model workflow instead of this one.
+description: The Structured Agentic Development Workflow. Orchestrates brainstorm, write-plan, build-phase, 3p-review, triage, test-driven-development, systematic-debugging, and verify-completion skills. Use when starting new work, switching between development phases, or when the user asks about the workflow. A dedicated build model uses the build-model workflow instead of this one.
 user-invocable: false
 ---
 
@@ -52,7 +52,7 @@ You MUST drive phase transitions forward automatically. Within the build loop (i
 | A Build Halt Report comes back to you | The build model stopped and reported; the tree is untouched around the halt | Verify the report first-party, classify it (plan defect / reality defect / decision-level problem / builder error), then `/write-plan`'s *"When a build halt comes back"* → amend the plan, **write the Amendment Log entry**, re-run the affected review passes in their order, hand it back. A decision-level problem goes to `/brainstorm`, not into an amendment |
 | The plan changes, for any reason | A halt, a review finding, a reverted phase, a user decision, a discovery | Amend the plan **and log it** in the plan's Amendment Log before anyone builds against it. An unlogged edit makes drift unmeasurable, which is the failure `/verify-completion`'s Part 3 exists to catch and cannot catch without the log |
 | Phase complete | Tests pass, self-review clear | → next `/build-phase` or "all phases complete" |
-| All build phases complete (main model) | `/build-phase` reported completion, its Phase Completion full-suite run (T4) passes | → `/3p-review` → `/handoff-summary` (build record) → `/verify-completion` |
+| All build phases complete (main model) | `/build-phase` reported completion, its Phase Completion full-suite run (T4) passes | → `/3p-review` → `/verify-completion` |
 | Dedicated build model session | User launched the session to build a plan with a smaller/faster model | This is not your workflow — use `/build-model`, which drives `/build-phase` → `/3p-review` → `/handoff-summary` → STOP |
 | User returns with handoff summary | Build was done by a different model (e.g. a dedicated build model) | → `/3p-review` **with the handoff summary as argument** (review the full output and address all concerns from the summary), then `/verify-completion` |
 | 3p-review found too much to fix in place | >~8 findings, findings across most phases, a repeated systemic defect, or a missing/unwired phase | `/3p-review` emits a **Rework Brief** → user carries it back to the build model → on return, re-review from Round 1 |
@@ -237,7 +237,7 @@ For best results, list the workflow skills in your project's config file (`CLAUD
 - `/build-phase` — execute plan phases with test + self-review; produces a build completion report (no review/handoff)
 - `/build-model` — dedicated build-model workflow: build-phase → 3p-review → handoff-summary → stop (alternative entry point to this workflow, for a smaller/faster build session)
 - `/3p-review` — independent third-person code review (after all build phases)
-- `/handoff-summary` — emit the fixed Build Handoff Summary artifact after review passes
+- `/handoff-summary`: emit the fixed Build Handoff Summary artifact after review passes, in a `/build-model` session
 - `/verify-completion` — the final gate: fresh suite, requirements tick-off, drift audit
 - `/compact-brief` : a one-line compact command and a resume brief to paste after it; suggested at the compact slots, usable any time
 - `/test-driven-development` — RED-GREEN-REFACTOR, test first always (from superpowers)

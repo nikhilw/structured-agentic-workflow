@@ -154,7 +154,7 @@ Three things block sign-off no matter how good the code looks. Check them explic
 Green tests do not prove a feature works; tests that mock the load-bearing seam prove only that the mock was called. A feature usually has *several* independent paths (`screen → request → route → store → back to the screen`, `request → route → repo → response`, `worker → derived store → completion record`, `mutation → background job → updated read`, `migration → upgraded deployed DB`). Name every one. For each, require a test crossing the real seam or evidenced manual verification (screenshot, captured log line, curl transcript). A path with neither is **CRITICAL** — it is unverified, whatever the unit tests say. Assertions must target the **leaf**: proving an intermediate holder received a dependency is insufficient; assert the actual consumer that uses it.
 
 **Gate 2 — Nothing rests on an unproven criterion.**
-Any handoff concern of the form "not integration-tested" / "manual E2E not executed" / "live X not verified" is blocking. It cannot be dismissed by reading code or running mocked tests — clear it by exercising the real seam, or by explicit written risk acceptance from the human (under `/build-model`, see below Gate 3).
+Any concern, in a handoff or a build report, of the form "not integration-tested" / "manual E2E not executed" / "live X not verified" is blocking. It cannot be dismissed by reading code or running mocked tests; clear it by exercising the real seam, or by explicit written risk acceptance from the human (under `/build-model`, see below Gate 3).
 
 **Gate 3 — Zero open findings at exit** (see Gate Check).
 
@@ -189,7 +189,7 @@ Map **decision → plan requirement → implementation → evidence**, and flag 
 - [ ] **Judgement calls you delegated, re-traced by you.** Where the plan or a Rework Brief said "this one is yours to judge, say which way you went", read what it chose and trace it yourself, callers and callees both ways, per `/existing-mechanisms` question 1. **Delegating the decision never delegated the tracing**, and what comes back is a claim like every other claim in the handoff. The build model chose with less of the system in view than you have: the guard it removed as redundant may also have been holding a second thing shut. A delegated call the handoff never mentions is worse than one you disagree with, so check the diff for choices nobody reported.
 - [ ] **You report these; you never edit the plan or the decision doc to match the code.** Every finding in this section is a difference between what was agreed and what exists, and the tempting fix is to update the document. That is not yours to do, and it erases the evidence the final gate is built to read. Findings are fixed in code, or carried to the human as a plan amendment for the planning model to make; under `/build-model`, carrying it is a Build Halt Report. A finding carried that way is a kind, not a case (RL-8): say which later phases it reaches, so the amendment covers them too (`/write-plan`, *When a build halt comes back*, step 3).
 - [ ] **Amendments without entries** — read the plan's **Amendment Log** against its phases. A phase whose text plainly answers a problem discovered during the build, with no entry recording that, is an unlogged amendment. It is a finding here and it becomes undocumented drift at `/verify-completion`, where it is far more expensive to reconstruct.
-- [ ] **Halts resolved by silence** — for every halt in the handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
+- [ ] **Halts resolved by silence:** for every halt in the build completion report or handoff summary, find its resolution: an amendment, an overrule the builder recorded, or a withdrawal. A halt that simply stops appearing was resolved by someone deciding something, and nobody wrote down who or what.
 
 This is architectural conformance — "was the agreed design built?" The line-by-line completion tick-off and the full decision-to-code drift audit belong to `/verify-completion` later; what you owe that gate is an accurate account of what the plan says *now* and how it got there.
 
@@ -442,7 +442,7 @@ Reviewer: Senior Architect (independent)
 **Ledger disposition** (every intake row, no blanks)
 | Item | Source | Disposition |
 |------|--------|-------------|
-| [phase / deviation / concern / manual criterion] | [plan §N, handoff] | [verified — evidence / fixed in review / risk-accepted by human / carried to Unproven Criteria] |
+| [phase / deviation / concern / manual criterion] | [plan §N, build report or handoff] | [verified: evidence / fixed in review / risk-accepted by human / carried to Unproven Criteria] |
 
 **Value paths & proof**
 - [path] → [no-mock test name or evidence artifact]

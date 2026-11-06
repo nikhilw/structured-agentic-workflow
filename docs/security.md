@@ -35,6 +35,19 @@ not a defect: the only way to clear it is to stop reading that text.
   the outside reviews every gate offers are given a read-only brief, and what they return is
   verified first-party before anything acts on it.
 
+## Six gates pre-approve the shell
+
+`brainstorm`, `write-plan`, `build-phase`, `build-model`, `3p-review` and `verify-completion` list plain
+`Bash` in `allowed-tools`. On Claude Code that pre-approves every shell command while the skill is
+active. They keep it because a project's test, lint, type-check and build commands cannot be named
+ahead of time, and a prompt on each one would stop an unattended build.
+
+What contains it is written, so it binds the model and the harness does not enforce it. Each gate
+that runs the plan's commands carries a binding copy of `test-scope`'s *What a run may execute*, and
+`brainstorm` allows read-only investigation only. To be asked every time, remove the entry from the
+installed copy. The references hold no shell entry, and `github-backlog` and `triage` pre-approve one
+command.
+
 ## The extras are not skills
 
 `docs/extras/` holds recipes for running other agent CLIs headless: exact launch commands, allowlists
