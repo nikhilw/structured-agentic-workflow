@@ -1,5 +1,5 @@
 # Setting up cursor-agent and agy on a dev machine
-*Tested with cursor-agent and agy 1.2.11. CLIs change; re-check with the two probes at the end.*
+CLIs change; re-check with the two probes at the end.
 
 Every machine that runs a build or review model headless needs this once. Paths below use `$HOME`;
 never write `~` into a config file, because agy rejects it (see Skills).

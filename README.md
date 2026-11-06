@@ -203,7 +203,7 @@ Law and adds the requirements tick-off and the drift audit.
 | [security.md](docs/security.md) | The standing scanner warnings on skills.sh, and what contains them |
 | [extras/driving-cursor-as-build-model.md](docs/extras/driving-cursor-as-build-model.md) | Worked recipe: running Cursor's CLI agent headless as the build model |
 | [extras/driving-agy-as-build-model.md](docs/extras/driving-agy-as-build-model.md) | The same for Google's Antigravity CLI (agy): what differs from Cursor |
-| [extras/driving-agy-as-plan-and-code-reviewer.md](docs/extras/driving-agy-as-plan-and-code-reviewer.md) | agy as the outside reviewer: one conversation, a plan review then a code review |
+| [extras/driving-agy-as-plan-and-code-reviewer.md](docs/extras/driving-agy-as-plan-and-code-reviewer.md) | agy as the outside reviewer: the prompt, what ends a run early, checking its citations |
 | [extras/agent-cli-setup.md](docs/extras/agent-cli-setup.md) | One-time setup for cursor-agent and agy: skills, one allowlist in two formats, two probes |
 | [extras/driving-codex-as-build-model.md](docs/extras/driving-codex-as-build-model.md) | Codex as the build model or a reviewer: the sandbox, resuming, taking over from another build model |
 | [extras/driving-claude-cli-as-reviewer.md](docs/extras/driving-claude-cli-as-reviewer.md) | A separate `claude -p` process for the deep read or the fix check |

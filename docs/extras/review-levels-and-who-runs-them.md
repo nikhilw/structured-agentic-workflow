@@ -1,7 +1,6 @@
 # Review levels, and which model runs each
-*From long multi-phase builds that split planning, building and reviewing across models. Each level
-catches what the one before it cannot. Costs are rough orders of magnitude from 2026, to compare the
-levels, not quotes.*
+For a long build that splits planning, building and reviewing across models. Each level catches what
+the one before it cannot. Costs are rough orders of magnitude, to compare the levels, not quotes.
 
 ## The levels
 
@@ -29,9 +28,9 @@ model. The rest are what a long build adds around the workflow's gates.
   starts (`/write-plan`, *When a build halt comes back*, step 3).
 - **Reviewers read committed code** whenever a build or mutations are running in the tree.
 - **Each brief lists what is already known or ruled**, so the reviewer spends on new problems.
-- **One reviewer at a time** (`review-lenses`, RL-9). Start the next only when the last has reported
-  and its findings are read. Parallel reviews hit their limits together and can burn the budget with
-  nothing to show. Leave about five minutes between reviewers on one quota; stop at the first quota
+- **Reviewers run in sequence** (`review-lenses`, RL-9). Start the next only when the last has reported
+  and its findings are read. Two may run together only when their reviews are unrelated and they draw
+  on unrelated quotas. Leave about five minutes between reviewers on one quota; stop at the first quota
   error and switch reviewer.
 - **An outside reviewer reads a clean clone, not your working tree,** when the tree holds anything
   that should not go to another vendor: `git clone --no-hardlinks <repo> <scratch>` (`--local` fails
