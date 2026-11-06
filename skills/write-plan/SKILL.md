@@ -429,7 +429,7 @@ is how a wrong halt gets written into the contract.
    - **Decision-level problem.** The finding undermines the approach itself, not this phase of it.
      This is the one that must not be patched. Say so plainly, and take it back to `/brainstorm`
      with the user; a decision-level problem absorbed as a phase amendment is the single largest
-     source of drift in this workflow. Stop the build and log an Amendment Log entry saying so. `/brainstorm`
+     source of drift in this workflow. Stop the build and add an Amendment Log entry saying it stopped here; no phase changes. `/brainstorm`
      writes a new decision document that names this one, and its new plan, under a new name, says which
      built phases stay and which are undone. The old plan then moves to `done/` with a last entry naming
      its replacement.
