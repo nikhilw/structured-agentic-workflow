@@ -297,12 +297,13 @@ filled-in brief to another model, because the reader who never heard the reasoni
 spots what makes no business sense.
 
 **8 · A rule change is a table, not a paragraph.**
-Some changes add a thing; others change *when* something happens: a trigger, a filter, a default, a
-threshold. Prose describes the cases someone thought of, and the case nobody thought of is the one
-that ships. So `/brainstorm` enumerates the cases from the state the rule reads, puts today's outcome
+Some changes change *when* something happens: a trigger, a filter, a default, a threshold. Prose
+describes the cases someone thought of, and the case nobody thought of is the one that ships. So
+`/brainstorm` enumerates the cases from the state the rule reads, puts today's outcome
 beside each approach's, and labels every row that differs as the fix or as collateral nobody asked
 for. Two proposals that sound equally targeted turn out to move three rows and nine, and the
-differing rows become the plan's test cases.
+differing rows become the plan's test cases. A change that adds a capability gets a table too: each
+situation, what the user does, what they see and what happens.
 
 ```mermaid
 flowchart LR

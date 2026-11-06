@@ -18,7 +18,7 @@ flowchart TD
     subgraph Brainstorm ["1 · Brainstorm — /brainstorm · planning model"]
         B1["Refresh graphify index once, if installed,<br/>then explore the problem space"] --> B1a["existing-mechanisms<br/>all 8 questions answered"]
         B1a --> B2["Propose approaches<br/>minimal ↔ structural<br/>+ E: ideal, then adjusted<br/>each through the review lenses"]
-        B2 --> B2a["Scenario table<br/>if a rule moves"]
+        B2 --> B2a["Scenario table<br/>if a rule moves or users see a change"]
         B2a --> B3["Challenge the obvious solution"]
         B3 --> B4{"Human satisfied?"}
         B4 -- "refine / pivot" --> B1
@@ -146,7 +146,7 @@ The skill will:
   should be extracted and shared. An approach costed against a third of its blast radius is how the
   wrong one wins the comparison, and that is more expensive than any missing file list later
 - Surface **contracts and constraints** (authority, identity, currentness, lifecycle,
-  consumers, environment) *before* proposing approaches, because a contract discovered later
+  consumers, environment, the forms an outside format can take) *before* proposing approaches, because a contract discovered later
   invalidates the comparison rather than one option
 - Propose 2–4 approaches spanning **minimal to structural**, each with its traced blast radius
   rather than a paragraph of adjectives
@@ -157,10 +157,12 @@ The skill will:
   decisions are actually costing you
 - **Challenge the obvious solution** — how far is the recommendation from that ideal, and what does
   the distance buy?
-- When an approach changes a rule rather than adding a thing (a trigger, a filter, a default, a
-  threshold), build a **scenario table**: every case from the state the rule reads, today's
-  outcome beside each approach's, and every differing row labelled as the fix or as collateral.
-  The differing rows become the plan's test cases
+- Decide the exact behaviour in a **scenario table**. When an approach changes a rule (a trigger, a
+  filter, a default, a threshold): every case from the state the rule reads, today's outcome beside
+  each approach's, and every differing row labelled as the fix or as collateral. When the change adds
+  a capability: each situation, what the user does, what they see and what happens. Those rows become
+  the plan's test cases. A change that moves no rule and shows users nothing says so in one line and
+  skips the table
 - Look at every approach through the **review lenses** (`review-lenses`): impact, removal, logic,
   behaviour, business sense, proof and coherence, one question at a time. They matter most here,
   where a lens can still eliminate an approach instead of patching a plan. **Behaviour** writes down
@@ -203,9 +205,14 @@ explicit."
 - Test criteria as **command + expected output**, never "tests pass"
 - A **State & Data Contracts** section (identity, currentness, authority and rebuild path,
   visibility during change, invariant enforcement layer, migration behaviour)
+- A **Screen State** section for every editable field, or the line "no screen edits a value"
 - A **Failure-Mode & Interaction Analysis** — lifetimes, boundary error codes and their
-  owners, cancellation paths, cross-component interactions, concurrency and aliasing
-- A **named no-mock seam test for every value path** — green unit tests do not prove wiring
+  owners, cancellation paths, cross-component interactions, concurrency and aliasing, one bad
+  value, errors after the commit, stored rows whose configuration is retired
+- A **named no-mock seam test for every value path**, starting where the user acts and tested in
+  both directions — green unit tests do not prove wiring
+- A **typed shape for every request and response body**, with the stored, shown and sent forms of a
+  value stated when they differ
 - Decisive gates ordered **before** the work that depends on them
 - A **ten-pass review** before saving, one question per pass and each pass's findings settled (fixed,
   or put to the owner) before the next one reads the plan: *what does this break that the plan never mentions?*, *does the

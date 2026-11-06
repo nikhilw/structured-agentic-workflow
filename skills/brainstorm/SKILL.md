@@ -11,8 +11,8 @@ You are entering the **Brainstorm Phase** of the Structured Agentic Development 
 
 > **Output style:** Check memory for `workflow-config:caveman-level`. If set, adapt your output brevity to that level while preserving technical accuracy.
 
-> **How much of this reaches the user.** The approaches, the recommendation and the questions they
-> must answer are the brainstorm; say those in full. The audit and the lenses are worked, not
+> **How much of this reaches the user.** The approaches, the recommendation, its scenario table and
+> the questions they must answer are the brainstorm; say those in full. The audit and the lenses are worked, not
 > narrated: each result changes the recommendation, becomes an Open Question, or goes into the
 > decision document, and the user hears one line about what changed (AW-28). A review that will not
 > close (RL-6) or a fix that needs rethinking (RL-7) is a question for them, in full. Everything you emit is
@@ -80,7 +80,7 @@ fi
 - **BS-10 · A probe proves the proposition it tested, and no more.** Evidence tier answers *how strong* your evidence is; this answers *what it is evidence of* — they are independent, and a tier-3 probe can still prove the wrong sentence. Before a claim carries your recommendation, **write the claim as a sentence**, then ask whether the probe tested that exact sentence or a neighbouring one. The failure is almost never a bad probe; it is proving an intermediate step and reporting it as the end-to-end result. "The callback receives the metadata" is not "the metadata reaches the exported span". "The repo writes the column" is not "the API serves the column". "The handler is registered" is not "the handler runs". Each pair differs by exactly one hop, and the hop is where the defect lives. When you catch a gap, either probe the actual end of the chain or state plainly which hop is still unverified — an unverified hop named in the decision document is a risk; an unverified hop reported as a result is a wrong recommendation.
 - **BS-11 · External reviews are evidence to verify, not verdicts to comply with.** If the user brings you a critique of your thinking from another model, another agent, or another person, treat every claim in it as a hypothesis about *this* codebase and check it first-party before acting. Adopt what holds up, say plainly what does not, and keep your recommendation where the evidence puts it. A wrong critique adopted uncritically costs more than a right one missed, because it arrives wearing borrowed authority.
 - **BS-12 · Delegate exploration sparingly, and cheaply.** Subagents multiply cost and latency — each re-establishes context, re-explores, and reports back, and then you re-read the report. Spawn one only for a genuinely wide survey (several unrelated modules, a large unfamiliar surface); handle anything you could finish in a handful of tool calls yourself. When you do delegate, **pin the cheapest model that can do the job** — grep, enumerate, and summarize is clerical work, and a subagent that inherits your model by default charges brainstorm-model rates for it. Reach for the smallest fast tier your harness offers (Haiku-class, Flash-class) for clerical sweeps, and step up a tier only when the task needs judgment rather than breadth. Brief it to return findings, not raw file contents: the saving is that you read a short report instead of forty files, and a subagent that dumps everything back into your context has cost you money instead of saving it. Keep spawn counts low, brief each one precisely the first time, and commit to what it reports instead of re-deriving it. Never delegate the thinking — the trade-off analysis and recommendation are yours. The one reader worth handing work to without a clerical reason is the business-sense lens's cold reader (BS-14): its value is exactly that it lacks your context, and what it returns is still yours to weigh.
-- **BS-13 · When the change moves a rule rather than adds a thing, table the scenarios before anyone argues about them.** Some changes add a capability, and prose describes those well enough. Others change *when* something happens — an eligibility condition, a trigger, a retry rule, a filter, a default, a guard, a threshold. For those, prose is the wrong instrument: it reasons about the cases someone thought of, and the case nobody thought of is the one that ships. Enumerate the cases from the state the rule reads, put today's outcome and the proposed outcome side by side, and let the rows that differ *be* the proposal. §4's scenario table has the method.
+- **BS-13 · Table the scenarios before anyone argues about them.** The exact functional behaviour is decided here, and prose is the wrong instrument for it: it reasons about the cases someone thought of, and the case nobody thought of is the one that ships. A change that moves a rule, changing *when* something happens (an eligibility condition, a trigger, a retry rule, a filter, a default, a guard, a threshold): enumerate the cases from the state the rule reads, put today's outcome and the proposed outcome side by side, and let the rows that differ *be* the proposal. A change that adds a capability: one row per situation, with what the user does, what they see and what happens. A change that moves no rule and has no user-visible behaviour says so in one line and skips the table. §4's scenario table has the method.
 - **BS-14 · Look at every approach through the review lenses, here first.** `/review-lenses` holds the perspectives the whole workflow reviews through: impact, removal, logic, behaviour, business sense, proof and coherence, one question each, run separately (RL-1). They matter most here. A lens applied at brainstorm eliminates a bad approach before anyone plans it; the same lens at plan review can only patch the plan, and at code review it can only catch what the build got wrong. Load it before §4. Its gate table's `/brainstorm` column says how deep each goes: every approach at survey depth in §4, and the recommendation in full in the Decision Audit. Two of them most often reverse a decision at this stage. **Behaviour** asks what the user actually sees under each approach. **Business sense** asks whether a typical user who never heard the reasoning would find the result odd, and it applies to the owner's own steer as well.
 - **BS-15 · A decision-document review stays above the implementation.** The brainstorm decides what gets built and how: the business decisions first, the exact functional behaviour (what each user action does, what the user sees), and the approach. The review judges exactly those, with the consequences. Code is evidence: opened to check what the document claims about today's system, or to find a caller or flow the decision breaks. The plan makes those decisions concrete, so code-level form (method names, signatures, file layout, which class holds what, the exact bodies a request sends) is the plan's, and is not a finding here (`/review-lenses`, under the gate table). Hold your own audit and any outside reviewer to this.
 - **BS-16 · Before an approach hand-builds a mechanism, ask what already solves it.** How it gets built is decided here, and form state, retries, parsing, scheduling, queues, validation and the like are solved problems. A design that hand-writes one is worse than it looks: it costs little to start and keeps growing. A small helper, or what the language's standard library already covers, needs no search. For each mechanism an approach would hand-build, name the mature library or framework that does the job, what is already a dependency here first, with its licence and whether it is maintained. Then use it, or say why not; "none fits, and here is what I checked" is an answer, and "we did not look" is not. Mark what you could not confirm, its upkeep for example, as unverified. A mechanism the codebase already hand-builds gets the same question: extending it is a choice, not a default. BS-7's rules apply to what you read about it, and adding a dependency is the user's to accept.
@@ -142,6 +142,7 @@ Answer each line for the data or behavior in play. Where you don't know, write *
 - **Lifecycle:** What states does this move through (created → active → superseded → deleted)? Who moves it, and can it move backwards?
 - **Consumers & surface authority:** Who reads this today, and which surface is authoritative *for them*? Changing a producer without enumerating its consumers is the standard way contracts break.
 - **Environment constraints:** What does the runtime forbid regardless of how good the design is — offline operation, read-only filesystem, single writer, air-gapped deployment, platform or resource limits?
+- **Outside formats:** For each format this reads that something else defines (a file type, an upload, a partner's payload), what forms can it take, from its documentation (BS-7) rather than from the examples at hand? Say which forms are in scope. The variety nobody listed is what the first real file brings.
 
 Skip a line only when it genuinely does not apply, and say that you're skipping it. Silent omission reads identically to "answered" in the decision document.
 
@@ -225,9 +226,12 @@ derivation earned its place by being run, not by producing a different answer.
 - **A shared interface is not a shared implementation.** "These should look like one API to the caller" does not imply one table, one file, one service, or one process. Separate the logical goal from the physical consolidation and price them separately — the consolidation is usually where the risk actually lives, and it is usually optional.
 - **Don't move something for a consumer that doesn't exist.** Restructuring now for a hypothetical second caller is a cost paid today against a benefit that may never arrive. If the second consumer is speculative, label it speculative and let the user decide whether to buy the option.
 
-#### When an approach changes a rule: the scenario table
+#### The scenario table
 
-An approach that changes *when* something happens cannot be described in prose without leaving
+Two forms, by what the change does (BS-13). A change that moves no rule and has no user-visible
+behaviour writes that one line and builds neither.
+
+**When an approach changes a rule.** An approach that changes *when* something happens cannot be described in prose without leaving
 something out. "It will still suggest for a fresh project, and it won't suggest while targets are
 pending" is a claim about two cases out of a number the sentence never states. Build the table
 instead (BS-13).
@@ -285,10 +289,35 @@ visible: A also moves case 11, B also moves case 12, and neither was asked for.
 rather than sentences, changed rows marked in the margin. The shape is the point: a reader should
 see the diff without reading the table.
 
+**When the change adds a capability.** There is no today to compare with, so the table states what
+is being decided, and it goes to the user with the recommendation, because it is what they are
+agreeing to. Write it for the recommendation, in the Decision Audit, and again if the user picks another approach. Add a column per approach only
+where approaches differ on a row that could decide between them.
+
+```
+situation               user does        sees                         what happens
+no value yet            opens the form   empty field                  nothing stored
+value detected in file  opens the form   detected value, marked so    nothing stored until saved
+stored value            clears, saves    empty field                  stored value removed
+save fails              saves            error, their edit still on   nothing stored; retry works
+```
+
+- **Get the situations from the state the capability reads**, as for a rule: the empty one, the one
+  with something already there, the failed one, the second time. A row nobody can answer is an Open
+  Question.
+- **For an editable screen, the situations include where the value came from** (stored, detected,
+  default, typed), and the rows cover what the user can do to it: edit, clear, save, save again,
+  move to another record with edits unsaved, and the stored value changing while they edit. A panel or
+  batch that stays open also says how long it lasts and what its values apply to.
+- **"What happens" is in functional words.** The stored and sent forms are the plan's (BS-15).
+- **A capability that also changes something existing** gets a today's column and the fix or
+  collateral labels on those rows.
+- **A small change makes a short table.** A button with one outcome is two rows: it worked, it failed.
+
 **Writing it is not building it (BS-1).** The table is a thinking instrument — it settles what the
-change *is* before anyone argues about whether to make it. It does carry forward, and usefully: the
-differing rows are exactly the cases the plan owes test criteria for, and `/write-plan` lifts them
-straight out. That is a downstream convenience, not the reason to write it.
+change *is* before anyone argues about whether to make it. It does carry forward, and usefully: a
+rule's differing rows and a capability's rows are exactly the cases the plan owes test criteria for,
+and `/write-plan` lifts them straight out. That is a downstream convenience, not the reason to write it.
 
 ### 5. Challenge the Obvious Solution
 
@@ -319,7 +348,7 @@ Run this audit against your own recommendation before you write anything down. I
 - **Is the recommendation reachable from the ideal?** Compare it against approach E's resulting design. If it is further away, name which adjustment it gives up and what that concession costs; if it is the resulting design, say so. A recommendation that cannot be located on that scale was chosen by convenience.
 - **What does the recommendation hand-build?** For each such mechanism, is the reason for not using a library still true now the design has settled (BS-16)? A hand-written mechanism that keeps growing as you walk the cases, one piece of state per field for example, is the sign that a library was the answer.
 - **Is the comparison still fair?** Re-check that no approach was charged for work it doesn't require, and that no approach was credited for a consumer that doesn't exist.
-- **If the recommendation moves a rule, is the scenario table built, and was today's column read rather than recalled?** (BS-13.) Check three things specifically: that the cases came from the state the rule reads and not from the ones that came to mind; that the recommendation has a column in it; and that every row where that column differs from today is labelled as the fix or as collateral. An unlabelled differing row is a behaviour change nobody has agreed to, and it is about to be recorded as decided.
+- **Is the scenario table built?** (BS-13.) **If the recommendation moves a rule,** was today's column read rather than recalled? Check three things specifically: that the cases came from the state the rule reads and not from the ones that came to mind; that the recommendation has a column in it; and that every row where that column differs from today is labelled as the fix or as collateral. An unlabelled differing row is a behaviour change nobody has agreed to, and it is about to be recorded as decided. **If it adds a capability,** does the table have the empty, existing, failed and second-time situations, with every cell answered? **If you wrote that it moves no rule and has no user-visible behaviour,** walk the surfaces once: anything a user would notice means it needs the table.
 - **Run the rest of the review lenses in full against the recommendation, one at a time** (`/review-lenses`, its `/brainstorm` column; RL-1). Impact is the trace above and proof is the load-bearing-claim checks above; these are the other four. §4 looked through them at survey depth to rank the approaches, and the winner now gets each one properly, while reversing it is still free:
   - **Logic.** Walk the whole checklist with concrete values, *the round trip* excepted, which is the plan's unless it decides the approach. *Values against each other* and *can the mechanism express the rule* matter most, because they are cheapest to fix at this stage: a weight equal to its threshold, or a reducer that cannot produce the decided outcome, costs one line here and a rework loop once built.
   - **Behaviour.** Write the recommendation's user-facing sentences for the main actions, as the user would say them, and walk the changed data onto every surface that shows it. These go into the document's **What the User Sees**, and the plan and the review are checked against them later.
@@ -368,7 +397,7 @@ concrete design and expects to find more; this block is what it starts from, and
 is a thing a later reader can see.]
 
 ## Contracts & Constraints
-[The ledger lines that mattered — authority, identity/cardinality, currentness, lifecycle, consumers, environment. Include the ones that came back `unknown` and how they were handled.]
+[The ledger lines that mattered — authority, identity/cardinality, currentness, lifecycle, consumers, environment, outside formats. Include the ones that came back `unknown` and how they were handled.]
 
 ## Approaches Considered
 
@@ -399,10 +428,12 @@ is a thing a later reader can see.]
 
 **What would reverse this decision:** [the condition under which the runner-up wins]
 
-**Scenario table:** [when this decision moves a rule, the table from §4: the cases, today's outcome,
-the decided outcome, and every differing row labelled as the fix or as collateral the user accepted.
-When it does not move a rule, this line says "not a rule change" and stays — a heading that is
-present and answered is evidence the question was asked, and a missing one is not.]
+**Scenario table:** [the table from §4 for the chosen approach. When this decision moves a rule: the
+cases, today's outcome, the decided outcome, and every differing row labelled as the fix or as
+collateral the user accepted. When it adds a capability: each situation, what the user does, what
+they see and what happens. When it does neither, this line says "moves no rule; no user-visible
+behaviour" and stays — a heading that is present and answered is evidence the question was asked,
+and a missing one is not.]
 
 **Why the others were rejected:**
 - [Approach X]: [specific reason it lost]

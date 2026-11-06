@@ -126,8 +126,8 @@ review. Build a checklist and walk it.
 - **Proven means an automated run you can name.** A criterion checked by reading is *unproven*, and
   it goes on the report as unproven. So does a criterion proven only at a scoped rung, which is a
   real result but a narrower claim than the plan asked for.
-- **Walk the plan's own sections, not just its phases.** State & Data Contracts, Failure Modes &
-  Interactions, and Value Paths & Seam Tests each specify behaviour. A named seam test that was
+- **Walk the plan's own sections, not just its phases.** State & Data Contracts, Screen State, Failure
+  Modes & Interactions, and Value Paths & Seam Tests each specify behaviour. A named seam test that was
   never written is a missing requirement, not a missing nicety.
 - **Anything in Out of Scope that got built anyway is a finding.** Scope grows silently and this is
   the only line that catches it.
@@ -223,9 +223,10 @@ plan does not describe, that absence *is* the finding. Write it that way.
 
 ### The scenario table, if the decision document has one
 
-A decision that moved a rule carries a table of cases with the outcome decided for each (BS-13),
-and it is the only part of the decision document that ticks off mechanically rather than being read
-for intent. Take each **differing** row, find what the code now does in that case, and compare. A
+A decision that moved a rule or added a capability carries a table of cases with the outcome decided
+for each (BS-13), and it is the only part of the decision document that ticks off mechanically rather
+than being read for intent. Take each **differing** row of a moved rule and each row of an added
+capability, find what the code now does in that case, and compare. A
 row labelled *collateral* is the one to check hardest: it was a behaviour change nobody asked for,
 the user accepted it explicitly, and it is the likeliest thing in the whole document to have been
 built as though it had never been decided. A row whose built behaviour does not match its decided
@@ -404,9 +405,9 @@ replacement never landed, and deletions no removal table named. Or "Nothing."]
   Each departure is a row above.
 - **Plan → Plan:** [each difference from the approved plan and the Amendment Log entry behind it,
   or "none"].
-- **Scenario table:** [N] differing rows checked against the built behaviour, [N] matched; each
-  mismatch is a row above. [Or: the decision document carries no table, or it records "not a rule
-  change".]
+- **Scenario table:** [N] rows checked against the built behaviour, [N] matched; each mismatch is a
+  row above. [Or: the decision document carries no table, or it records that the change moves no
+  rule and has no user-visible behaviour.]
 - **What the User Sees:** [N] expectation sentences checked against the built behaviour, [N] held;
   each broken one is a row above. [Or: the decision document has no such section.]
 - **DecisionDoc → Code:** [does the code solve the problem that was decided; did the document's
