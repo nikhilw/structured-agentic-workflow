@@ -210,7 +210,7 @@ explicit."
   owners, cancellation paths, cross-component interactions, concurrency and aliasing, one bad
   value, errors after the commit, stored rows whose configuration is retired
 - A **named no-mock seam test for every value path**, starting where the user acts and tested in
-  both directions — green unit tests do not prove wiring
+  both directions; green unit tests do not prove wiring
 - A **typed shape for every request and response body**, with the stored, shown and sent forms of a
   value stated when they differ
 - Decisive gates ordered **before** the work that depends on them

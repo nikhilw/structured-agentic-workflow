@@ -119,7 +119,8 @@ Every command this gate runs is bounded by `/test-scope`'s *What a run may execu
 # Part 2 — Requirements tick-off (plan → code)
 
 Re-read the plan from disk. Not from memory of it, not from the handoff summary, not from the
-review. Build a checklist and walk it.
+review. Build a checklist and walk it. With no plan, the checklist is one row: the reported symptom,
+and the run showing it gone.
 
 - **Every phase, every implementation step, every test criterion, one line each.** Mark each
   **built and proven**, **built but unproven**, or **not built**.
@@ -154,7 +155,7 @@ comparing, not after you have found something.
 
 **If no decision document exists** (a bug fix, a quick fix, or a plan written without a brainstorm),
 say so explicitly, run the Plan → Plan comparison, and record that the two decision-document
-comparisons had nothing to read. Silence about a missing decision doc reads as "checked, matched".
+comparisons had nothing to read; with no plan either, all three had nothing to read. Silence about a missing decision doc reads as "checked, matched".
 
 **Label things with what they are.** The three comparisons below (DecisionDoc → Plan, Plan → Plan
 and DecisionDoc → Code) are named for the two documents they read, because that is the only name a reader can decode without this file in front of them.
@@ -188,7 +189,7 @@ and every consequence it recorded:
 |---|---|---|
 | **Upheld** | the plan implements the decision as written | yes |
 | **Narrowed** | the plan implements part of it, deliberately, and says so | yes, if the plan says so |
-| **Superseded** | the plan does something the decision ruled out | only with an Amendment Log entry naming the decision it supersedes |
+| **Superseded** | the plan does something the decision ruled out | only with an Amendment Log entry naming the decision it supersedes, or a *Departures* entry in the plan's Decision Source, there when the plan was approved (*Plan → Plan*'s baseline), recording that the user chose it |
 | **Dropped** | the decision is simply absent from the plan | **no**, this is the finding |
 
 A decision the plan's Decision Source lists as *Carried by another plan* is not dropped; it is audited with that plan.
@@ -368,7 +369,7 @@ in the code as written."]
 
 | We decided | We built instead | Where | Was it written down before this gate? |
 |---|---|---|---|
-| "[quoted from the decision doc]" ([which section]) | [what the code actually does, plainly] | [file:line] | no, found here / yes, [amendment entry] |
+| "[quoted from the decision doc]" ([which section]) | [what the code actually does, plainly] | [file:line] | no, found here / yes, [amendment entry, or Departures entry there at approval] |
 
 ### What we built and nobody decided
 [Capability that widened past what was decided, scope the plan never carried, a plan step with no

@@ -79,7 +79,7 @@ These define what "correct" means here: project instructions (`CLAUDE.md`, `AGEN
 
 ### Build the review ledger
 
-Every row needs a disposition in the final summary — verified, fixed, or explicitly risk-accepted by the human:
+Every row needs a disposition in the final summary — verified, fixed, or explicitly risk-accepted by the human (under `/build-model`, also the carried disposition in *Blocking Gates*):
 
 - every plan phase and its claimed status
 - every reported deviation from the plan, and whether an amendment covers it
@@ -155,6 +155,8 @@ Green tests do not prove a feature works; tests that mock the load-bearing seam 
 Any handoff concern of the form "not integration-tested" / "manual E2E not executed" / "live X not verified" is blocking. It cannot be dismissed by reading code or running mocked tests — clear it by exercising the real seam, or by explicit written risk acceptance from the human.
 
 **Gate 3 — Zero open findings at exit** (see Gate Check).
+
+**Under `/build-model`, where no human is present,** a criterion the plan marks manual, with WP-5's recorded check, that this session cannot perform does not hold the sign-off under any of these gates. Its ledger disposition is "carried to the handoff's Unproven Criteria", which the main model's review then holds. A path the plan gives no proof at all stays **CRITICAL**.
 
 **Work with the test infrastructure that exists.** These gates demand proof, not a particular harness. Verify each harness, fixture, and command actually exists here before citing it as evidence or demanding it in a finding. Do **not** stand up an unrelated browser/E2E framework to satisfy this skill — introducing a test stack the project never chose is a bigger change than the feature, and not a reviewer's call. Where no suitable harness exists, take the strongest real automated seam plus the plan's bounded manual evidence, and record in the summary which harness was absent and how you confirmed that. "No harness exists" explains why proof is manual; it never excuses proof being absent.
 
@@ -438,7 +440,7 @@ Reviewer: Senior Architect (independent)
 **Ledger disposition** (every intake row, no blanks)
 | Item | Source | Disposition |
 |------|--------|-------------|
-| [phase / deviation / concern / manual criterion] | [plan §N, handoff] | [verified — evidence / fixed in review / risk-accepted by human] |
+| [phase / deviation / concern / manual criterion] | [plan §N, handoff] | [verified — evidence / fixed in review / risk-accepted by human / carried to Unproven Criteria] |
 
 **Value paths & proof**
 - [path] → [no-mock test name or evidence artifact]

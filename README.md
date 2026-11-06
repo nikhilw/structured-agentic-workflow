@@ -297,7 +297,7 @@ filled-in brief to another model, because the reader who never heard the reasoni
 spots what makes no business sense.
 
 **8 · A rule change is a table, not a paragraph.**
-Some changes change *when* something happens: a trigger, a filter, a default, a threshold. Prose
+Some changes move *when* something happens: a trigger, a filter, a default, a threshold. Prose
 describes the cases someone thought of, and the case nobody thought of is the one that ships. So
 `/brainstorm` enumerates the cases from the state the rule reads, puts today's outcome
 beside each approach's, and labels every row that differs as the fix or as collateral nobody asked

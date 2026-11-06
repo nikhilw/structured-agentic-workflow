@@ -142,7 +142,7 @@ drift at the end of a project is usually made of.
 
 ### Step 2: TDD, One Test at a Time
 
-Use `/test-driven-development`. This is mandatory for every phase. Check memory for `workflow-config:testing-methodology`: if it is `bdd`, each failing test is a Given-When-Then scenario in the project's own BDD harness instead of a unit-first test, taken one scenario at a time. Red, green and refactor are unchanged, and so is the rule that nothing is implemented before a test fails. If the project has no BDD harness, that is a plan defect, not a reason to install one or to fall back to unit tests quietly; halt and say so.
+Use `/test-driven-development`. This is mandatory for every phase, with the one exception named under the cycle below. Check memory for `workflow-config:testing-methodology`: if it is `bdd`, each failing test is a Given-When-Then scenario in the project's own BDD harness instead of a unit-first test, taken one scenario at a time. Red, green and refactor are unchanged, and so is the rule that nothing is implemented before a test fails. If the project has no BDD harness, that is a plan defect, not a reason to install one or to fall back to unit tests quietly; halt and say so.
 
 The plan's tests are your to-do list, and you take them **one at a time**. Writing the whole list and then all the code is not this cycle: code no single test demanded is code nothing has proved, and that is what later has to be proved another way.
 
@@ -150,7 +150,7 @@ The plan's tests are your to-do list, and you take them **one at a time**. Writi
 2. **Green:** Write only enough code to pass that one test, even when you can see what the next test will need. Run that test. One the plan names as red until a later phase stays red; move on. Do not refactor surrounding code unless the plan explicitly calls for it.
 3. **Refactor:** Clean up while the tests you have stay green, extracting what repeats. Then take the next test.
 
-**The plan still bounds the code: nothing it did not describe gets built.** If its design needs a behaviour that no test on the list demands, either a test is missing or the behaviour is not needed. That is a plan defect: halt. Glue a listed test already runs through (imports, wiring, registrations) and what Refactor extracts need no test of their own.
+**The plan still bounds the code: nothing it did not describe gets built.** If its design needs a behaviour that no test on the list demands, either a test is missing or the behaviour is not needed. That is a plan defect: halt. Glue a listed test already runs through (imports, wiring, registrations) and what Refactor extracts need no test of their own. Nor does a step whose only proof is a manual criterion the plan justified under WP-5, which has no red run: build it from the plan's text (a manual criterion with no recorded check of why no harness can do it is a plan defect, so halt), check it the way the criterion says, and record the result; what you could not check goes in the build completion report as unproven.
 
 **You must complete the whole list.** Do not stop after writing tests. The tests exist to drive the implementation.
 

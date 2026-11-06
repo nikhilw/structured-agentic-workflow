@@ -47,7 +47,7 @@ Run these steps **in order**. Each step has a clear owner; do not collapse them 
 
    Its first step at Phase 1 is a **plan review** — fresh eyes on the plan, the mirror of the `/3p-review` you will run in step 2. You did not write this plan, which makes you the only reader of it without the author's assumptions. Take that seriously: a defect found there costs a paragraph, and the same defect found in step 2 costs a full rework loop. Surface and halt; do not redesign.
 
-2. **Review — `/3p-review`.** Run a holistic third-person review of the **entire** implementation. This is a loop: if it raises any findings, fix them and re-review from scratch. Continue until **zero open findings**. Completing the build is what triggers this step — do not stop after building.
+2. **Review — `/3p-review`.** Run a holistic third-person review of the **entire** implementation. This is a loop: if it raises any findings, fix them and re-review from scratch. Continue until **zero open findings**. A criterion the plan marks manual, with WP-5's recorded check, that this session cannot perform is not a finding to loop on: it goes in the handoff's Unproven Criteria for the main model's review and the user (`/3p-review`, *Blocking Gates*). A path the plan gives no proof at all stays a finding. Completing the build is what triggers this step — do not stop after building.
 
 3. **Hand off — `/handoff-summary`.** Emit the Build Handoff Summary in its exact format. Review is a gate, not content — the summary does not restate the `/3p-review` result.
 

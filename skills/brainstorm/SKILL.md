@@ -231,8 +231,8 @@ derivation earned its place by being run, not by producing a different answer.
 Two forms, by what the change does (BS-13). A change that moves no rule and has no user-visible
 behaviour writes that one line and builds neither.
 
-**When an approach changes a rule.** An approach that changes *when* something happens cannot be described in prose without leaving
-something out. "It will still suggest for a fresh project, and it won't suggest while targets are
+**When an approach changes a rule.** An approach that changes *when* something happens cannot be
+described in prose without leaving something out. "It will still suggest for a fresh project, and it won't suggest while targets are
 pending" is a claim about two cases out of a number the sentence never states. Build the table
 instead (BS-13).
 
@@ -291,8 +291,8 @@ see the diff without reading the table.
 
 **When the change adds a capability.** There is no today to compare with, so the table states what
 is being decided, and it goes to the user with the recommendation, because it is what they are
-agreeing to. Write it for the recommendation, in the Decision Audit, and again if the user picks another approach. Add a column per approach only
-where approaches differ on a row that could decide between them.
+agreeing to. Write it for the recommendation, in the Decision Audit, and again if the user picks
+another approach. Add a column per approach only where approaches differ on a row that could decide between them.
 
 ```
 situation               user does        sees                         what happens
@@ -432,7 +432,7 @@ is a thing a later reader can see.]
 cases, today's outcome, the decided outcome, and every differing row labelled as the fix or as
 collateral the user accepted. When it adds a capability: each situation, what the user does, what
 they see and what happens. When it does neither, this line says "moves no rule; no user-visible
-behaviour" and stays — a heading that is present and answered is evidence the question was asked,
+behaviour" and stays; a heading that is present and answered is evidence the question was asked,
 and a missing one is not.]
 
 **Why the others were rejected:**

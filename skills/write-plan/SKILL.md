@@ -123,7 +123,7 @@ Two of the eight decide what the plan must contain:
 
 ### Design Patterns
 
-Choosing a pattern is an architectural decision, so **the plan makes it and names it**, within the approach `/brainstorm` decided — the build model should never have to decide "what shape should this be?". Name the pattern *and* the problem it solves; a pattern named without its problem is decoration the reviewer will strip out.
+Choosing a pattern is an architectural decision, so **the plan makes it and names it**, within the approach `/brainstorm` decided; the build model should never have to decide "what shape should this be?". Name the pattern *and* the problem it solves; a pattern named without its problem is decoration the reviewer will strip out.
 
 **Run the scan yourself; nobody is going to raise this for you.** The user describes a problem, not a shape, and the build model builds whatever the plan spells out. So walk the table below against this design once, before the phases are written, reading the **left column first**, as a list of problems you might have, not as a lookup for a name you already picked. A design that matches a row and never says so ships the hand-rolled version of a solved problem, and the plan reads as though the question was considered.
 
@@ -468,7 +468,7 @@ is how a wrong halt gets written into the contract.
    write, a default. A halt is usually the build hitting a case the plan never walked, so the fix
    gets walked through that case and the cases next to it. Then the **behaviour** and
    **business-sense passes**, if the amendment changes what a user sees or gets. Then the **contracts pass**, if it
-   touched contracts, failure modes, or phase ordering. Then the **proof pass**, if it added or
+   touched contracts, screen state, failure modes, or phase ordering. Then the **proof pass**, if it added or
    changed a criterion or broke an existing test (a halt on a failing test usually did both). Then
    the **coherence pass**, always, because an amendment is exactly an edit made in one place that
    the rest of the document has not caught up with. Then the **executability pass**, always,
